@@ -1,10 +1,10 @@
 import type { Config } from '@jest/types'
-import { pathsToModuleNameMapper } from 'ts-jest/utils'
-import { compilerOptions } from './tsconfig.json'
+// import { pathsToModuleNameMapper } from 'ts-jest/utils'
+// import { compilerOptions } from './tsconfig.json'
 
-const moduleNameMapper = pathsToModuleNameMapper(compilerOptions.paths, {
-	prefix: '<rootDir>/src'
-})
+// const moduleNameMapper = pathsToModuleNameMapper(compilerOptions.paths, {
+// 	prefix: '<rootDir>/src'
+// })
 
 export default {
 	roots: ['<rootDir>/src'],
@@ -17,5 +17,5 @@ export default {
 	coverageDirectory: './coverage',
 	clearMocks: true,
 	cache: true,
-	moduleNameMapper
+	// moduleNameMapper
 } as Config.InitialOptions
