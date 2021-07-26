@@ -4,5 +4,31 @@
   "main": "src/main.ts",
   "repository": "https://github.com/Vortechs-TDSH/node-api.git",
   "author": "Guilherme Vieira <guivpw68@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "@nestjs/common": "^8.0.4",
+    "@nestjs/config": "^1.0.1",
+    "@nestjs/core": "^8.0.4",
+    "@nestjs/graphql": "^8.0.2",
+    "@nestjs/jwt": "^8.0.0",
+    "@nestjs/platform-fastify": "^8.0.4",
+    "fastify": "^3.19.2",
+    "reflect-metadata": "^0.1.13",
+    "rxjs": "^7.2.0"
+  },
+  "devDependencies": {
+    "@types/faker": "^5.5.7",
+    "@types/jest": "^26.0.24",
+    "@types/node": "^16.4.3",
+    "eslint": "^7.31.0",
+    "faker": "^5.5.3",
+    "git-commit-msg-linter": "^3.2.6",
+    "husky": "^7.0.1",
+    "jest": "^27.0.6",
+    "lint-staged": "^11.1.1",
+    "prettier": "^2.3.2",
+    "ts-jest": "^27.0.4",
+    "tsconfig-paths": "^3.10.1",
+    "typescript": "^4.3.5"
+  }
 }
