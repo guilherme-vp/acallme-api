@@ -1,0 +1,105 @@
+{
+	"parser": "@typescript-eslint/parser",
+	"env": {
+		"es6": true,
+		"node": true
+	},
+	"extends": [
+		"eslint:recommended",
+		"plugin:@typescript-eslint/eslint-recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:import/typescript",
+		"prettier"
+	],
+	"parserOptions": {
+		"ecmaVersion": 12,
+		"sourceType": "module"
+	},
+	"plugins": [
+		"import",
+		"prettier",
+		"@typescript-eslint"
+	],
+	"rules": {
+		"linebreak-style": [
+			"error",
+			"unix"
+		],
+		"semi": [
+			"error",
+			"never"
+		],
+		"comma-dangle": [
+			"error",
+			"never"
+		],
+		"arrow-parens": [
+			"error",
+			"as-needed"
+		],
+		"object-shorthand": "error",
+		"no-template-curly-in-string": "error",
+		"prefer-template": "error",
+		"no-plusplus": [
+			"error",
+			{
+				"allowForLoopAfterthoughts": true
+			}
+		],
+		"no-tabs": [
+			"error",
+			{
+				"allowIndentationTabs": true
+			}
+		],
+		"indent": [
+			"error",
+			"tab",
+			{
+				"SwitchCase": 1
+			}
+		],
+		"lines-between-class-members": "off",
+		"no-param-reassign": "off",
+		"no-nested-ternary": "off",
+		"prefer-arrow-callback": [
+			"error",
+			{
+				"allowUnboundThis": true,
+				"allowNamedFunctions": true
+			}
+		],
+		"prefer-const": [
+			"error",
+			{
+				"destructuring": "all",
+				"ignoreReadBeforeAssign": false
+			}
+		],
+		"quotes": [
+			"error",
+			"single",
+			{
+				"allowTemplateLiterals": true,
+				"avoidEscape": false
+			}
+		],
+		"@typescript-eslint/no-shadow": [
+			"error"
+		],
+		"@typescript-eslint/semi": [
+			"error",
+			"never"
+		],
+		"import/no-unresolved": "error",
+		"import/extensions": [
+			"error",
+			"never",
+			{
+				"json": "always"
+			}
+		],
+		"import/no-extraneous-dependencies": "off",
+		"import/prefer-default-export": "off"
+	}
+}
