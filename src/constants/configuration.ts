@@ -1,17 +1,7 @@
-export const GRAPHQL_PATH = '/graphql'
-export const AUTH_HEADER = 'authorization'
-const SECRET = process.env.SECRET || 'secret123'
-const NODE_ENV = process.env.NODE_ENV || 'development'
-const IN_PROD = NODE_ENV === 'staging'
+type Envs = 'development' | 'production'
 
-const APOLLO_OPTIONS = {
-	endpoint: '/graphql',
-	subscriptions: '/graphql',
-	playground: '/graphql',
-	cors: {
-		origin: '*'
-	},
-	debug: IN_PROD ? false : true
-}
+const AUTH_HEADER: string = 'authorization'
+const SECRET: string = process.env.SECRET || 'secret123'
+const NODE_ENV: Envs = process.env.NODE_ENV as Envs || 'development'
 
-export { APOLLO_OPTIONS, SECRET, IN_PROD, NODE_ENV }
+export { SECRET, NODE_ENV, AUTH_HEADER }
