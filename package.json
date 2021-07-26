@@ -1,0 +1,8 @@
+{
+  "name": "acall-me",
+  "version": "1.0.0",
+  "main": "src/main.ts",
+  "repository": "https://github.com/Vortechs-TDSH/node-api.git",
+  "author": "Guilherme Vieira <guivpw68@gmail.com>",
+  "license": "MIT"
+}
