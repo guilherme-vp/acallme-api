@@ -22,7 +22,24 @@
 		"experimentalDecorators": true,
 		"emitDecoratorMetadata": true,
 		"skipLibCheck": true,
-		"forceConsistentCasingInFileNames": true
+		"forceConsistentCasingInFileNames": true,
+		"paths": {
+			"@services/*": [
+				"services/*"
+			],
+			"@main/*": [
+				"main/*"
+			],
+			"@domain/*": [
+				"domain/*"
+			],
+			"@constants/*": [
+				"constants/*"
+			],
+			"@modules/*": [
+				"modules/*"
+			]
+		}
 	},
 	"exclude": [
 		"dist",
