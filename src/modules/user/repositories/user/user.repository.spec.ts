@@ -29,7 +29,8 @@ describe('UserRepository', () => {
 					provide: DatabaseService,
 					useValue: {
 						user: {
-							findMany: jest.fn()
+							findMany: jest.fn(),
+							count: jest.fn()
 						}
 					}
 				}
@@ -55,10 +56,23 @@ describe('UserRepository', () => {
 
 			const promise = userRepository.getMany()
 
-			expect(promise).resolves.toContainEqual(user)
 			expect(promise).resolves.toBeDefined()
 			expect(promise).resolves.toBeInstanceOf(Array)
+			expect(promise).resolves.toContainEqual(user)
 			expect(databaseService.user.findMany).toHaveBeenCalled()
+		})
+
+		it('should return the count of users by unique fields', async () => {
+			jest.spyOn(databaseService.user, 'count').mockResolvedValueOnce(1)
+			const { email, cpf } = user
+
+			const promise = userRepository.count({ email, cpf })
+
+			expect(promise).resolves.toBeDefined()
+			expect(promise).resolves.toBe(1)
+			expect(databaseService.user.count).toHaveBeenCalledWith({
+				where: { email: user.email, cpf: user.cpf }
+			})
 		})
 	})
 })
