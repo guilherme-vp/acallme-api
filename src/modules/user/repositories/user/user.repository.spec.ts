@@ -1,6 +1,21 @@
+import faker from 'faker'
 import { Test } from '@nestjs/testing'
+import { User } from '@prisma/client'
 import { DatabaseService } from '@services/database'
 import { UserRepository } from './user.repository'
+
+const user: User = {
+	id: faker.datatype.uuid(),
+	name: faker.name.findName(),
+	email: faker.internet.email(),
+	password: faker.internet.password(),
+	birth: faker.date.past(),
+	cpf: faker.datatype.string(11),
+	gender: 'M',
+	createdAt: faker.date.past(),
+	updatedAt: faker.date.past(),
+	phone: faker.phone.phoneNumber()
+}
 
 describe('UserRepository', () => {
 	let databaseService: DatabaseService
@@ -35,12 +50,12 @@ describe('UserRepository', () => {
 	})
 
 	describe('execute', () => {
-		it('should return no user', async () => {
-			jest.spyOn(databaseService.user, 'findMany').mockResolvedValueOnce([])
+		it('should return an array of users', async () => {
+			jest.spyOn(databaseService.user, 'findMany').mockResolvedValueOnce([user])
 
 			const promise = userRepository.getUsers()
 
-			expect(promise).resolves.toStrictEqual([])
+			expect(promise).resolves.toContainEqual(user)
 			expect(promise).resolves.toBeDefined()
 			expect(promise).resolves.toBeInstanceOf(Array)
 			expect(databaseService.user.findMany).toHaveBeenCalled()
