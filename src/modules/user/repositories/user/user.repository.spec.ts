@@ -53,7 +53,7 @@ describe('UserRepository', () => {
 		it('should return an array of users', async () => {
 			jest.spyOn(databaseService.user, 'findMany').mockResolvedValueOnce([user])
 
-			const promise = userRepository.getUsers()
+			const promise = userRepository.getMany()
 
 			expect(promise).resolves.toContainEqual(user)
 			expect(promise).resolves.toBeDefined()

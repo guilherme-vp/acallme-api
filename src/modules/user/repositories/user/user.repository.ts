@@ -5,7 +5,7 @@ import { DatabaseService } from '@services/database'
 export class UserRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
-	async getUsers() {
+	async getMany() {
 		return this.databaseService.user.findMany()
 	}
 }
