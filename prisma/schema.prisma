@@ -10,12 +10,12 @@ generator client {
 model User {
   id         String      @id @default(uuid())
   name       String
-  email      String
+  email      String      @unique
   password   String
   birth      DateTime
   gender     Gender
   phone      String?
-  cpf        String?
+  cpf        String      @unique
   Patient    Patient?
   Specialist Specialist?
 
@@ -27,19 +27,19 @@ model Patient {
   id              String  @id @default(uuid())
   isTourCompleted Boolean @default(false) @map("is_tour_completed")
   User            User?   @relation(fields: [userId], references: [id])
-  userId          String?
+  userId          String? @unique
 
   @@map("pacients")
 }
 
 model Specialist {
   id        String  @id @default(uuid())
-  cnpj      String
-  crp       String?
-  crm       String?
+  cnpj      String  @unique
+  crp       String? @unique
+  crm       String? @unique
   specialty String
   User      User?   @relation(fields: [userId], references: [id])
-  userId    String?
+  userId    String? @unique
 
   @@map("specialists")
 }
