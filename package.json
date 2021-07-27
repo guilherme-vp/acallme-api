@@ -6,6 +6,9 @@
 	"author": "Guilherme Vieira <guivpw68@gmail.com>",
 	"license": "MIT",
 	"scripts": {
+		"migrate": "prisma migrate dev --preview-feature",
+		"prisma:studio": "prisma studio",
+		"prisma:generate": "prisma generate",
 		"start": "nest start",
 		"start:dev": "nest start --watch --debug",
 		"build": "nest build"
