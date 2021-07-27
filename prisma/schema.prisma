@@ -1,0 +1,50 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id         String      @id @default(uuid())
+  name       String
+  email      String
+  password   String
+  birth      DateTime
+  gender     Gender
+  phone      String?
+  cpf        String?
+  Patient    Patient?
+  Specialist Specialist?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @map("updated_at")
+}
+
+model Patient {
+  id              String  @id @default(uuid())
+  isTourCompleted Boolean @default(false) @map("is_tour_completed")
+  User            User?   @relation(fields: [userId], references: [id])
+  userId          String?
+
+  @@map("pacients")
+}
+
+model Specialist {
+  id        String  @id @default(uuid())
+  cnpj      String
+  crp       String?
+  crm       String?
+  specialty String
+  User      User?   @relation(fields: [userId], references: [id])
+  userId    String?
+
+  @@map("specialists")
+}
+
+enum Gender {
+  M
+  F
+}
