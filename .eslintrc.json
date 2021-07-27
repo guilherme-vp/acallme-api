@@ -87,11 +87,12 @@
 		"@typescript-eslint/no-shadow": [
 			"error"
 		],
+		"@typescript-eslint/no-explicit-any": "off",
+		"@typescript-eslint/explicit-module-boundary-types": "off",
 		"@typescript-eslint/semi": [
 			"error",
 			"never"
 		],
-		"import/no-unresolved": "error",
 		"import/extensions": [
 			"error",
 			"never",
