@@ -102,17 +102,21 @@
 				"groups": [
 					"builtin",
 					"external",
-					"internal",
-					"parent",
-					"sibling",
-					"index"
+					"internal"
 				],
 				"pathGroups": [
 					{
 						"pattern": "~/**",
 						"group": "external"
 					}
-				]
+				],
+				"pathGroupsExcludedImportTypes": [
+					"builtin"
+				],
+				"newlines-between": "always",
+				"alphabetize": {
+					"order": "asc"
+				}
 			}
 		],
 		"import/extensions": [
