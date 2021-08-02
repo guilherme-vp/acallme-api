@@ -49,8 +49,6 @@
 	"exclude": [
 		"dist",
 		"coverage",
-		"test",
-		"**/*spec.ts",
 		"jest.config.ts"
 	]
 }
