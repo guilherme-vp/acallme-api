@@ -6,17 +6,17 @@
 	"author": "Guilherme Vieira <guivpw68@gmail.com>",
 	"license": "MIT",
 	"scripts": {
+		"build": "rimraf dist & nest build",
+		"format": "prettier --write src",
+		"lint": "eslint --fix src/**/*.ts",
 		"migrate": "prisma migrate dev --preview-feature",
 		"prisma:studio": "prisma studio",
 		"prisma:generate": "prisma generate",
-		"start": "nest start",
-		"start:dev": "nest start --watch --debug",
-		"build": "nest build",
+		"start": "node ./dist/main",
+		"start:dev": "env-cmd nest start --watch --debug",
 		"test": "jest --detectOpenHandles --runInBand",
 		"test:watch": "yarn test --watch",
-		"test:ci": "yarn test --coverage",
-		"lint": "eslint --fix src/**/*.ts",
-		"format": "prettier --write src"
+		"test:ci": "yarn test --coverage"
 	},
 	"dependencies": {
 		"@nestjs/common": "^8.0.4",
@@ -29,6 +29,7 @@
 		"apollo-server-fastify": "^3.0.2",
 		"class-transformer": "^0.4.0",
 		"class-validator": "^0.13.1",
+		"env-cmd": "^10.1.0",
 		"fastify": "^3.19.2",
 		"graphql": "^15.5.1",
 		"graphql-depth-limit": "^1.1.0",
