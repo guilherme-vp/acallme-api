@@ -15,8 +15,7 @@ import {
 			fallbackLanguage: 'pt-BR',
 			parser: LocaleParser,
 			parserOptions: {
-				path: path.join(__dirname, '/locales/'),
-				watch: true
+				path: path.join(__dirname, '/locales/')
 			},
 			resolvers: [new HeaderResolver(['x-custom-lang']), AcceptLanguageResolver]
 		})
