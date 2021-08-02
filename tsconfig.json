@@ -5,6 +5,7 @@
 		"lib": [
 			"ESNext"
 		],
+		"moduleResolution": "node",
 		"outDir": "dist",
 		"rootDir": ".",
 		"baseUrl": "src",
@@ -23,6 +24,7 @@
 		"emitDecoratorMetadata": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
+		"diagnostics": true,
 		"paths": {
 			"@services/*": [
 				"services/*"
@@ -38,6 +40,9 @@
 			],
 			"@modules/*": [
 				"modules/*"
+			],
+			"@core/*": [
+				"*"
 			]
 		}
 	},
