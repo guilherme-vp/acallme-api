@@ -1,18 +1,18 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { GraphQLModule } from '@nestjs/graphql'
-import { config } from '@main/config'
-import { NODE_ENV } from '@constants/configuration'
-import { UserModule } from '@modules/index'
-import { DatabaseModule } from '@services/database'
-import { LanguageModule } from '@modules/language'
+
+import { NODE_ENV } from '~constants/configuration'
+import { PatientModule } from '~core/modules'
+import { DatabaseModule, LanguageModule } from '~core/services'
+import { config } from '~main/config'
 
 const IS_DEV = NODE_ENV === 'development'
 
 @Module({
 	imports: [
 		DatabaseModule,
-		UserModule,
+		PatientModule,
 		LanguageModule,
 		GraphQLModule.forRoot({
 			autoSchemaFile: true,

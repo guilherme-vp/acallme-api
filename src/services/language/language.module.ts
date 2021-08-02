@@ -1,4 +1,5 @@
 import path from 'path'
+
 import { Module, Global } from '@nestjs/common'
 import {
 	I18nModule,

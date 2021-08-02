@@ -1,4 +1,5 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql'
+
 import { UserGender } from '~modules/common/enums'
 
 @ObjectType()
