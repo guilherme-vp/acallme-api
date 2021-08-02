@@ -26,22 +26,22 @@
 		"forceConsistentCasingInFileNames": true,
 		"diagnostics": true,
 		"paths": {
-			"@services/*": [
+			"~services/*": [
 				"services/*"
 			],
-			"@main/*": [
+			"~main/*": [
 				"main/*"
 			],
-			"@domain/*": [
+			"~domain/*": [
 				"domain/*"
 			],
-			"@constants/*": [
+			"~constants/*": [
 				"constants/*"
 			],
-			"@modules/*": [
+			"~modules/*": [
 				"modules/*"
 			],
-			"@core/*": [
+			"~core/*": [
 				"*"
 			]
 		}
