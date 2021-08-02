@@ -5,10 +5,11 @@ import { PrismaClient } from '@prisma/client'
 export class DatabaseService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
 	async onModuleInit() {
 		await this.$connect()
-		console.log('Database connection has been established.')
+		console.info('Database connection has been established.')
 	}
 
 	async onModuleDestroy() {
 		await this.$disconnect()
+		console.info('Database connection has been closed.')
 	}
 }
