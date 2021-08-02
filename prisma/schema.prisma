@@ -8,16 +8,17 @@ generator client {
 }
 
 model User {
-  id         String      @id @default(uuid())
-  name       String
-  email      String      @unique
-  password   String
-  birth      DateTime
-  gender     Gender
-  phone      String?
-  cpf        String      @unique
-  Patient    Patient?
-  Specialist Specialist?
+  id              String      @id @default(uuid())
+  name            String
+  email           String      @unique
+  password        String
+  birth           DateTime
+  gender          Gender
+  phone           String?
+  cpf             String      @unique
+  isEmailVerified Boolean?    @default(false)
+  Patient         Patient?
+  Specialist      Specialist?
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @map("updated_at")
