@@ -7,40 +7,42 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id              String      @id @default(uuid())
+model Patient {
+  id              String   @id @default(uuid())
   name            String
-  email           String      @unique
+  email           String   @unique
   password        String
   birth           DateTime
   gender          Gender
   phone           String?
-  cpf             String      @unique
-  isEmailVerified Boolean?    @default(false)
-  Patient         Patient?
-  Specialist      Specialist?
+  cpf             String   @unique
+  isEmailVerified Boolean? @default(false) @map("is_email_verified")
+  isTourCompleted Boolean  @default(false) @map("is_tour_completed")
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @map("updated_at")
-}
-
-model Patient {
-  id              String  @id @default(uuid())
-  isTourCompleted Boolean @default(false) @map("is_tour_completed")
-  User            User?   @relation(fields: [userId], references: [id])
-  userId          String? @unique
 
   @@map("pacients")
 }
 
 model Specialist {
-  id        String  @id @default(uuid())
-  cnpj      String  @unique
-  crp       String? @unique
-  crm       String? @unique
-  specialty String
-  User      User?   @relation(fields: [userId], references: [id])
-  userId    String? @unique
+  id              String   @id @default(uuid())
+  name            String
+  email           String   @unique
+  password        String
+  birth           DateTime
+  gender          Gender
+  phone           String?
+  isEmailVerified Boolean? @default(false) @map("is_email_verified")
+  isTourCompleted Boolean  @default(false) @map("is_tour_completed")
+  specialty       String
+  cpf             String   @unique
+  cnpj            String   @unique
+  crp             String?  @unique
+  crm             String?  @unique
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @map("updated_at")
 
   @@map("specialists")
 }
