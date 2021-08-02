@@ -1,3 +1,3 @@
-export type BaseUseCase<T> = {
-	execute(input?: Record<string, unknown>): Promise<T> | T
+export type BaseUseCase<T = any> = {
+	execute(input?: unknown): Promise<T> | T | unknown
 }
