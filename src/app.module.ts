@@ -16,9 +16,6 @@ const IS_DEV = NODE_ENV === 'development'
 		UserModule,
 		I18nModule.forRoot({
 			fallbackLanguage: 'pt-BR',
-			fallbacks: {
-				pt: 'pt-BR'
-			},
 			parser: LocaleParser,
 			parserOptions: {
 				path: path.join(__dirname, 'locales'),
