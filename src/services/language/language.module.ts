@@ -19,6 +19,7 @@ import {
 			},
 			resolvers: [new HeaderResolver(['x-custom-lang']), AcceptLanguageResolver]
 		})
-	]
+	],
+	exports: [I18nModule]
 })
 export class LanguageModule {}
