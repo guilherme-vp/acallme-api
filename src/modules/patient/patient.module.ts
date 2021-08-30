@@ -1,20 +1,12 @@
 import { Module } from '@nestjs/common'
 
+import { AuthenticationResolver } from './graphql/resolvers'
 import { PatientRepository } from './repositories'
-import { UseCasesService } from './use-cases'
+import { UseCases, UseCasesService } from './use-cases'
 import { LanguageModule, DatabaseModule } from '~core/services'
 
 @Module({
 	imports: [LanguageModule, DatabaseModule],
-	providers: [
-		{
-			provide: 'PATIENT_USECASE',
-			useClass: UseCasesService
-		},
-		{
-			provide: 'PATIENT_REPOSITORY',
-			useClass: PatientRepository
-		}
-	]
+	providers: [...UseCases, UseCasesService, PatientRepository, AuthenticationResolver]
 })
 export class PatientModule {}
