@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { I18nService } from 'nestjs-i18n'
 
 import { BaseUseCase } from '~domain/base'
@@ -6,9 +6,10 @@ import { SignUpDto } from '~modules/patient/dtos'
 import { PatientModel } from '~modules/patient/graphql/models'
 import { PatientRepository } from '~modules/patient/repositories'
 
+@Injectable()
 export class SignUpUseCase implements BaseUseCase<PatientModel> {
 	constructor(
-		@Inject('PATIENT_REPOSITORY') private readonly patientRepository: PatientRepository,
+		private readonly patientRepository: PatientRepository,
 		private readonly languageService: I18nService
 	) {}
 
