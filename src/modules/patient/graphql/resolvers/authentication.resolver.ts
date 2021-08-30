@@ -1,12 +1,12 @@
-import { Inject } from '@nestjs/common'
-import { Query, Mutation, Args } from '@nestjs/graphql'
+import { Query, Mutation, Args, Resolver } from '@nestjs/graphql'
 
 import { PatientModel } from '../models'
 import { SignUpDto } from '~modules/patient/dtos'
 import { UseCasesService } from '~modules/patient/use-cases'
 
+@Resolver()
 export class AuthenticationResolver {
-	constructor(@Inject('PATIENT_USECASE') private readonly useCasesService: UseCasesService) {}
+	constructor(private readonly useCasesService: UseCasesService) {}
 
 	@Query(() => String)
 	HelloWorld() {
