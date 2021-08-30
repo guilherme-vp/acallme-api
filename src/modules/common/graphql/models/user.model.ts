@@ -15,8 +15,8 @@ export class UserModel {
 
 	password!: string
 
-	@Field(() => Date, { nullable: true })
-	birth?: Date
+	@Field(() => Date)
+	birth!: Date
 
 	@Field()
 	cpf!: string
@@ -24,7 +24,7 @@ export class UserModel {
 	@Field(() => UserGender)
 	gender!: UserGender
 
-	@Field(() => Boolean)
+	@Field(() => Boolean, { nullable: true })
 	isEmailVerified?: boolean
 
 	@Field({ nullable: true })
