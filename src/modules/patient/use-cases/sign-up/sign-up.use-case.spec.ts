@@ -45,7 +45,7 @@ describe('SignUpUseCase', () => {
 	})
 
 	describe('execute', () => {
-		it('should throw an error if pacient already exists ', async () => {
+		it('should throw an error if patient already exists', async () => {
 			jest.spyOn(patientRepository, 'existsEmailCpf').mockResolvedValueOnce(1)
 
 			const promise = signUpUseCase.execute(input)
