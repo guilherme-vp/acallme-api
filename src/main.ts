@@ -11,10 +11,10 @@ const bootstrap = async () => {
 	const configService = app.get(ConfigService)
 	const nestConfig = configService.get<NestConfig>('nest')
 
-	const port = nestConfig?.port || 5002
+	const port = nestConfig?.port || 5005
 
 	await app.listen(port, () => {
-		Logger.log(`App runing at port: ${port}`)
+		Logger.log(`App running at port: ${port}`)
 	})
 }
 
