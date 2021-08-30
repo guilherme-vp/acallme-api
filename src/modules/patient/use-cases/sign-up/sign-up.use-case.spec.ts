@@ -26,17 +26,11 @@ describe('SignUpUseCase', () => {
 	beforeAll(async () => {
 		const module = await Test.createTestingModule({
 			imports: [LanguageModule, DatabaseModule],
-			providers: [
-				SignUpUseCase,
-				{
-					provide: 'PATIENT_REPOSITORY',
-					useClass: PatientRepository
-				}
-			]
+			providers: [SignUpUseCase, PatientRepository]
 		}).compile()
 
 		languageService = await module.get(I18nService)
-		patientRepository = await module.get('PATIENT_REPOSITORY')
+		patientRepository = await module.get(PatientRepository)
 		signUpUseCase = await module.get(SignUpUseCase)
 	})
 
