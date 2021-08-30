@@ -1,12 +1,11 @@
 import { Test } from '@nestjs/testing'
-import { Patient } from '@prisma/client'
 import faker from 'faker'
 
 import { PatientRepository } from './patient.repository'
 import { UserGender } from '~modules/common/enums'
 import { DatabaseService } from '~services/database'
 
-const patient: Patient = {
+const patient = {
 	id: faker.datatype.uuid(),
 	name: faker.name.findName(),
 	email: faker.internet.email(),
@@ -29,11 +28,11 @@ describe('PatientRepository', () => {
 		const module = await Test.createTestingModule({
 			providers: [
 				PatientRepository,
-
 				{
 					provide: DatabaseService,
 					useValue: {
 						patient: {
+							create: jest.fn(),
 							findMany: jest.fn(),
 							count: jest.fn()
 						}
@@ -77,6 +76,18 @@ describe('PatientRepository', () => {
 			expect(promise).resolves.toBe(1)
 			expect(databaseService.patient.count).toHaveBeenCalledWith({
 				where: { email: patient.email, cpf: patient.cpf }
+			})
+		})
+
+		it('should create and return a patient', async () => {
+			jest.spyOn(databaseService.patient, 'create').mockResolvedValueOnce(patient)
+
+			const promise = patientRepository.create(patient)
+
+			expect(promise).resolves.toBeDefined()
+			expect(promise).resolves.toMatchObject(patient)
+			expect(databaseService.patient.create).toHaveBeenCalledWith({
+				data: patient
 			})
 		})
 	})
