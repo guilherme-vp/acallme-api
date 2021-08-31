@@ -1,5 +1,5 @@
 import { Global, Module } from '@nestjs/common'
-import { ConfigService } from '@nestjs/config'
+import { ConfigModule, ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
 
 import { CryptService } from './crypt'
@@ -17,6 +17,7 @@ const jwtModule = JwtModule.registerAsync({
 			}
 		}
 	},
+	imports: [ConfigModule],
 	inject: [ConfigService]
 })
 
