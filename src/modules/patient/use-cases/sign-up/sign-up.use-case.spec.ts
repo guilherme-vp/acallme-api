@@ -1,3 +1,4 @@
+import { JwtService } from '@nestjs/jwt'
 import { Test } from '@nestjs/testing'
 import faker from 'faker'
 import { I18nService } from 'nestjs-i18n'
@@ -36,11 +37,18 @@ describe('SignUpUseCase', () => {
 	let signUpUseCase: SignUpUseCase
 	let languageService: I18nService
 	let cryptService: CryptService
+	let jwtService: JwtService
 
 	beforeAll(async () => {
 		const module = await Test.createTestingModule({
 			providers: [
 				SignUpUseCase,
+				{
+					provide: JwtService,
+					useValue: {
+						sign: jest.fn()
+					}
+				},
 				{
 					provide: I18nService,
 					useValue: {
@@ -65,6 +73,7 @@ describe('SignUpUseCase', () => {
 
 		languageService = await module.get(I18nService)
 		cryptService = await module.get(CryptService)
+		jwtService = await module.get(JwtService)
 		patientRepository = await module.get(PatientRepository)
 		signUpUseCase = await module.get(SignUpUseCase)
 	})
@@ -77,6 +86,7 @@ describe('SignUpUseCase', () => {
 		expect(patientRepository).toBeDefined()
 		expect(languageService).toBeDefined()
 		expect(cryptService).toBeDefined()
+		expect(jwtService).toBeDefined()
 		expect(signUpUseCase).toBeDefined()
 	})
 
@@ -94,24 +104,35 @@ describe('SignUpUseCase', () => {
 			expect(languageService.translate).toHaveBeenCalledWith('auth.user-already-exists')
 			expect(cryptService.encrypt).not.toHaveBeenCalled()
 			expect(patientRepository.create).not.toHaveBeenCalled()
+			expect(jwtService.sign).not.toHaveBeenCalled()
 		})
 
-		it('should successfully create a patient and return it', async () => {
+		it('should successfully create a patient and return a token', async () => {
+			const signedToken = faker.datatype.string()
+
 			jest.spyOn(patientRepository, 'existsEmailCpf').mockResolvedValueOnce(0)
 			jest.spyOn(cryptService, 'encrypt').mockResolvedValueOnce(hashedPassword)
 			jest.spyOn(patientRepository, 'create').mockResolvedValueOnce(patient)
+			jest.spyOn(jwtService, 'sign').mockReturnValueOnce(signedToken)
 
 			const response = await signUpUseCase.execute(input)
 
 			expect(response).toBeDefined()
-			expect(response).toMatchObject(patient)
-			expect(response.password).toEqual(hashedPassword)
+			expect(response.token).toEqual(signedToken)
+			expect(response.createdPatient).toMatchObject(patient)
+			expect(response.createdPatient.password).toEqual(hashedPassword)
 			expect(patientRepository.existsEmailCpf).toHaveBeenCalled()
 			expect(patientRepository.existsEmailCpf).toHaveBeenCalledWith({ email: input.email, cpf: input.cpf })
 			expect(languageService.translate).not.toHaveBeenCalled()
 			expect(cryptService.encrypt).toHaveBeenCalled()
 			expect(cryptService.encrypt).toHaveBeenCalledWith(input.password)
 			expect(patientRepository.create).toHaveBeenCalledWith({ ...input, password: hashedPassword })
+			expect(jwtService.sign).toHaveBeenCalled()
+			expect(jwtService.sign).toHaveBeenCalledWith({
+				id: patient.id,
+				name: patient.name,
+				email: patient.email
+			})
 		})
 	})
 })
