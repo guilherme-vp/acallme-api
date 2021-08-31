@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing'
 import faker from 'faker'
 
 import { PatientRepository } from './patient.repository'
-import { UserGender } from '~modules/common/enums'
+import { UserGender } from '~domain/enums'
 import { DatabaseService } from '~services/database'
 
 const patient = {
