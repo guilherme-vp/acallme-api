@@ -1,16 +1,16 @@
 import { Injectable } from '@nestjs/common'
 
-import { PatientModel } from '~modules/patient/graphql/models'
+import { PatientModel } from '~domain/models'
 import { DatabaseService } from '~services/database'
 
 @Injectable()
 export class PatientRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
-	async create(data: PatientModel) {
+	async create(data: Omit<PatientModel, 'id' | 'createdAt' | 'updatedAt'>): Promise<PatientModel> {
 		return this.databaseService.patient.create({
 			data
-		})
+		}) as unknown as PatientModel
 	}
 
 	async getMany() {
