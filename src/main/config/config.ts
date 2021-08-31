@@ -10,7 +10,10 @@ export interface NestConfig {
 export interface SecurityConfig {
 	expiresIn: string
 	refreshIn: string
+	secret: string
 }
+
+const { secret } = process.env
 
 const config: AppConfig = {
 	nest: {
@@ -18,7 +21,8 @@ const config: AppConfig = {
 	},
 	security: {
 		expiresIn: '15m',
-		refreshIn: '7d'
+		refreshIn: '7d',
+		secret: secret || 'test123'
 	}
 }
 
