@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common'
+import { JwtService } from '@nestjs/jwt'
 import { I18nService } from 'nestjs-i18n'
 
 import { BaseUseCase } from '~domain/base'
@@ -12,7 +13,8 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 	constructor(
 		private readonly patientRepository: PatientRepository,
 		private readonly languageService: I18nService,
-		private readonly cryptService: CryptService
+		private readonly cryptService: CryptService,
+		private readonly jwtService: JwtService
 	) {}
 
 	async execute(input: SignUpDto) {
@@ -26,6 +28,17 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 
 		const password = await this.cryptService.encrypt(userPassword)
 
-		return this.patientRepository.create({ ...fields, email, cpf, password })
+		const createdPatient = await this.patientRepository.create({ ...fields, email, cpf, password })
+
+		const createdToken = this.jwtService.sign({
+			id: createdPatient.id,
+			name: createdPatient.name,
+			email
+		})
+
+		return {
+			token: createdToken,
+			createdPatient
+		}
 	}
 }
