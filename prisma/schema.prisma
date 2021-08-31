@@ -20,7 +20,7 @@ model Patient {
   isTourCompleted Boolean  @default(false) @map("is_tour_completed")
 
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("pacients")
 }
@@ -42,7 +42,7 @@ model Specialist {
   crm             String?  @unique
 
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @map("updated_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("specialists")
 }
