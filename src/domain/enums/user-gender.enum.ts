@@ -1,4 +1,5 @@
 export enum UserGender {
 	M = 'M',
-	F = 'F'
+	F = 'F',
+	NB = 'NB'
 }
