@@ -1,4 +1,4 @@
-import { UserGender } from '~domain/enums'
+import { UserGender } from '@domain/enums'
 
 export class UserModel {
 	id!: string

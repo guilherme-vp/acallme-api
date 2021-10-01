@@ -1,10 +1,10 @@
+import { NestConfig } from '@core/config'
 import { Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify'
 
 import { AppModule } from './app.module'
-import { NestConfig } from '~main/config'
 
 const bootstrap = async () => {
 	const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter())
