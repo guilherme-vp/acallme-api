@@ -41,7 +41,7 @@ CREATE TABLE t_clg_especialidade (
 
 CREATE TABLE t_clg_especialista (
     cd_especialista        NUMBER GENERATED ALWAYS AS IDENTITY,
-    cd_agenda_especialista NUMBER(5) NOT NULL,
+    cd_agenda_especialista NUMBER(5),
     nm_especialista        VARCHAR2(50) NOT NULL,
     ds_email               VARCHAR2(50) NOT NULL,
     ds_senha               VARCHAR2(30) NOT NULL,
@@ -64,7 +64,7 @@ CREATE TABLE t_clg_especializar (
 
 CREATE TABLE t_clg_paciente (
     cd_paciente        NUMBER GENERATED ALWAYS AS IDENTITY,
-    cd_agenda_paciente NUMBER(5) NOT NULL,
+    cd_agenda_paciente NUMBER(5),
     nm_paciente        VARCHAR2(50) NOT NULL,
     ds_email           VARCHAR2(50) NOT NULL,
     ds_senha           VARCHAR2(30) NOT NULL,
