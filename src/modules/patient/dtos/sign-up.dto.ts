@@ -1,15 +1,16 @@
+import { UserGender } from '@domain/enums'
 import {
 	IsDate,
 	IsEmail,
 	IsEnum,
+	IsNumber,
 	IsOptional,
 	IsPhoneNumber,
 	IsString,
 	Length,
-	Matches
+	Matches,
+	MinLength
 } from 'class-validator'
-
-import { UserGender } from '~domain/enums'
 
 export class SignUpDto {
 	@IsEmail()
@@ -20,10 +21,13 @@ export class SignUpDto {
 	name!: string
 
 	@Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/)
+	@IsString()
 	password!: string
 
-	@Matches(/?[0-9]{3}?[0-9]{3}?[0-9]{3}?[0-9]{2}{11}/)
-	cpf!: string
+	@Matches(/^?[0-9]{3}?[0-9]{3}?[0-9]{3}?[0-9]{2}{11,}$/)
+	@IsNumber()
+	@MinLength(11)
+	cpf!: number
 
 	@IsEnum(UserGender)
 	gender!: UserGender
@@ -31,7 +35,8 @@ export class SignUpDto {
 	@IsDate()
 	birth!: Date
 
-	@IsPhoneNumber('BR')
+	@IsNumber()
 	@IsOptional()
-	phone?: string
+	@MinLength(11)
+	phone?: number
 }
