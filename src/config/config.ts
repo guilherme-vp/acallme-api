@@ -1,3 +1,5 @@
+const { secret } = process.env
+
 export interface AppConfig {
 	nest: NestConfig
 	security: SecurityConfig
@@ -12,8 +14,6 @@ export interface SecurityConfig {
 	refreshIn: string
 	secret: string
 }
-
-const { secret } = process.env
 
 const config: AppConfig = {
 	nest: {
