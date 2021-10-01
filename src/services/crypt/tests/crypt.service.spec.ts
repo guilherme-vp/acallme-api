@@ -3,6 +3,8 @@ import faker from 'faker'
 
 import { CryptService } from '../crypt.service'
 
+jest.mock('bcrypt')
+
 describe('CryptService', () => {
 	let cryptService: CryptService
 
@@ -27,7 +29,7 @@ describe('CryptService', () => {
 			const str = faker.datatype.string()
 			const hashedStr = faker.datatype.string()
 
-			// jest.spyOn(cryptService, 'encrypt').mockResolvedValueOnce(hashedStr)
+			jest.spyOn(cryptService, 'encrypt').mockResolvedValueOnce(hashedStr)
 
 			const promise = cryptService.encrypt(str)
 
