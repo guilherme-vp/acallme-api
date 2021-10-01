@@ -71,9 +71,9 @@ CREATE TABLE t_clg_paciente (
     dt_nascimento      DATE NOT NULL,
     ds_genero          VARCHAR2(2) NOT NULL,
     nr_cpf             NUMBER(9) NOT NULL,
-    nr_cpf_digito      NUMBER(2),
-    nr_telefone        NUMBER(9),
-    nr_telefone_ddd    NUMBER(2)
+    nr_cpf_digito      NUMBER(2) NOT NULL,
+    nr_telefone        NUMBER(9) NOT NULL,
+    nr_telefone_ddd    NUMBER(2) NOT NULL
 );
 
 CREATE TABLE t_clg_prontuario (
