@@ -14,34 +14,13 @@ services:
       - db
 
   db:
-    image: postgres:latest
+    image: store/oracle/database-enterprise:12.2.0.1-slim
     container_name: acallme_db
     restart: unless-stopped
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data:/opt/oracle/oradata
     ports:
-      - '5365:5432'
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: acallme
-    networks:
-      - app-network
-
-  pgadmin4:
-    image: dpage/pgadmin4:latest
-    container_name: acallme_db_insight
-    restart: unless-stopped
-    environment:
-      PGADMIN_DEFAULT_EMAIL: postgres@postgres.com
-      PGADMIN_DEFAULT_PASSWORD: postgres
-    ports:
-      - '5050:80'
-    depends_on:
-      - db
-    volumes:
-      - db-data:/var/lib/postgresql/data
-
+      - '1521:1521'
     networks:
       - app-network
 
