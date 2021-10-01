@@ -1,10 +1,24 @@
 import { Module, Global } from '@nestjs/common'
-
-import { DatabaseService } from './database.service'
-
+import { KnexModule } from 'nestjs-knex'
 @Global()
 @Module({
-	providers: [DatabaseService],
-	exports: [DatabaseService]
+	imports: [
+		KnexModule.forRootAsync({
+			useFactory: async () => {
+				return {
+					config: {
+						client: 'oracledb',
+						connection: {
+							user: 'SYS',
+							password: 'Oradoc_db1',
+							host: 'localhost',
+							port: 1521,
+							database: 'ORCLCDB'
+						}
+					}
+				}
+			}
+		})
+	]
 })
 export class DatabaseModule {}
