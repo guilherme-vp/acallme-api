@@ -1,11 +1,11 @@
-import { OmitProperties, RequireAtLeastOne } from '@core/types'
+import { DefaultSelect, OmitProperties } from '@core/types'
 import { Injectable } from '@nestjs/common'
 import { DatabaseService } from '@services/database'
 import { Tables } from '@services/database/tables'
 
 import { PatientModel } from '../../entities'
 
-type DefaultSelect = Array<Lowercase<keyof RequireAtLeastOne<Omit<PatientModel, 'DS_SENHA'>>>>
+type PatientSelect = DefaultSelect<PatientModel, 'DS_SENHA'>
 
 @Injectable()
 export class PatientRepository {
@@ -13,7 +13,7 @@ export class PatientRepository {
 
 	async create(
 		data: OmitProperties<PatientModel, 'CD_PACIENTE' | 'CD_AGENDA_PACIENTE'>,
-		select?: DefaultSelect
+		select?: PatientSelect
 	): Promise<PatientModel> {
 		const inputKeys = Object.keys(data)
 
@@ -31,7 +31,7 @@ export class PatientRepository {
 		return createdUser as PatientModel
 	}
 
-	async getOneById(id: number, select?: DefaultSelect): Promise<PatientModel> {
+	async getOneById(id: number, select?: PatientSelect): Promise<PatientModel> {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
 			Tables.Patient
 		} WHERE cd_paciente = :id`
@@ -41,7 +41,7 @@ export class PatientRepository {
 		return result
 	}
 
-	async getMany(where?: Partial<PatientModel>, select?: DefaultSelect) {
+	async getMany(where?: Partial<PatientModel>, select?: PatientSelect) {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Patient}`
 
 		if (where) {
