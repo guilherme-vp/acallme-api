@@ -1,13 +1,12 @@
 import { BaseUseCase } from '@domain/base'
 import { SignUpDto } from '@modules/patients/dtos'
+import { PatientModel } from '@modules/patients/entities'
 import { PatientRepository } from '@modules/patients/repositories'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { CryptService } from '@services/crypt'
 import * as datefns from 'date-fns'
 import { I18nService } from 'nestjs-i18n'
-
-import { PatientModel } from '../../entities'
 
 @Injectable()
 export class SignUpUseCase implements BaseUseCase<PatientModel> {
@@ -56,7 +55,8 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 		const createdToken = this.jwtService.sign({
 			id: createdPatient.cd_paciente,
 			name,
-			email
+			email,
+			role: 'patient'
 		})
 
 		delete createdPatient.ds_senha
