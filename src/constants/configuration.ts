@@ -1,7 +1,15 @@
+import { ConnectionAttributes } from 'oracledb'
+
 type Envs = 'development' | 'production'
 
-const AUTH_HEADER = 'authorization'
-const SECRET: string = process.env.SECRET || 'secret123'
-const NODE_ENV: Envs = (process.env.NODE_ENV as Envs) || 'development'
+const { NODE_ENV: ProcessEnv, DATABASE_USER, DATABASE_PASS, DATABASE_URI } = process.env
 
-export { SECRET, NODE_ENV, AUTH_HEADER }
+const NODE_ENV: Envs = (ProcessEnv as Envs) || 'development'
+
+const dbConfig: ConnectionAttributes = {
+	user: DATABASE_USER ?? 'oracle',
+	password: DATABASE_PASS ?? 'oracle',
+	connectionString: DATABASE_URI ?? 'localhost:1521/ORCLCDB.localdomain'
+}
+
+export { NODE_ENV, dbConfig }
