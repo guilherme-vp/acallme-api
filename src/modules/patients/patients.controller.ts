@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common'
+import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common'
 
 import { SignUpDto } from './dtos'
+import { PatientModel } from './entities'
 import { PatientService } from './patients.service'
 
 @Controller('patients')
@@ -13,7 +14,12 @@ export class PatientsController {
 	}
 
 	@Get(':id')
-	findById(@Param('id') id: string) {
+	async findById(@Param('id') id: string) {
 		return this.patientService.findById(+id)
+	}
+
+	@Get()
+	async findOne(@Query() query: PatientModel) {
+		return this.patientService.findOne(query)
 	}
 }
