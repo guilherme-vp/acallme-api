@@ -2,7 +2,7 @@ import { ConnectionAttributes } from 'oracledb'
 
 type Envs = 'development' | 'production'
 
-const { NODE_ENV: ProcessEnv, DATABASE_USER, DATABASE_PASS, DATABASE_URI } = process.env
+const { NODE_ENV: ProcessEnv, DATABASE_USER, DATABASE_PASS, DATABASE_URI, SECRET } = process.env
 
 const NODE_ENV: Envs = (ProcessEnv as Envs) || 'development'
 
@@ -12,4 +12,4 @@ const dbConfig: ConnectionAttributes = {
 	connectionString: DATABASE_URI ?? 'localhost:1521/ORCLCDB.localdomain'
 }
 
-export { NODE_ENV, dbConfig }
+export { NODE_ENV, dbConfig, SECRET }

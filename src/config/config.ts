@@ -1,4 +1,4 @@
-const { secret } = process.env
+import { SECRET } from '@constants/configuration'
 
 export interface AppConfig {
 	nest: NestConfig
@@ -22,7 +22,7 @@ const config: AppConfig = {
 	security: {
 		expiresIn: '15m',
 		refreshIn: '7d',
-		secret: secret || 'test123'
+		secret: SECRET || 'test123'
 	}
 }
 
