@@ -1,7 +1,7 @@
 import { BaseUseCase } from '@domain/base'
 import { SignUpDto } from '@modules/patients/dtos'
 import { PatientRepository } from '@modules/patients/repositories'
-import { Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { CryptService } from '@services/crypt'
 import * as datefns from 'date-fns'
@@ -32,7 +32,7 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 		})
 
 		if (patientExists) {
-			throw new Error(await this.languageService.translate('auth.user-already-exists'))
+			throw new BadRequestException(await this.languageService.translate('auth.user-already-exists'))
 		}
 
 		const password = await this.cryptService.encrypt(userPassword)
