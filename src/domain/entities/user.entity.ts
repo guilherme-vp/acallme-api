@@ -1,12 +1,12 @@
 import { UserGender } from '@domain/enums'
 
 export class UserModel {
-	ds_email!: string
-	ds_senha?: string
-	dt_nascimento!: Date
-	ds_genero!: UserGender
-	nr_cpf!: number
-	nr_cpf_digito!: number
-	nr_telefone?: number
-	nr_telefone_ddd?: number
+	DS_EMAIL!: string
+	DS_SENHA?: string
+	DT_NASCIMENTO!: Date
+	DS_GENERO!: UserGender
+	NR_CPF!: number
+	NR_CPF_DIGITO!: number
+	NR_TELEFONE?: number
+	NR_TELEFONE_DDD?: number
 }

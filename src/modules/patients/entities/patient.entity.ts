@@ -1,7 +1,7 @@
 import { UserModel } from '@domain/entities'
 
 export class PatientModel extends UserModel {
-	cd_paciente?: number
-	cd_agenda_paciente?: number
-	nm_paciente!: string
+	CD_PACIENTE?: number
+	CD_AGENDA_PACIENTE?: number
+	NM_PACIENTE!: string
 }

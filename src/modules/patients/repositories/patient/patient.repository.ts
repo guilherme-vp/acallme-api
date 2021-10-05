@@ -12,7 +12,7 @@ export class PatientRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async create(
-		data: OmitProperties<PatientModel, 'cd_paciente' | 'cd_agenda_paciente'>,
+		data: OmitProperties<PatientModel, 'CD_PACIENTE' | 'CD_AGENDA_PACIENTE'>,
 		select?: DefaultSelect
 	): Promise<PatientModel> {
 		const inputKeys = Object.keys(data)
@@ -25,7 +25,7 @@ export class PatientRepository {
 
 		const [createdUser] = await this.databaseService.executeQuery<PatientModel>(
 			`SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Patient} WHERE ds_email = :email`,
-			{ email: data.ds_email }
+			{ email: data.DS_EMAIL }
 		)
 
 		return createdUser as PatientModel
