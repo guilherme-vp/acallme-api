@@ -5,9 +5,17 @@ import { NestFactory } from '@nestjs/core'
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify'
 
 import { AppModule } from './app.module'
+import { HttpExceptionFilter } from './filters'
+import { ValidationPipe } from './pipes'
 
 const bootstrap = async () => {
 	const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter())
+
+	app.useGlobalFilters(new HttpExceptionFilter())
+	app.useGlobalPipes(new ValidationPipe())
+
+	app.enableCors()
+
 	const configService = app.get(ConfigService)
 	const nestConfig = configService.get<NestConfig>('nest')
 
