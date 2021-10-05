@@ -18,7 +18,6 @@ export class FindByIdUseCase implements BaseUseCase<PatientModel> {
 		if (!foundPatient) {
 			throw new NotFoundException(await this.languageService.translate('auth.user-does-not-exists'))
 		}
-		console.log(foundPatient)
 
 		const patient = formatPatient(foundPatient)
 
