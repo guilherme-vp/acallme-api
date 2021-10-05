@@ -1,14 +1,19 @@
-import { Controller, Post, Body } from '@nestjs/common'
+import { Controller, Get, Post, Body, Param } from '@nestjs/common'
 
 import { SignUpDto } from './dtos'
-import { UseCasesService } from './use-cases'
+import { PatientService } from './patients.service'
 
 @Controller('patients')
 export class PatientsController {
-	constructor(private readonly useCasesService: UseCasesService) {}
+	constructor(private readonly patientService: PatientService) {}
 
 	@Post('signup')
 	async signUp(@Body() input: SignUpDto) {
-		return this.useCasesService.signUp(input)
+		return this.patientService.signUp(input)
+	}
+
+	@Get(':id')
+	findById(@Param('id') id: string) {
+		return this.patientService.findById(+id)
 	}
 }
