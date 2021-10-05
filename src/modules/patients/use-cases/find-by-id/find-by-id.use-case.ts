@@ -1,6 +1,7 @@
 import { BaseUseCase } from '@domain/base'
 import { PatientModel } from '@modules/patients/entities'
 import { PatientRepository } from '@modules/patients/repositories'
+import { formatPatient } from '@modules/patients/util'
 import { Injectable, NotFoundException } from '@nestjs/common'
 import { I18nService } from 'nestjs-i18n'
 
@@ -17,9 +18,12 @@ export class FindByIdUseCase implements BaseUseCase<PatientModel> {
 		if (!foundPatient) {
 			throw new NotFoundException(await this.languageService.translate('auth.user-does-not-exists'))
 		}
+		console.log(foundPatient)
+
+		const patient = formatPatient(foundPatient)
 
 		return {
-			patient: foundPatient
+			patient
 		}
 	}
 }

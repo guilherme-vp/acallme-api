@@ -2,6 +2,7 @@ import { BaseUseCase } from '@domain/base'
 import { SignUpDto } from '@modules/patients/dtos'
 import { PatientModel } from '@modules/patients/entities'
 import { PatientRepository } from '@modules/patients/repositories'
+import { formatPatient } from '@modules/patients/util'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { CryptService } from '@services/crypt'
@@ -41,29 +42,29 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 		const fullPhone = +stringifiedPhone.substring(2, stringifiedPhone.length)
 
 		const createdPatient = await this.patientRepository.create({
-			nm_paciente: name,
-			ds_email: email,
-			ds_senha: password,
-			ds_genero: gender,
-			dt_nascimento: datefns.parse(birth, 'dd/MM/yyyy', new Date()),
-			nr_cpf: fullCpf,
-			nr_cpf_digito: digitsCpf,
-			nr_telefone: fullPhone,
-			nr_telefone_ddd: dddPhone
+			NM_PACIENTE: name,
+			DS_EMAIL: email,
+			DS_SENHA: password,
+			DS_GENERO: gender,
+			DT_NASCIMENTO: datefns.parse(birth, 'dd/MM/yyyy', new Date()),
+			NR_CPF: fullCpf,
+			NR_CPF_DIGITO: digitsCpf,
+			NR_TELEFONE: fullPhone,
+			NR_TELEFONE_DDD: dddPhone
 		})
 
 		const createdToken = this.jwtService.sign({
-			id: createdPatient.cd_paciente,
+			id: createdPatient.CD_PACIENTE,
 			name,
 			email,
 			role: 'patient'
 		})
 
-		delete createdPatient.ds_senha
+		const patient = formatPatient(createdPatient)
 
 		return {
 			token: createdToken,
-			patient: createdPatient
+			patient
 		}
 	}
 }
