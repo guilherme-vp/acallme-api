@@ -1,4 +1,4 @@
-import { UserModel } from '@domain/models'
+import { UserModel } from '@domain/entities'
 
 export class SpecialistModel extends UserModel {
 	cd_especialista?: number
