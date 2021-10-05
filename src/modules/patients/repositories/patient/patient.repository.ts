@@ -1,11 +1,11 @@
-import { DefaultSelect, OmitProperties } from '@core/types'
+import { DefaultSelect, OmitProperties, RequireAtLeastOne } from '@core/types'
 import { Injectable } from '@nestjs/common'
 import { DatabaseService } from '@services/database'
 import { Tables } from '@services/database/tables'
 
 import { PatientModel } from '../../entities'
 
-type PatientSelect = DefaultSelect<PatientModel, 'DS_SENHA'>
+export type PatientSelect = DefaultSelect<PatientModel, 'DS_SENHA'>
 
 @Injectable()
 export class PatientRepository {
@@ -37,6 +37,18 @@ export class PatientRepository {
 		} WHERE cd_paciente = :id`
 
 		const [result] = await this.databaseService.executeQuery<PatientModel>(query, { id })
+
+		return result
+	}
+
+	async getOne(where: RequireAtLeastOne<PatientModel>, select?: PatientSelect): Promise<PatientModel> {
+		const whereKeys = Object.keys(where).map(key => `${key} = :${key}`)
+
+		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Patient} WHERE ${whereKeys.join(
+			', '
+		)}`
+
+		const [result] = await this.databaseService.executeQuery<PatientModel>(query, where)
 
 		return result
 	}
