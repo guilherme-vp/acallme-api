@@ -4,7 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
 
 import { CryptService } from './crypt'
-import { DatabaseModule } from './database'
+import { DatabaseService } from './database'
 import { LanguageModule } from './language'
 
 const jwtModule = JwtModule.registerAsync({
@@ -23,8 +23,8 @@ const jwtModule = JwtModule.registerAsync({
 
 @Global()
 @Module({
-	imports: [jwtModule, LanguageModule, DatabaseModule],
-	providers: [CryptService],
-	exports: [CryptService, jwtModule, LanguageModule, DatabaseModule]
+	imports: [jwtModule, LanguageModule],
+	providers: [CryptService, DatabaseService],
+	exports: [CryptService, DatabaseService, jwtModule, LanguageModule]
 })
 export class ServicesModule {}
