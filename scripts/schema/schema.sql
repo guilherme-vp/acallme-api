@@ -1,12 +1,12 @@
--- DROP TABLE t_clg_agenda_especialista CASCADE CONSTRAINTS;
--- DROP TABLE t_clg_agenda_paciente CASCADE CONSTRAINTS;
--- DROP TABLE t_clg_chamada CASCADE CONSTRAINTS;
--- DROP TABLE t_clg_consulta CASCADE CONSTRAINTS;
--- DROP TABLE t_clg_especialidade CASCADE CONSTRAINTS;
--- DROP TABLE t_clg_especialista CASCADE CONSTRAINTS;
--- DROP TABLE t_clg_especializar CASCADE CONSTRAINTS;
--- DROP TABLE t_clg_paciente CASCADE CONSTRAINTS;
--- DROP TABLE t_clg_prontuario CASCADE CONSTRAINTS;
+DROP TABLE t_clg_agenda_especialista CASCADE CONSTRAINTS;
+DROP TABLE t_clg_agenda_paciente CASCADE CONSTRAINTS;
+DROP TABLE t_clg_chamada CASCADE CONSTRAINTS;
+DROP TABLE t_clg_consulta CASCADE CONSTRAINTS;
+DROP TABLE t_clg_especialidade CASCADE CONSTRAINTS;
+DROP TABLE t_clg_especialista CASCADE CONSTRAINTS;
+DROP TABLE t_clg_especializar CASCADE CONSTRAINTS;
+DROP TABLE t_clg_paciente CASCADE CONSTRAINTS;
+DROP TABLE t_clg_prontuario CASCADE CONSTRAINTS;
 
 CREATE TABLE t_clg_agenda_especialista (
     cd_agenda_especialista NUMBER GENERATED ALWAYS AS IDENTITY,
@@ -31,7 +31,8 @@ CREATE TABLE t_clg_consulta (
     cd_agenda_paciente     NUMBER(5) NOT NULL,
     cd_agenda_especialista NUMBER(5) NOT NULL,
     vl_consulta            NUMBER(8, 2) NOT NULL,
-    dt_consulta            DATE NOT NULL
+    dt_consulta            DATE NOT NULL,
+		vl_confirmado          NUMBER(1)
 );
 
 CREATE TABLE t_clg_especialidade (
