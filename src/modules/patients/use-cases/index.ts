@@ -1,6 +1,7 @@
 import { Provider } from '@nestjs/common'
 
 export * from './sign-up'
+export * from './login'
 export * from './find-by-id'
 export * from './find-one'
 
