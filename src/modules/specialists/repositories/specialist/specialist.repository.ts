@@ -75,18 +75,18 @@ export class SpecialistRepository {
 		return result
 	}
 
-	async existsEmailCpf(fields: {
+	async existsEmailCnpj(fields: {
 		email: string
-		cpf: { full: number; digits: number }
+		cnpj: { full: number; digits: number }
 	}): Promise<boolean> {
-		const { cpf, email } = fields
+		const { cnpj, email } = fields
 
-		const query = `SELECT cd_especialista FROM ${Tables.Specialist} WHERE ds_email = :email OR (nr_cpf = :cpf AND nr_cpf_digito = :digits)`
+		const query = `SELECT cd_especialista FROM ${Tables.Specialist} WHERE ds_email = :email OR (nr_cnpj = :cnpj AND nr_cnpj_digito = :digits)`
 
 		const [result] = await this.databaseService.executeQuery<SpecialistModel>(query, {
 			email,
-			cpf: cpf.full,
-			digits: cpf.digits
+			cnpj: cnpj.full,
+			digits: cnpj.digits
 		})
 
 		if (!result) {
