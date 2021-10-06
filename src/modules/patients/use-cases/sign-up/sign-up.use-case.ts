@@ -1,6 +1,7 @@
+import { splitCpf, splitPhone } from '@core/util'
 import { BaseUseCase } from '@domain/base'
 import { SignUpDto } from '@modules/patients/dtos'
-import { PatientModel } from '@modules/patients/entities'
+import { PatientFormatted, PatientModel } from '@modules/patients/entities'
 import { PatientRepository } from '@modules/patients/repositories'
 import { formatPatient } from '@modules/patients/util'
 import { BadRequestException, Injectable } from '@nestjs/common'
@@ -18,13 +19,10 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 		private readonly jwtService: JwtService
 	) {}
 
-	async execute(input: SignUpDto) {
+	async execute(input: SignUpDto): Promise<{ patient: PatientFormatted; token: string }> {
 		const { email, cpf, password: userPassword, birth, gender, name, phone } = input
 
-		const filteredCpf = cpf.replace(/[.-]/g, '')
-
-		const fullCpf = +filteredCpf.substring(0, filteredCpf.length - 2)
-		const digitsCpf = +filteredCpf.substring(filteredCpf.length - 2)
+		const [fullCpf, digitsCpf] = splitCpf(cpf)
 
 		const patientExists = await this.patientRepository.existsEmailCpf({
 			email,
@@ -32,14 +30,19 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 		})
 
 		if (patientExists) {
-			throw new BadRequestException(await this.languageService.translate('auth.user-already-exists'))
+			throw new BadRequestException(
+				await this.languageService.translate('auth.user-already-exists')
+			)
 		}
 
 		const password = await this.cryptService.encrypt(userPassword)
 
-		const stringifiedPhone = String(phone)
-		const dddPhone = +stringifiedPhone.substring(0, 2)
-		const fullPhone = +stringifiedPhone.substring(2, stringifiedPhone.length)
+		const finalPhone: number[] = []
+
+		if (phone) {
+			const [dddPhone, fullPhone] = splitPhone(phone)
+			finalPhone.push(dddPhone, fullPhone)
+		}
 
 		const createdPatient = await this.patientRepository.create({
 			NM_PACIENTE: name,
@@ -49,18 +52,18 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 			DT_NASCIMENTO: datefns.parse(birth, 'dd/MM/yyyy', new Date()),
 			NR_CPF: fullCpf,
 			NR_CPF_DIGITO: digitsCpf,
-			NR_TELEFONE: fullPhone,
-			NR_TELEFONE_DDD: dddPhone
+			NR_TELEFONE: finalPhone[0],
+			NR_TELEFONE_DDD: finalPhone[1]
 		})
 
+		const patient = formatPatient(createdPatient)
+
 		const createdToken = this.jwtService.sign({
-			id: createdPatient.CD_PACIENTE,
+			id: patient.id,
 			name,
 			email,
 			role: 'patient'
 		})
-
-		const patient = formatPatient(createdPatient)
 
 		return {
 			token: createdToken,

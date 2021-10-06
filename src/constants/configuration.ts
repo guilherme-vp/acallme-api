@@ -2,7 +2,13 @@ import { ConnectionAttributes } from 'oracledb'
 
 type Envs = 'development' | 'production'
 
-const { NODE_ENV: ProcessEnv, DATABASE_USER, DATABASE_PASS, DATABASE_URI, SECRET } = process.env
+const {
+	NODE_ENV: ProcessEnv,
+	DATABASE_USER,
+	DATABASE_PASS,
+	DATABASE_URI,
+	SECRET = 'test123'
+} = process.env
 
 const NODE_ENV: Envs = (ProcessEnv as Envs) || 'development'
 

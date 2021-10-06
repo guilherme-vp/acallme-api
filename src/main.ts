@@ -9,7 +9,10 @@ import { HttpExceptionFilter } from './filters'
 import { ValidationPipe } from './pipes'
 
 const bootstrap = async () => {
-	const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter())
+	const app = await NestFactory.create<NestFastifyApplication>(
+		AppModule,
+		new FastifyAdapter()
+	)
 
 	app.useGlobalFilters(new HttpExceptionFilter())
 	app.useGlobalPipes(new ValidationPipe())
