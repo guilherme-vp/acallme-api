@@ -20,9 +20,9 @@ const config: AppConfig = {
 		port: 5005
 	},
 	security: {
-		expiresIn: '15m',
+		expiresIn: '1d',
 		refreshIn: '7d',
-		secret: SECRET || 'test123'
+		secret: SECRET
 	}
 }
 
