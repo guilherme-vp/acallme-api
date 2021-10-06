@@ -7,7 +7,7 @@ export class LoginDto {
 
 	@IsString()
 	@IsOptional()
-	cpf?: string
+	cnpj?: string
 
 	@IsString()
 	password!: string

@@ -6,8 +6,7 @@ import {
 	IsOptional,
 	IsString,
 	Length,
-	Matches,
-	MinLength
+	Matches
 } from 'class-validator'
 
 export class SignUpDto {
@@ -23,8 +22,20 @@ export class SignUpDto {
 	password!: string
 
 	@IsString()
-	@MinLength(11)
-	cpf!: string
+	@Length(14, 14)
+	cnpj?: string
+
+	@IsString()
+	@Length(11, 11)
+	cpf?: string
+
+	@IsString()
+	@Length(4, 8)
+	crp?: string
+
+	@IsString()
+	@Length(3, 6)
+	crm?: string
 
 	@IsEnum(UserGender)
 	gender!: UserGender
@@ -34,6 +45,6 @@ export class SignUpDto {
 
 	@IsString()
 	@IsOptional()
-	@MinLength(11)
+	@Length(11, 11)
 	phone?: number
 }
