@@ -46,7 +46,6 @@ export class AuthMiddleware implements NestMiddleware {
 				HttpStatus.UNAUTHORIZED
 			)
 		}
-		console.log(user)
 
 		req.user = user.patient
 
