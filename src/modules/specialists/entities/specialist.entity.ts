@@ -1,11 +1,13 @@
 import { UserModel } from '@domain/entities'
 
-export class SpecialistModel extends UserModel {
+export type SpecialistModel = UserModel & {
 	CD_ESPECIALISTA?: number
 	CD_AGENDA_ESPECIALISTA?: number
-	NM_ESPECIALISTA!: string
-	NR_CNPJ?: string
-	NR_CNPJ_DIGITO?: string
+	NM_ESPECIALISTA: string
+	NR_CPF?: number
+	NR_CPF_DIGITO?: number
+	NR_CNPJ?: number
+	NR_CNPJ_DIGITO?: number
 	NR_CRP?: number
 	NR_CRM?: number
 }

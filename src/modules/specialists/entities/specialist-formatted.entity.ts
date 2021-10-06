@@ -1,6 +1,7 @@
 import { UserFormattedModel } from '@domain/entities'
 
-export interface SpecialistFormatted extends UserFormattedModel {
+export type SpecialistFormatted = UserFormattedModel & {
+	cpf?: string
 	cnpj?: string
 	crp?: string
 	crm?: string
