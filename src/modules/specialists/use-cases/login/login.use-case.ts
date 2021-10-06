@@ -1,4 +1,4 @@
-import { splitCpf } from '@core/util'
+import { splitCnpj } from '@core/util'
 import { LoginDto } from '@modules/specialists/dtos'
 import { SpecialistFormatted } from '@modules/specialists/entities'
 import { SpecialistRepository } from '@modules/specialists/repositories'
@@ -20,14 +20,14 @@ export class LoginUseCase {
 	async execute(
 		input: LoginDto
 	): Promise<{ specialist: SpecialistFormatted; token: string }> {
-		const { password, cpf = '', email = '' } = input
+		const { password, cnpj = '', email = '' } = input
 
-		const [full] = splitCpf(cpf)
+		const [full, digits] = splitCnpj(cnpj)
 
 		const foundSpecialist = await this.specialistRepository.getOne(
 			{
 				DS_EMAIL: email,
-				NR_CPF: full
+				NR_CNPJ: Number(`${full}${digits}`)
 			},
 			'OR'
 		)
