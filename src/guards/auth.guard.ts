@@ -1,6 +1,7 @@
+/* eslint-disable import/extensions */
 import { UserToken } from '@domain/base'
-// eslint-disable-next-line import/extensions
 import { PatientService } from '@modules/patients/patients.service'
+import { SpecialistService } from '@modules/specialists/specialists.service'
 import {
 	Injectable,
 	CanActivate,
@@ -16,7 +17,8 @@ export class AuthGuard implements CanActivate {
 	constructor(
 		private readonly jwtService: JwtService,
 		private readonly languageService: I18nService,
-		private readonly patientService: PatientService
+		private readonly patientService: PatientService,
+		private readonly specialistService: SpecialistService
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -43,16 +45,23 @@ export class AuthGuard implements CanActivate {
 			)
 		}
 
-		const user = await this.patientService.findById(decoded.id)
+		const patient = await this.patientService.findById(decoded.id)
+		const specialist = await this.specialistService.findById(decoded.id)
 
-		if (!user) {
+		if (!patient && !specialist) {
 			throw new HttpException(
 				await this.languageService.translate('auth.user-does-not-exists'),
 				HttpStatus.UNAUTHORIZED
 			)
 		}
 
-		request.user = user.patient
+		if (patient) {
+			request.user = patient.patient
+		}
+
+		if (specialist) {
+			request.user = specialist.specialist
+		}
 
 		return true
 	}
