@@ -1,4 +1,4 @@
-import { formatCpf, formatPhone } from '@core/util'
+import { formatCnpj, formatCpf, formatPhone } from '@core/util'
 import * as datefns from 'date-fns'
 
 import { SpecialistFormatted, SpecialistModel } from '../entities'
@@ -14,10 +14,20 @@ export function formatSpecialist(data: SpecialistModel): SpecialistFormatted {
 		NR_TELEFONE_DDD: ddd,
 		NR_CPF: cpf,
 		NR_CPF_DIGITO: digits,
-		DT_NASCIMENTO: birth
+		DT_NASCIMENTO: birth,
+		NR_CNPJ: cnpj,
+		NR_CNPJ_DIGITO: cnpjDigits,
+		NR_CRM: crm,
+		NR_CRP: crp
 	} = data
 
 	const formattedCpf = formatCpf(cpf, digits)
+
+	let formattedCnpj: number | undefined = undefined
+
+	if (cnpj && cnpjDigits) {
+		formattedCnpj = formatCnpj(cnpj, cnpjDigits)
+	}
 
 	let formattedPhone: number | undefined = undefined
 
@@ -34,7 +44,10 @@ export function formatSpecialist(data: SpecialistModel): SpecialistFormatted {
 		name,
 		gender,
 		cpf: String(formattedCpf),
+		cnpj: String(formattedCnpj),
 		phone: String(formattedPhone),
-		birth: birthDate
+		birth: birthDate,
+		crm: String(crm),
+		crp: String(crp)
 	}
 }
