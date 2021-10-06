@@ -1,4 +1,4 @@
-import { splitCpf, splitPhone } from '@core/util'
+import { splitCnpj, splitCpf, splitPhone } from '@core/util'
 import { BaseUseCase } from '@domain/base'
 import { SignUpDto } from '@modules/specialists/dtos'
 import { SpecialistFormatted, SpecialistModel } from '@modules/specialists/entities'
@@ -22,13 +22,42 @@ export class SignUpUseCase implements BaseUseCase<SpecialistModel> {
 	async execute(
 		input: SignUpDto
 	): Promise<{ specialist: SpecialistFormatted; token: string }> {
-		const { email, cpf, password: userPassword, birth, gender, name, phone } = input
-
-		const [fullCpf, digitsCpf] = splitCpf(cpf)
-
-		const specialistExists = await this.specialistRepository.existsEmailCpf({
+		const {
 			email,
-			cpf: { digits: digitsCpf, full: fullCpf }
+			cnpj,
+			cpf,
+			crm,
+			crp,
+			password: userPassword,
+			birth,
+			gender,
+			name,
+			phone
+		} = input
+
+		const finalCnpj: number[] = []
+
+		if (cnpj) {
+			const [fullCnpj, digitsCnpj] = splitCnpj(cnpj)
+			finalCnpj.push(fullCnpj, digitsCnpj)
+		}
+
+		const finalCpf: number[] = []
+
+		if (cpf) {
+			const [fullCpf, digitsCpf] = splitCpf(cpf)
+			finalCpf.push(fullCpf, digitsCpf)
+		}
+
+		if (finalCnpj.length < 2 && finalCpf.length < 2) {
+			throw new BadRequestException(
+				await this.languageService.translate('specialist.cpnj-cpf-not-given')
+			)
+		}
+
+		const specialistExists = await this.specialistRepository.existsEmailCnpj({
+			email,
+			cnpj: { digits: finalCnpj[0], full: finalCnpj[1] }
 		})
 
 		if (specialistExists) {
@@ -52,10 +81,14 @@ export class SignUpUseCase implements BaseUseCase<SpecialistModel> {
 			DS_SENHA: password,
 			DS_GENERO: gender,
 			DT_NASCIMENTO: datefns.parse(birth, 'dd/MM/yyyy', new Date()),
-			NR_CPF: fullCpf,
-			NR_CPF_DIGITO: digitsCpf,
+			NR_CPF: finalCpf[0],
+			NR_CPF_DIGITO: finalCpf[1],
+			NR_CNPJ: finalCnpj[0],
+			NR_CNPJ_DIGITO: finalCnpj[1],
 			NR_TELEFONE: finalPhone[0],
-			NR_TELEFONE_DDD: finalPhone[1]
+			NR_TELEFONE_DDD: finalPhone[1],
+			NR_CRM: Number(crm),
+			NR_CRP: Number(crp)
 		})
 
 		const specialist = formatSpecialist(createdSpecialist)
