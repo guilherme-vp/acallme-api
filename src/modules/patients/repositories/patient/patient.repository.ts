@@ -32,7 +32,7 @@ export class PatientRepository {
 			{ email: data.DS_EMAIL }
 		)
 
-		return createdUser as PatientModel
+		return createdUser
 	}
 
 	async getOneById(id: number, select?: PatientSelect): Promise<PatientModel> {

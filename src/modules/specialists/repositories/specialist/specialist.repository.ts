@@ -32,7 +32,7 @@ export class SpecialistRepository {
 			{ email: data.DS_EMAIL }
 		)
 
-		return createdUser as SpecialistModel
+		return createdUser
 	}
 
 	async getOneById(id: number, select?: SpecialistSelect): Promise<SpecialistModel> {
