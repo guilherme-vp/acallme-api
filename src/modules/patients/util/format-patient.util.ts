@@ -1,9 +1,9 @@
 import { formatCpf, formatPhone } from '@core/util'
 import * as datefns from 'date-fns'
 
-import { PatientModel } from '../entities'
+import { PatientFormatted, PatientModel } from '../entities'
 
-export function formatPatient(data: PatientModel) {
+export function formatPatient(data: PatientModel): PatientFormatted {
 	const {
 		CD_PACIENTE: id,
 		CD_AGENDA_PACIENTE: scheduleId,
@@ -33,8 +33,8 @@ export function formatPatient(data: PatientModel) {
 		email,
 		name,
 		gender,
-		cpf: formattedCpf,
-		phone: formattedPhone,
+		cpf: String(formattedCpf),
+		phone: String(formattedPhone),
 		birth: birthDate
 	}
 }

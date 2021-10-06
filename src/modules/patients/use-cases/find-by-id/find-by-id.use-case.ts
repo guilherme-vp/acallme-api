@@ -1,5 +1,5 @@
 import { BaseUseCase } from '@domain/base'
-import { PatientModel } from '@modules/patients/entities'
+import { PatientFormatted, PatientModel } from '@modules/patients/entities'
 import { PatientRepository } from '@modules/patients/repositories'
 import { formatPatient } from '@modules/patients/util'
 import { Injectable, NotFoundException } from '@nestjs/common'
@@ -12,11 +12,13 @@ export class FindByIdUseCase implements BaseUseCase<PatientModel> {
 		private readonly languageService: I18nService
 	) {}
 
-	async execute(id: number) {
+	async execute(id: number): Promise<{ patient: PatientFormatted }> {
 		const foundPatient = await this.patientRepository.getOneById(id)
 
 		if (!foundPatient) {
-			throw new NotFoundException(await this.languageService.translate('auth.user-does-not-exists'))
+			throw new NotFoundException(
+				await this.languageService.translate('auth.user-does-not-exists')
+			)
 		}
 
 		const patient = formatPatient(foundPatient)
