@@ -1,4 +1,6 @@
 export * from './format-cpf.util'
 export * from './format-phone.util'
+export * from './format-cnpj.util'
 export * from './split-cpf.util'
 export * from './split-phone.util'
+export * from './split-cnpj.util'
