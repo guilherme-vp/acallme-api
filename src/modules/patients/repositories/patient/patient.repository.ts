@@ -5,7 +5,7 @@ import { Tables } from '@services/database/tables'
 
 import { PatientModel } from '../../entities'
 
-export type PatientSelect = DefaultSelect<PatientModel, 'DS_SENHA'>
+export type PatientSelect = DefaultSelect<PatientModel>
 
 @Injectable()
 export class PatientRepository {
@@ -19,12 +19,16 @@ export class PatientRepository {
 
 		const inputVars = inputKeys.map(key => `:${key}`)
 
-		const query = `INSERT INTO ${Tables.Patient} (${inputKeys.join(', ')}) VALUES (${inputVars.join(', ')})`
+		const query = `INSERT INTO ${Tables.Patient} (${inputKeys.join(
+			', '
+		)}) VALUES (${inputVars.join(', ')})`
 
 		await this.databaseService.executeQuery(query, data)
 
 		const [createdUser] = await this.databaseService.executeQuery<PatientModel>(
-			`SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Patient} WHERE ds_email = :email`,
+			`SELECT ${select ? select.join(`, `) : '*'} FROM ${
+				Tables.Patient
+			} WHERE ds_email = :email`,
 			{ email: data.DS_EMAIL }
 		)
 
@@ -41,12 +45,16 @@ export class PatientRepository {
 		return result
 	}
 
-	async getOne(where: RequireAtLeastOne<PatientModel>, select?: PatientSelect): Promise<PatientModel> {
+	async getOne(
+		where: RequireAtLeastOne<PatientModel>,
+		method: 'AND' | 'OR' = 'AND',
+		select?: PatientSelect
+	): Promise<PatientModel> {
 		const whereKeys = Object.keys(where).map(key => `${key} = :${key}`)
 
-		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Patient} WHERE ${whereKeys.join(
-			', '
-		)}`
+		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
+			Tables.Patient
+		} WHERE ${whereKeys.join(` ${method} `)}`
 
 		const [result] = await this.databaseService.executeQuery<PatientModel>(query, where)
 
@@ -67,7 +75,10 @@ export class PatientRepository {
 		return result
 	}
 
-	async existsEmailCpf(fields: { email: string; cpf: { full: number; digits: number } }): Promise<boolean> {
+	async existsEmailCpf(fields: {
+		email: string
+		cpf: { full: number; digits: number }
+	}): Promise<boolean> {
 		const { cpf, email } = fields
 
 		const query = `SELECT cd_paciente FROM ${Tables.Patient} WHERE ds_email = :email OR (nr_cpf = :cpf AND nr_cpf_digito = :digits)`
