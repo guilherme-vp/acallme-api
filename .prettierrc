@@ -8,5 +8,5 @@
 	"trailingComma": "none",
 	"tabWidth": 2,
 	"semi": false,
-	"printWidth": 108
+	"printWidth": 92
 }
