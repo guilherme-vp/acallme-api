@@ -1,4 +1,4 @@
-import { dbConfig } from '@constants/configuration'
+import { dbConfig } from '@common/constants/configuration'
 import { Injectable, OnModuleDestroy, OnModuleInit } from '@nestjs/common'
 import oracledb, { BindParameters, Connection } from 'oracledb'
 

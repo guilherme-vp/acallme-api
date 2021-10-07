@@ -1,5 +1,5 @@
-import { RequireAtLeastOne } from '@core/types'
-import { BaseUseCase } from '@domain/base'
+import { BaseUseCase } from '@common/domain/base'
+import { RequireAtLeastOne } from '@core/types/'
 import { SpecialistFormatted, SpecialistModel } from '@modules/specialists/entities'
 import { SpecialistRepository } from '@modules/specialists/repositories'
 import { formatSpecialist } from '@modules/specialists/utils'

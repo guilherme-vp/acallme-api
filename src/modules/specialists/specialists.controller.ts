@@ -1,6 +1,6 @@
-import { Roles } from '@core/decorators'
-import { AuthGuard, RolesGuard } from '@core/guards'
-import { Role } from '@domain/enums'
+import { Roles } from '@common/decorators'
+import { Role } from '@common/domain/enums'
+import { AuthGuard, RolesGuard } from '@common/guards'
 import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common'
 
 import { Specialist } from './decorators'

@@ -29,17 +29,20 @@
 			"@services/*": [
 				"services/*"
 			],
-			"@main/*": [
-				"main/*"
-			],
-			"@domain/*": [
-				"domain/*"
-			],
-			"@constants/*": [
-				"constants/*"
-			],
 			"@modules/*": [
 				"modules/*"
+			],
+			"@common/*": [
+				"common/*"
+			],
+			"@providers/*": [
+				"providers/*"
+			],
+			"@views/*": [
+				"views/*"
+			],
+			"@assets/*": [
+				"pipes/*"
 			],
 			"@core/*": [
 				"*"

@@ -1,4 +1,4 @@
-import { Role } from '@domain/enums'
+import { Role } from '@common/domain/enums'
 import { Injectable } from '@nestjs/common'
 
 import { CreateUseCase } from './use-cases/create'

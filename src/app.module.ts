@@ -1,4 +1,4 @@
-import { config } from '@core/config'
+import { config } from '@common/config'
 import { ServicesModule } from '@core/services'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'

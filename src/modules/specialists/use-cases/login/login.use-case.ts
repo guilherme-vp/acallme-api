@@ -1,4 +1,4 @@
-import { splitCnpj } from '@core/utils'
+import { splitCnpj } from '@common/utils'
 import { LoginDto } from '@modules/specialists/dtos'
 import { SpecialistFormatted } from '@modules/specialists/entities'
 import { SpecialistRepository } from '@modules/specialists/repositories'

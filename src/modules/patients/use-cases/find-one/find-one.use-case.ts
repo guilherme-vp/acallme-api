@@ -1,5 +1,5 @@
-import { RequireAtLeastOne } from '@core/types'
-import { BaseUseCase } from '@domain/base'
+import { BaseUseCase } from '@common/domain/base'
+import { RequireAtLeastOne } from '@core/types/'
 import { PatientFormatted, PatientModel } from '@modules/patients/entities'
 import { PatientRepository } from '@modules/patients/repositories'
 import { formatPatient } from '@modules/patients/utils'

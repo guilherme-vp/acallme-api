@@ -1,12 +1,12 @@
-import { NestConfig } from '@core/config'
+import { NestConfig } from '@common/config'
+import { HttpExceptionFilter } from '@common/filters'
+import { ValidationPipe } from '@common/pipes'
 import { Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify'
 
 import { AppModule } from './app.module'
-import { HttpExceptionFilter } from './filters'
-import { ValidationPipe } from './pipes'
 
 const bootstrap = async () => {
 	const app = await NestFactory.create<NestFastifyApplication>(

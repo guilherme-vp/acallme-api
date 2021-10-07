@@ -1,4 +1,4 @@
-import { RequireAtLeastOne } from '@core/types'
+import { RequireAtLeastOne } from '@core/types/'
 import { Injectable } from '@nestjs/common'
 
 import { SignUpDto, LoginDto } from './dtos'

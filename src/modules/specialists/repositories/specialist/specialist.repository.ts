@@ -1,4 +1,4 @@
-import { DefaultSelect, OmitProperties, RequireAtLeastOne } from '@core/types'
+import { DefaultSelect, OmitProperties, RequireAtLeastOne } from '@core/types/'
 import { Injectable } from '@nestjs/common'
 import { DatabaseService } from '@services/database'
 import { Tables } from '@services/database/tables'

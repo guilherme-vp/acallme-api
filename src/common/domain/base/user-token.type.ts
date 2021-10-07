@@ -1,4 +1,4 @@
-import { Role } from '@domain/enums'
+import { Role } from '@common/domain/enums'
 
 export interface UserToken {
 	id: number

@@ -1,4 +1,4 @@
-import { splitCpf } from '@core/utils'
+import { splitCpf } from '@common/utils'
 import { LoginDto } from '@modules/patients/dtos'
 import { PatientFormatted } from '@modules/patients/entities'
 import { PatientRepository } from '@modules/patients/repositories'

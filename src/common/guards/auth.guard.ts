@@ -1,6 +1,6 @@
 /* eslint-disable import/extensions */
-import { UserToken } from '@domain/base'
-import { Role } from '@domain/enums'
+import { UserToken } from '@common/domain/base'
+import { Role } from '@common/domain/enums'
 import { PatientService } from '@modules/patients/patients.service'
 import { SpecialistService } from '@modules/specialists/specialists.service'
 import {

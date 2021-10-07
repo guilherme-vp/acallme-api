@@ -1,4 +1,4 @@
-import { SecurityConfig } from '@core/config'
+import { SecurityConfig } from '@common/config'
 import { Global, Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { JwtModule as NestJwtModule, JwtService } from '@nestjs/jwt'

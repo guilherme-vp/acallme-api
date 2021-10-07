@@ -1,4 +1,4 @@
-import { UserModel } from '@domain/entities'
+import { UserModel } from '@common/domain/entities'
 
 export type SpecialistModel = UserModel & {
 	CD_ESPECIALISTA?: number

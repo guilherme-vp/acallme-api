@@ -1,4 +1,4 @@
-import { UserGender } from '@domain/enums'
+import { UserGender } from '@common/domain/enums'
 
 export interface UserModel {
 	DS_EMAIL: string

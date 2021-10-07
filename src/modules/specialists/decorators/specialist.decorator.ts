@@ -1,4 +1,4 @@
-import { SECRET } from '@constants/configuration'
+import { SECRET } from '@common/constants/configuration'
 import {
 	createParamDecorator,
 	ExecutionContext,

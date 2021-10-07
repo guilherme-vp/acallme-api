@@ -1,4 +1,4 @@
-import { UserFormattedModel } from '@domain/entities'
+import { UserFormattedModel } from '@common/domain/entities'
 
 declare module 'fastify' {
 	export interface FastifyRequest {

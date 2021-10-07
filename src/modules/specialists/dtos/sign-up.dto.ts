@@ -1,4 +1,4 @@
-import { UserGender } from '@domain/enums'
+import { UserGender } from '@common/domain/enums'
 import {
 	IsDateString,
 	IsEmail,

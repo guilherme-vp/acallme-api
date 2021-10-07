@@ -1,4 +1,4 @@
-import { OmitProperties } from '@core/types'
+import { OmitProperties } from '@core/types/'
 import { PatientScheduleModel } from '@modules/schedules/entities'
 import { Injectable } from '@nestjs/common'
 import { DatabaseService } from '@services/database'
