@@ -1,3 +1,5 @@
+import { ISendMailOptions } from '@nestjs-modules/mailer'
+
 import { RequireOnlyOne } from './require-only-one'
 
 export interface IAddress {
@@ -9,7 +11,7 @@ export type IMessage = {
 	/**
 	 * Defaults are:
 	 *
-	 * `from.name = "Acall me"`
+	 * `from.name = "ACall me"`
 	 *
 	 * `from.address = "acallme.vortechs@gmail.com"`
 	 */
@@ -23,6 +25,7 @@ export type IReturnMail = RequireOnlyOne<
 	{
 		subject: string
 		html?: string
+		attachments?: ISendMailOptions['attachments']
 	},
 	'html'
 >

@@ -32,8 +32,8 @@ const config: AppConfig = {
 		transport: mailConfig,
 		defaults: {
 			from: `"No Reply" <acallme.vortechs@gmail.com>`
-		},
-		preview: NODE_ENV !== 'production'
+		}
+		// preview: NODE_ENV !== 'development'
 	}
 }
 
