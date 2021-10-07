@@ -1,4 +1,6 @@
 export * from './database'
 export * from './language'
 export * from './crypt'
+export * from './jwt'
+export * from './mail'
 export * from './services.module'
