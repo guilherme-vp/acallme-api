@@ -51,6 +51,7 @@
 		"@nestjs/cli": "^8.1.1",
 		"@nestjs/testing": "^8.0.4",
 		"@types/bcrypt": "^5.0.0",
+		"@types/cache-manager": "^3.4.2",
 		"@types/cron": "^1.7.3",
 		"@types/date-fns": "^2.6.0",
 		"@types/faker": "^5.5.7",
