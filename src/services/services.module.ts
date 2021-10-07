@@ -8,7 +8,6 @@ import { CryptService } from './crypt'
 import { DatabaseService } from './database'
 import { LanguageModule } from './language'
 import { MailerModule } from './mail'
-import { TasksModule } from './tasks'
 
 const jwtModule = JwtModule.registerAsync({
 	useFactory: async (configService: ConfigService) => {
@@ -35,14 +34,7 @@ const cacheModule = CacheModule.registerAsync({
 
 @Global()
 @Module({
-	imports: [
-		jwtModule,
-		cacheModule,
-		LanguageModule,
-		ScheduleModule.forRoot(),
-		TasksModule,
-		MailerModule
-	],
+	imports: [jwtModule, cacheModule, LanguageModule, ScheduleModule.forRoot(), MailerModule],
 	providers: [CryptService, DatabaseService],
 	exports: [
 		CryptService,
