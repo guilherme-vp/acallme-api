@@ -1,17 +1,38 @@
+import { RequireAtLeastOne } from '@core/types'
+import { PatientFormatted } from '@modules/patients/entities'
 import { Injectable } from '@nestjs/common'
 
-// import { FindByIdUseCase, FindOneUseCase } from './use-cases'
+import { CreateDto } from './dtos'
+import { AppointmentModel } from './entities'
+import {
+	ConfirmUseCase,
+	CreateUseCase,
+	FindByIdUseCase,
+	FindManyUseCase
+} from './use-cases'
 
 @Injectable()
 export class AppointmentService {
-	// constructor(
-	// private findByIdUseCase: FindByIdUseCase,
-	// private findOneUseCase: FindOneUseCase
-	// ) {}
-	// async findById(id: number) {
-	// return this.findByIdUseCase.execute(id)
-	// }
-	// async findOne(fields: RequireAtLeastOne<AppointmentModel>) {
-	// return this.findOneUseCase.execute(fields)
-	// }
+	constructor(
+		private findManyUseCase: FindManyUseCase,
+		private findByIdUseCase: FindByIdUseCase,
+		private createUseCase: CreateUseCase,
+		private confirmUseCase: ConfirmUseCase
+	) {}
+
+	async findMany(where?: RequireAtLeastOne<AppointmentModel>) {
+		return this.findManyUseCase.execute(where)
+	}
+
+	async findById(appointmentId: number) {
+		return this.findByIdUseCase.execute(appointmentId)
+	}
+
+	async create(input: CreateDto, patient: PatientFormatted) {
+		return this.createUseCase.execute(input, patient)
+	}
+
+	async confirm(specialistId: number, appointmentId: number) {
+		return this.confirmUseCase.execute(specialistId, appointmentId)
+	}
 }
