@@ -1,8 +1,10 @@
-import { SECRET } from '@constants/configuration'
+import { SECRET, mailConfig, NODE_ENV } from '@constants/configuration'
+import { MailerOptions } from '@nestjs-modules/mailer'
 
 export interface AppConfig {
 	nest: NestConfig
 	security: SecurityConfig
+	mailer: MailerConfig
 }
 
 export interface NestConfig {
@@ -15,6 +17,8 @@ export interface SecurityConfig {
 	secret: string
 }
 
+export type MailerConfig = MailerOptions
+
 const config: AppConfig = {
 	nest: {
 		port: 5005
@@ -23,6 +27,13 @@ const config: AppConfig = {
 		expiresIn: '1d',
 		refreshIn: '7d',
 		secret: SECRET
+	},
+	mailer: {
+		transport: mailConfig,
+		defaults: {
+			from: `"No Reply" <acallme.vortechs@gmail.com>`
+		},
+		preview: NODE_ENV !== 'production'
 	}
 }
 
