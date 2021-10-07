@@ -1,4 +1,4 @@
-interface WelcomeMailVars {
+export interface WelcomeMailVars {
 	company: string
 	welcomeTitle: string
 	welcomeDesc: string
