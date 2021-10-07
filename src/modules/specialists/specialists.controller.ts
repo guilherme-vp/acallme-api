@@ -1,5 +1,5 @@
 import { Roles } from '@core/decorators'
-import { AuthGuard } from '@core/guards'
+import { AuthGuard, RolesGuard } from '@core/guards'
 import { Role } from '@domain/enums'
 import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common'
 
@@ -22,21 +22,22 @@ export class SpecialistsController {
 		return this.specialistService.login(input)
 	}
 
-	@UseGuards(AuthGuard)
+	@UseGuards(AuthGuard, RolesGuard)
+	@Roles(Role.Specialist)
 	@Get('me')
 	async me(@Specialist('id') id: number) {
 		return this.specialistService.findById(id)
 	}
 
-	@UseGuards(AuthGuard)
-	@Roles(Role.Specialist, Role.Specialist)
+	@UseGuards(AuthGuard, RolesGuard)
+	@Roles(Role.Patient, Role.Specialist)
 	@Get(':id')
 	async findById(@Param('id') id: string) {
 		return this.specialistService.findById(+id)
 	}
 
-	@UseGuards(AuthGuard)
-	@Roles(Role.Specialist, Role.Specialist)
+	@UseGuards(AuthGuard, RolesGuard)
+	@Roles(Role.Specialist)
 	@Get()
 	async findOne(@Query() query: SpecialistModel) {
 		return this.specialistService.findOne(query)
