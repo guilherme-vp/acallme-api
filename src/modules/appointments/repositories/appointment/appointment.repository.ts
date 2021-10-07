@@ -1,10 +1,12 @@
 import { DefaultSelect, OmitProperties, RequireAtLeastOne } from '@core/types/'
 import { Injectable } from '@nestjs/common'
+import { ScheduleModule } from '@nestjs/schedule'
 import { DatabaseService } from '@services/database'
 import { Tables } from '@services/database/tables'
 import OracleDB from 'oracledb'
 
 import { AppointmentModel } from '../../entities'
+import { joinUsers } from './appointment.join'
 
 export type AppointmentSelect = DefaultSelect<AppointmentModel>
 
@@ -13,7 +15,10 @@ export class AppointmentRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async create(
-		data: OmitProperties<AppointmentModel, 'CD_CONSULTA'>,
+		data: OmitProperties<
+			AppointmentModel,
+			'CD_CONSULTA' | 'CD_PRONTUARIO' | 'VL_CONFIRMADO'
+		>,
 		select?: AppointmentSelect
 	): Promise<AppointmentModel> {
 		const inputKeys = Object.keys(data)
@@ -22,7 +27,7 @@ export class AppointmentRepository {
 
 		const query = `INSERT INTO ${Tables.Appointment} (${inputKeys.join(
 			', '
-		)}) VALUES (${inputVars.join(', ')}) RETURNING ${
+		)}, vl_confirmado) VALUES (${inputVars.join(', ')}, 0) RETURNING ${
 			select ? select.join(`, `) : '*'
 		} RETURNING cd_consulta INTO :returning_id`
 
@@ -69,17 +74,63 @@ export class AppointmentRepository {
 		return result
 	}
 
-	async getMany(where: RequireAtLeastOne<AppointmentModel>, select?: AppointmentSelect) {
-		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Appointment}`
+	async getMany(
+		where?: RequireAtLeastOne<AppointmentModel>,
+		join = false,
+		select?: AppointmentSelect
+	): Promise<AppointmentModel[]> {
+		let query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Appointment}`
+
+		if (join) {
+			query = query.concat(joinUsers)
+		}
 
 		if (where) {
 			const inputVars = Object.entries(where).map(([key, value]) => `${key} = ${value}`)
 
-			query.concat(`WHERE ${inputVars.join(', ')}`)
+			query = query.concat(`WHERE ${inputVars.join(', ')}`)
 		}
 
 		const result = await this.databaseService.executeQuery<AppointmentModel>(query, [])
 
 		return result
+	}
+
+	async getManyTodayWithUsers(date?: Date, join = true): Promise<AppointmentModel[]> {
+		let query = `SELECT * FROM ${Tables.Appointment} AP `
+
+		if (join) {
+			query = query.concat(joinUsers)
+		}
+
+		query = query.concat(' WHERE dt_consulta >= :today')
+
+		const result = await this.databaseService.executeQuery<AppointmentModel>(query, {
+			today: date
+		})
+
+		return result
+	}
+
+	async isAlreadyScheduled(scheduledDate: Date): Promise<boolean> {
+		const query = `SELECT cd_consulta FROM ${Tables.Appointment} WHERE dt_consulta = :date`
+
+		const [result] = await this.databaseService.executeQuery<ScheduleModule>(query, {
+			date: scheduledDate
+		})
+
+		if (result) {
+			return true
+		}
+
+		return false
+	}
+
+	async confirmAppointment(appointmentId: number): Promise<boolean> {
+		const query = `UPDATE ${Tables.Appointment} SET vl_confirmado = 1 WHERE cd_consulta = :id`
+
+		await this.databaseService.executeQuery(query, { id: appointmentId })
+
+		return true
 	}
 }
