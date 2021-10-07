@@ -2,6 +2,7 @@ import { DefaultSelect, OmitProperties, RequireAtLeastOne } from '@core/types/'
 import { Injectable } from '@nestjs/common'
 import { DatabaseService } from '@services/database'
 import { Tables } from '@services/database/tables'
+import oracleDB from 'oracledb'
 
 import { PatientModel } from '../../entities'
 
@@ -21,15 +22,18 @@ export class PatientRepository {
 
 		const query = `INSERT INTO ${Tables.Patient} (${inputKeys.join(
 			', '
-		)}) VALUES (${inputVars.join(', ')})`
+		)}) VALUES (${inputVars.join(', ')}) RETURNING cd_paciente INTO :returning_id`
 
-		await this.databaseService.executeQuery(query, data)
+		const result = await this.databaseService.executeQuery(query, {
+			...data,
+			returning_id: { dir: oracleDB.BIND_OUT, type: oracleDB.NUMBER }
+		})
 
 		const [createdUser] = await this.databaseService.executeQuery<PatientModel>(
 			`SELECT ${select ? select.join(`, `) : '*'} FROM ${
 				Tables.Patient
-			} WHERE ds_email = :email`,
-			{ email: data.DS_EMAIL }
+			} WHERE cd_paciente = :id`,
+			{ id: result.returning_id[0] }
 		)
 
 		return createdUser
