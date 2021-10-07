@@ -120,11 +120,8 @@
 			}
 		],
 		"import/extensions": [
-			"error",
-			"never",
-			{
-				"json": "always"
-			}
+			"off",
+			"never"
 		],
 		"import/no-unresolved": "off",
 		"import/no-extraneous-dependencies": "off",
