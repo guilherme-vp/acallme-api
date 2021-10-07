@@ -36,13 +36,6 @@ const cacheModule = CacheModule.registerAsync({
 @Module({
 	imports: [jwtModule, cacheModule, LanguageModule, ScheduleModule.forRoot(), MailerModule],
 	providers: [CryptService, DatabaseService],
-	exports: [
-		CryptService,
-		DatabaseService,
-		jwtModule,
-		cacheModule,
-		LanguageModule,
-		MailerModule
-	]
+	exports: [CryptService, DatabaseService, jwtModule, cacheModule]
 })
 export class ServicesModule {}
