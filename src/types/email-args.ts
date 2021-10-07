@@ -2,7 +2,7 @@ import { RequireOnlyOne } from './require-only-one'
 
 export interface IAddress {
 	address: string
-	name?: string | undefined
+	name: string
 }
 
 export type IMessage = {
