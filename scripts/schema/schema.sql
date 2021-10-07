@@ -27,7 +27,7 @@ CREATE TABLE t_clg_chamada (
 
 CREATE TABLE t_clg_consulta (
     cd_consulta            NUMBER GENERATED ALWAYS AS IDENTITY,
-    cd_prontuario          NUMBER(5) NOT NULL,
+    cd_prontuario          NUMBER(5),
     cd_agenda_paciente     NUMBER(5) NOT NULL,
     cd_agenda_especialista NUMBER(5) NOT NULL,
     vl_consulta            NUMBER(8, 2) NOT NULL,
