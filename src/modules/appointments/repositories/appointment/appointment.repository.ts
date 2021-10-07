@@ -76,7 +76,7 @@ export class AppointmentRepository {
 
 	async getMany(
 		where?: RequireAtLeastOne<AppointmentModel>,
-		join = false,
+		join = true,
 		select?: AppointmentSelect
 	): Promise<AppointmentModel[]> {
 		let query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Appointment}`
@@ -91,23 +91,24 @@ export class AppointmentRepository {
 			query = query.concat(`WHERE ${inputVars.join(', ')}`)
 		}
 
-		const result = await this.databaseService.executeQuery<AppointmentModel>(query, [])
+		const result = await this.databaseService.executeQuery<AppointmentModel>(query, where)
 
 		return result
 	}
 
-	async getManyTodayWithUsers(date?: Date, join = true): Promise<AppointmentModel[]> {
-		let query = `SELECT * FROM ${Tables.Appointment} AP `
+	async getManyTodayWithUsers(
+		dates: { startDate: Date; endDate: Date },
+		join = true
+	): Promise<AppointmentModel[]> {
+		let query = `SELECT * FROM ${Tables.Appointment} AP`
 
 		if (join) {
 			query = query.concat(joinUsers)
 		}
 
-		query = query.concat(' WHERE dt_consulta >= :today')
+		query = query.concat('WHERE dt_consulta BETWEEN :startDate AND :endDate')
 
-		const result = await this.databaseService.executeQuery<AppointmentModel>(query, {
-			today: date
-		})
+		const result = await this.databaseService.executeQuery<AppointmentModel>(query, dates)
 
 		return result
 	}
