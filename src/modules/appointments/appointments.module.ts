@@ -5,13 +5,14 @@ import { ServicesModule } from '@services/services.module'
 import { AppointmentsController } from './appointments.controller'
 import { AppointmentService } from './appointments.service'
 import { AppointmentRepository } from './repositories'
-// import { UseCases } from './use-cases'
+import { TaskService } from './tasks'
+import { UseCases } from './use-cases'
 
 @Global()
 @Module({
 	imports: [ServicesModule, ScheduleModule],
 	controllers: [AppointmentsController],
-	providers: [AppointmentService, AppointmentRepository],
-	exports: [AppointmentService]
+	providers: [...UseCases, AppointmentService, TaskService, AppointmentRepository],
+	exports: [AppointmentService, TaskService]
 })
 export class AppointmentsModule {}
