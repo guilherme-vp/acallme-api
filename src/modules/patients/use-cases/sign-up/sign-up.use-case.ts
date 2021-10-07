@@ -1,6 +1,7 @@
 import { BaseUseCase } from '@common/domain/base'
 import { Role } from '@common/domain/enums'
 import { splitCpf, splitPhone } from '@common/utils'
+import { welcomeEmailProps } from '@core/providers'
 import { SignUpDto } from '@modules/patients/dtos'
 import { PatientFormatted, PatientModel } from '@modules/patients/entities'
 import { PatientRepository } from '@modules/patients/repositories'
@@ -9,6 +10,7 @@ import { SchedulesService } from '@modules/schedules/schedules.service'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { CryptService } from '@services/crypt'
+import { MailerService } from '@services/mail'
 import * as datefns from 'date-fns'
 import { I18nService } from 'nestjs-i18n'
 
@@ -19,7 +21,8 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 		private readonly scheduleService: SchedulesService,
 		private readonly languageService: I18nService,
 		private readonly cryptService: CryptService,
-		private readonly jwtService: JwtService
+		private readonly jwtService: JwtService,
+		private readonly mailerService: MailerService
 	) {}
 
 	async execute(input: SignUpDto): Promise<{ patient: PatientFormatted; token: string }> {
@@ -74,6 +77,16 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 			name,
 			email,
 			role: 'patient'
+		})
+
+		await this.mailerService.send({
+			to: {
+				address: email,
+				name: patient.name
+			},
+			...welcomeEmailProps({
+				name: patient.name
+			})
 		})
 
 		return {

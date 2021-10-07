@@ -1,6 +1,7 @@
 import { BaseUseCase } from '@common/domain/base'
 import { Role } from '@common/domain/enums'
 import { splitCnpj, splitCpf, splitPhone } from '@common/utils'
+import { welcomeEmailProps } from '@core/providers'
 import { SchedulesService } from '@modules/schedules/schedules.service'
 import { SignUpDto } from '@modules/specialists/dtos'
 import { SpecialistFormatted, SpecialistModel } from '@modules/specialists/entities'
@@ -9,6 +10,7 @@ import { formatSpecialist } from '@modules/specialists/utils'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { CryptService } from '@services/crypt'
+import { MailerService } from '@services/mail'
 import * as datefns from 'date-fns'
 import { I18nService } from 'nestjs-i18n'
 
@@ -19,7 +21,8 @@ export class SignUpUseCase implements BaseUseCase<SpecialistModel> {
 		private readonly languageService: I18nService,
 		private readonly scheduleService: SchedulesService,
 		private readonly cryptService: CryptService,
-		private readonly jwtService: JwtService
+		private readonly jwtService: JwtService,
+		private readonly mailerService: MailerService
 	) {}
 
 	async execute(
@@ -106,6 +109,16 @@ export class SignUpUseCase implements BaseUseCase<SpecialistModel> {
 			name,
 			email,
 			role: 'specialist'
+		})
+
+		await this.mailerService.send({
+			to: {
+				address: email,
+				name: specialist.name
+			},
+			...welcomeEmailProps({
+				name: specialist.name
+			})
 		})
 
 		return {
