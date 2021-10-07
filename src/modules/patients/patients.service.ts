@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common'
 
 import { SignUpDto, LoginDto } from './dtos'
 import { PatientModel } from './entities'
+import { PatientSelect } from './repositories'
 import { SignUpUseCase, LoginUseCase, FindByIdUseCase, FindOneUseCase } from './use-cases'
 
 @Injectable()
@@ -22,8 +23,8 @@ export class PatientService {
 		return this.loginUseCase.execute(input)
 	}
 
-	async findById(id: number) {
-		return this.findByIdUseCase.execute(id)
+	async findById(id: number, select?: PatientSelect) {
+		return this.findByIdUseCase.execute(id, select)
 	}
 
 	async findOne(fields: RequireAtLeastOne<PatientModel>) {

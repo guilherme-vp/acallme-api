@@ -1,6 +1,6 @@
 import { BaseUseCase } from '@common/domain/base'
 import { PatientFormatted, PatientModel } from '@modules/patients/entities'
-import { PatientRepository } from '@modules/patients/repositories'
+import { PatientRepository, PatientSelect } from '@modules/patients/repositories'
 import { formatPatient } from '@modules/patients/utils'
 import { Injectable } from '@nestjs/common'
 
@@ -8,8 +8,11 @@ import { Injectable } from '@nestjs/common'
 export class FindByIdUseCase implements BaseUseCase<PatientModel> {
 	constructor(private readonly patientRepository: PatientRepository) {}
 
-	async execute(id: number): Promise<{ patient: PatientFormatted } | null> {
-		const foundPatient = await this.patientRepository.getOneById(id)
+	async execute(
+		id: number,
+		select?: PatientSelect
+	): Promise<{ patient: PatientFormatted } | null> {
+		const foundPatient = await this.patientRepository.getOneById(id, select)
 
 		if (!foundPatient) {
 			return null
