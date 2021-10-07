@@ -12,6 +12,9 @@ node_modules
 !.vscode/settings.json
 .eslintcache
 
+# OS
+.DS_Store
+
 # misc
 /coverage
 yarn-error.log
