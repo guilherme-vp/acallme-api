@@ -1,5 +1,6 @@
 /* eslint-disable import/extensions */
 import { UserToken } from '@domain/base'
+import { Role } from '@domain/enums'
 import { PatientService } from '@modules/patients/patients.service'
 import { SpecialistService } from '@modules/specialists/specialists.service'
 import {
@@ -56,11 +57,11 @@ export class AuthGuard implements CanActivate {
 		}
 
 		if (patient) {
-			request.user = patient.patient
+			request.user = { ...patient.patient, role: Role.Patient }
 		}
 
 		if (specialist) {
-			request.user = specialist.specialist
+			request.user = { ...specialist.specialist, role: Role.Specialist }
 		}
 
 		return true
