@@ -1,10 +1,10 @@
 import { config } from '@common/config'
-import { ServicesModule } from '@core/services'
 import { PatientsModule } from '@modules/patients/patients.module'
 import { SchedulesModule } from '@modules/schedules/schedules.module'
 import { SpecialistsModule } from '@modules/specialists/specialists.module'
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
+import { ServicesModule } from '@services/services.module'
 
 @Module({
 	imports: [
