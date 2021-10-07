@@ -35,9 +35,15 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 		await this.connection.close()
 	}
 
-	async executeQuery<T = any>(sqlQuery: string, args?: BindParameters): Promise<T[]> {
-		const result = await this.connection.execute(sqlQuery, args ?? {})
+	async executeQuery<T = any>(
+		sqlQuery: string,
+		args?: BindParameters
+		// eslint-disable-next-line @typescript-eslint/ban-types
+	): Promise<T extends object ? T[] : any> {
+		const result = await this.connection.execute(sqlQuery, args ?? {}, { maxRows: 50 })
 
-		return result.rows as T[]
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		return (result.rows as T[]) ?? result.outBinds
 	}
 }
