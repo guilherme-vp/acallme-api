@@ -2,7 +2,7 @@ import { RequireAtLeastOne } from '@core/types'
 import { BaseUseCase } from '@domain/base'
 import { SpecialistFormatted, SpecialistModel } from '@modules/specialists/entities'
 import { SpecialistRepository } from '@modules/specialists/repositories'
-import { formatSpecialist } from '@modules/specialists/util'
+import { formatSpecialist } from '@modules/specialists/utils'
 import { Injectable } from '@nestjs/common'
 
 @Injectable()

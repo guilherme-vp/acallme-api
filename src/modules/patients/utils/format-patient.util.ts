@@ -1,4 +1,4 @@
-import { formatCpf, formatPhone } from '@core/util'
+import { formatCpf, formatPhone } from '@core/utils'
 import * as datefns from 'date-fns'
 
 import { PatientFormatted, PatientModel } from '../entities'

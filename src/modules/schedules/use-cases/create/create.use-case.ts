@@ -4,7 +4,7 @@ import {
 	PatientScheduleRepository,
 	SpecialistScheduleRepository
 } from '@modules/schedules/repositories'
-import { formatSchedule } from '@modules/schedules/util'
+import { formatSchedule } from '@modules/schedules/utils'
 import { Injectable } from '@nestjs/common'
 
 @Injectable()

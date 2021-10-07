@@ -1,7 +1,7 @@
 import { BaseUseCase } from '@domain/base'
 import { PatientFormatted, PatientModel } from '@modules/patients/entities'
 import { PatientRepository } from '@modules/patients/repositories'
-import { formatPatient } from '@modules/patients/util'
+import { formatPatient } from '@modules/patients/utils'
 import { Injectable } from '@nestjs/common'
 
 @Injectable()

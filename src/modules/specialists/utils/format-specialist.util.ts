@@ -1,4 +1,4 @@
-import { formatCnpj, formatCpf, formatPhone } from '@core/util'
+import { formatCnpj, formatCpf, formatPhone } from '@core/utils'
 import * as datefns from 'date-fns'
 
 import { SpecialistFormatted, SpecialistModel } from '../entities'
