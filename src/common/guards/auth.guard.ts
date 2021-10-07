@@ -11,6 +11,7 @@ import {
 	HttpStatus
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
+import { FastifyRequest } from 'fastify'
 import { I18nService } from 'nestjs-i18n'
 
 @Injectable()
@@ -23,7 +24,7 @@ export class AuthGuard implements CanActivate {
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const request = context.switchToHttp().getRequest()
+		const request = context.switchToHttp().getRequest() as FastifyRequest
 
 		const authHeader = request.headers['authorization']
 
