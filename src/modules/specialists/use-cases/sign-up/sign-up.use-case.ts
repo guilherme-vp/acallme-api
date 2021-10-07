@@ -1,5 +1,7 @@
 import { splitCnpj, splitCpf, splitPhone } from '@core/util'
 import { BaseUseCase } from '@domain/base'
+import { Role } from '@domain/enums'
+import { SchedulesService } from '@modules/schedules/schedules.service'
 import { SignUpDto } from '@modules/specialists/dtos'
 import { SpecialistFormatted, SpecialistModel } from '@modules/specialists/entities'
 import { SpecialistRepository } from '@modules/specialists/repositories'
@@ -15,6 +17,7 @@ export class SignUpUseCase implements BaseUseCase<SpecialistModel> {
 	constructor(
 		private readonly specialistRepository: SpecialistRepository,
 		private readonly languageService: I18nService,
+		private readonly scheduleService: SchedulesService,
 		private readonly cryptService: CryptService,
 		private readonly jwtService: JwtService
 	) {}
@@ -91,7 +94,12 @@ export class SignUpUseCase implements BaseUseCase<SpecialistModel> {
 			NR_CRP: Number(crp)
 		})
 
-		const specialist = formatSpecialist(createdSpecialist)
+		const createdSchedule = await this.scheduleService.create(
+			createdSpecialist.CD_ESPECIALISTA as number,
+			Role.Patient
+		)
+
+		const specialist = formatSpecialist({ ...createdSpecialist, ...createdSchedule })
 
 		const createdToken = this.jwtService.sign({
 			id: specialist.id,

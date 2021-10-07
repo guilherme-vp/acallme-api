@@ -1,9 +1,11 @@
 import { splitCpf, splitPhone } from '@core/util'
 import { BaseUseCase } from '@domain/base'
+import { Role } from '@domain/enums'
 import { SignUpDto } from '@modules/patients/dtos'
 import { PatientFormatted, PatientModel } from '@modules/patients/entities'
 import { PatientRepository } from '@modules/patients/repositories'
 import { formatPatient } from '@modules/patients/util'
+import { SchedulesService } from '@modules/schedules/schedules.service'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { CryptService } from '@services/crypt'
@@ -14,6 +16,7 @@ import { I18nService } from 'nestjs-i18n'
 export class SignUpUseCase implements BaseUseCase<PatientModel> {
 	constructor(
 		private readonly patientRepository: PatientRepository,
+		private readonly scheduleService: SchedulesService,
 		private readonly languageService: I18nService,
 		private readonly cryptService: CryptService,
 		private readonly jwtService: JwtService
@@ -49,14 +52,22 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 			DS_EMAIL: email,
 			DS_SENHA: password,
 			DS_GENERO: gender,
-			DT_NASCIMENTO: datefns.parse(birth, 'dd/MM/yyyy', new Date()),
+			DT_NASCIMENTO: datefns.parse(birth, 'yyyy-dd-MM', new Date()),
 			NR_CPF: fullCpf,
 			NR_CPF_DIGITO: digitsCpf,
-			NR_TELEFONE: finalPhone[0],
-			NR_TELEFONE_DDD: finalPhone[1]
+			NR_TELEFONE_DDD: finalPhone[0],
+			NR_TELEFONE: finalPhone[1]
 		})
 
-		const patient = formatPatient(createdPatient)
+		const createdSchedule = await this.scheduleService.create(
+			createdPatient.CD_PACIENTE as number,
+			Role.Patient
+		)
+
+		const patient = formatPatient({
+			...createdPatient,
+			CD_AGENDA_PACIENTE: createdSchedule.scheduleId
+		})
 
 		const createdToken = this.jwtService.sign({
 			id: patient.id,
