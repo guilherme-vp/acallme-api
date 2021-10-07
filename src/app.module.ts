@@ -1,4 +1,6 @@
 import { config } from '@common/config'
+import { AppointmentsModule } from '@modules/appointments/appointments.module'
+import { MessageModule } from '@modules/message/message.module'
 import { PatientsModule } from '@modules/patients/patients.module'
 import { SchedulesModule } from '@modules/schedules/schedules.module'
 import { SpecialistsModule } from '@modules/specialists/specialists.module'
@@ -8,10 +10,12 @@ import { ServicesModule } from '@services/services.module'
 
 @Module({
 	imports: [
+		MessageModule,
 		ServicesModule,
 		PatientsModule,
 		SpecialistsModule,
 		SchedulesModule,
+		AppointmentsModule,
 		ConfigModule.forRoot({ isGlobal: true, load: [config] })
 	]
 })
