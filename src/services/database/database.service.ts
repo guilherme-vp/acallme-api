@@ -40,7 +40,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 		args?: BindParameters
 		// eslint-disable-next-line @typescript-eslint/ban-types
 	): Promise<T extends object ? T[] : any> {
-		const result = await this.connection.execute(sqlQuery, args ?? {}, { maxRows: 50 })
+		const result = await this.connection.execute(sqlQuery, args ?? {})
 
 		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 		// @ts-ignore
