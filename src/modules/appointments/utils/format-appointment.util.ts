@@ -1,3 +1,7 @@
+import { formatPatient } from '@modules/patients/utils'
+import { formatSpecialist } from '@modules/specialists/utils'
+import * as datefns from 'date-fns'
+
 import { AppointmentFormatted, AppointmentModel } from '../entities'
 
 export function formatAppointment(data: AppointmentModel): AppointmentFormatted {
@@ -8,7 +12,9 @@ export function formatAppointment(data: AppointmentModel): AppointmentFormatted 
 		DT_CONSULTA: scheduled,
 		VL_CONSULTA: cost,
 		CD_PRONTUARIO: recordId,
-		VL_CONFIRMADO: confirmed
+		VL_CONFIRMADO: confirmed,
+		P: patient,
+		S: specialist
 	} = data
 
 	return {
@@ -16,8 +22,10 @@ export function formatAppointment(data: AppointmentModel): AppointmentFormatted 
 		cost,
 		patientSchedId,
 		specialistSchedId,
-		scheduled,
+		scheduled: datefns.formatRelative(scheduled, new Date()),
 		confirmed: Boolean(confirmed),
-		recordId
+		recordId,
+		patient: formatPatient(patient),
+		specialist: formatSpecialist(specialist)
 	}
 }
