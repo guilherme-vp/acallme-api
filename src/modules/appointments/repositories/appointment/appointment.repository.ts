@@ -17,7 +17,7 @@ export class AppointmentRepository {
 	async create(
 		data: OmitProperties<
 			AppointmentModel,
-			'CD_CONSULTA' | 'CD_PRONTUARIO' | 'VL_CONFIRMADO'
+			'CD_CONSULTA' | 'CD_PRONTUARIO' | 'VL_CONFIRMADO' | 'P' | 'S'
 		>,
 		select?: AppointmentSelect
 	): Promise<AppointmentModel> {
@@ -59,7 +59,7 @@ export class AppointmentRepository {
 	}
 
 	async getOne(
-		where: RequireAtLeastOne<AppointmentModel>,
+		where: RequireAtLeastOne<Omit<AppointmentModel, 'P' | 'S'>>,
 		method: 'AND' | 'OR' = 'AND',
 		select?: AppointmentSelect
 	): Promise<AppointmentModel> {
@@ -75,7 +75,7 @@ export class AppointmentRepository {
 	}
 
 	async getMany(
-		where?: RequireAtLeastOne<AppointmentModel>,
+		where?: RequireAtLeastOne<Omit<AppointmentModel, 'P' | 'S'>>,
 		join = true,
 		select?: AppointmentSelect
 	): Promise<AppointmentModel[]> {
@@ -106,18 +106,29 @@ export class AppointmentRepository {
 			query = query.concat(joinUsers)
 		}
 
-		query = query.concat('WHERE dt_consulta BETWEEN :startDate AND :endDate')
+		query = query.concat(
+			'WHERE dt_consulta BETWEEN :startDate AND :endDate AND vl_confirmado = :confirm'
+		)
 
-		const result = await this.databaseService.executeQuery<AppointmentModel>(query, dates)
+		const result = await this.databaseService.executeQuery<AppointmentModel>(query, {
+			...dates,
+			confirm: 1
+		})
 
 		return result
 	}
 
-	async isAlreadyScheduled(scheduledDate: Date): Promise<boolean> {
-		const query = `SELECT cd_consulta FROM ${Tables.Appointment} WHERE dt_consulta = :date`
+	async isAlreadyScheduled(
+		scheduledDate: Date
+		// specialistSchedId: number,
+		// patientSchedId: number
+	): Promise<boolean> {
+		const query = `SELECT cd_consulta FROM ${Tables.Appointment} WHERE dt_consulta = :date AND cd_agenda_especialista = :specialistSchedId AND cd_agenda_paciente = :patientSchedId`
 
 		const [result] = await this.databaseService.executeQuery<ScheduleModule>(query, {
-			date: scheduledDate
+			date: scheduledDate,
+			specialistSchedId: 2,
+			patientSchedId: 2
 		})
 
 		if (result) {
