@@ -7,5 +7,6 @@ export enum WsEvents {
 	SEND_USERS_CALL = 'send-users-call',
 	ANSWER_CALL = 'answer-call',
 	RECEIVE_CALL = 'receive-call',
-	END_CALL = 'end-call'
+	END_CALL = 'end-call',
+	SEND_NOTIFICATION = 'send-notification'
 }
