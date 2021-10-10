@@ -7,12 +7,19 @@ import { AppointmentService } from './appointments.service'
 import { AppointmentRepository } from './repositories'
 import { TaskService } from './tasks'
 import { UseCases } from './use-cases'
+import { Gateways } from './websockets'
 
 @Global()
 @Module({
 	imports: [ServicesModule, ScheduleModule],
 	controllers: [AppointmentsController],
-	providers: [...UseCases, AppointmentService, TaskService, AppointmentRepository],
+	providers: [
+		...UseCases,
+		...Gateways,
+		AppointmentService,
+		TaskService,
+		AppointmentRepository
+	],
 	exports: [AppointmentService, TaskService]
 })
 export class AppointmentsModule {}
