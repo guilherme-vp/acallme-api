@@ -13,7 +13,8 @@ CREATE TABLE t_clg_agenda (
     cd_paciente     NUMBER(5),
     dt_ini_range    DATE NOT NULL,
     dt_fim_range    DATE NOT NULL,
-    vl_confirmado   NUMBER(1)
+    vl_confirmado   NUMBER(1),
+    nr_desabilitado NUMBER(1)
 );
 
 CREATE TABLE t_clg_chamada (
@@ -39,7 +40,7 @@ CREATE TABLE t_clg_especialista (
     dt_nascimento   DATE NOT NULL,
     ds_genero       VARCHAR2(2) NOT NULL,
     ds_sobre        VARCHAR2(300),
-    ds_avatar_url   VARCHAR2(100),
+    im_avatar_url   VARCHAR2(100),
     vl_consulta     NUMBER(4, 2) NOT NULL,
     nr_cnpj         NUMBER(12),
     nr_cnpj_digito  NUMBER(2),
@@ -61,7 +62,7 @@ CREATE TABLE t_clg_paciente (
     ds_senha        VARCHAR2(75) NOT NULL,
     dt_nascimento   DATE NOT NULL,
     ds_genero       VARCHAR2(2) NOT NULL,
-    ds_avatar_url   VARCHAR2(100),
+    im_avatar_url   VARCHAR2(100),
     nr_cpf          NUMBER(9) NOT NULL,
     nr_cpf_digito   NUMBER(2) NOT NULL,
     nr_telefone     NUMBER(9) NOT NULL,
