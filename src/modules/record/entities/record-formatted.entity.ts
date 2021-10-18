@@ -5,5 +5,5 @@ export interface RecordFormatted {
 	appointmentId: number
 	observation?: string
 	diagnosis: string
-	appointment: AppointmentFormatted
+	appointment?: AppointmentFormatted
 }

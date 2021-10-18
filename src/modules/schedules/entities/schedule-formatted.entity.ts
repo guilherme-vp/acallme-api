@@ -4,13 +4,13 @@ import { SpecialistFormatted } from '@modules/specialists/entities'
 
 export interface ScheduleFormatted {
 	scheduleId: number
-	appointmentId: number
 	specialistId: number
+	appointmentId?: number
 	patientId?: number
 	rangeStart: Date
 	rangeEnd: Date
 	confirmed?: boolean
-	appointment: AppointmentFormatted
-	specialist: SpecialistFormatted
+	appointment?: AppointmentFormatted
+	specialist?: SpecialistFormatted
 	patient?: PatientFormatted
 }

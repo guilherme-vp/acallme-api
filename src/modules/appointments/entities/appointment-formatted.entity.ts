@@ -5,8 +5,8 @@ export interface AppointmentFormatted {
 	id: number
 	scheduleId: number
 	recordId: number
-	duration: number
-	rating: number
-	schedule: ScheduleFormatted
-	record: RecordFormatted
+	duration?: number
+	rating?: number
+	schedule?: ScheduleFormatted
+	record?: RecordFormatted
 }
