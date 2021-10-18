@@ -8,7 +8,7 @@ DROP TABLE t_clg_prontuario CASCADE CONSTRAINTS;
 
 CREATE TABLE t_clg_agenda (
     cd_agenda       NUMBER GENERATED ALWAYS AS IDENTITY,
-    cd_chamada      NUMBER(5) NOT NULL,
+    cd_chamada      NUMBER(5),
     cd_especialista NUMBER(5) NOT NULL,
     cd_paciente     NUMBER(5),
     dt_ini_range    DATE NOT NULL,
