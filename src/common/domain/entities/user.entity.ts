@@ -5,7 +5,7 @@ export interface UserModel {
 	DS_SENHA: string
 	DT_NASCIMENTO: Date
 	DS_GENERO: UserGender
-	DS_AVATAR_URL?: string
+	IM_AVATAR_URL?: string
 	NR_CPF: number
 	NR_CPF_DIGITO: number
 	NR_TELEFONE: number

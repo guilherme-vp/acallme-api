@@ -10,6 +10,7 @@ export interface ScheduleFormatted {
 	rangeStart: Date
 	rangeEnd: Date
 	confirmed?: boolean
+	disabled?: boolean
 	appointment?: AppointmentFormatted
 	specialist?: SpecialistFormatted
 	patient?: PatientFormatted

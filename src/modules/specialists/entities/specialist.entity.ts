@@ -8,6 +8,6 @@ export type SpecialistModel = UserModel & {
 	NR_CRP?: number
 	NR_CRM?: number
 	DS_SOBRE: string
-	DS_AVATAR_URL: string
+	IM_AVATAR_URL: string
 	VL_CONSULTA: number
 }

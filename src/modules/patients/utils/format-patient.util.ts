@@ -8,7 +8,7 @@ export function formatPatient(data: PatientModel): PatientFormatted {
 		CD_PACIENTE: id,
 		DS_SENHA: password,
 		DS_EMAIL: email,
-		DS_AVATAR_URL: avatarUrl,
+		IM_AVATAR_URL: avatarUrl,
 		NM_PACIENTE: name,
 		DS_GENERO: gender,
 		NR_TELEFONE: phone,
