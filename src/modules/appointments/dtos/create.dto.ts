@@ -1,14 +1,17 @@
-import { IsDateString, IsNumber, Min } from 'class-validator'
+import { IsNumber, IsOptional, Min } from 'class-validator'
 
 export class CreateDto {
 	@IsNumber()
 	@Min(0)
-	specialistId!: number
+	scheduleId!: number
 
-	@IsNumber({ maxDecimalPlaces: 2 })
-	@Min(1)
-	cost!: number
+	@IsNumber()
+	@Min(0)
+	@IsOptional()
+	duration?: number
 
-	@IsDateString({ strict: true })
-	scheduled!: Date
+	@IsNumber({ maxDecimalPlaces: 1 })
+	@Min(0)
+	@IsOptional()
+	rating?: number
 }
