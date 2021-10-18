@@ -22,31 +22,29 @@ export class AppointmentGuard implements CanActivate {
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const { user, params } = context.switchToHttp().getRequest() as FastifyRequest
 
-		let incomingSchedule: ScheduleFormatted
+		let incomingSchedule: ScheduleFormatted | undefined
 
 		if (user.role === Role.Patient) {
-			incomingSchedule = await this.scheduleService.getPatientSchedule(user.id as number)
+			const foundSchedule = await this.scheduleService.getOne({ patientId: user.id })
+
+			incomingSchedule = foundSchedule?.schedule
 		} else {
-			incomingSchedule = await this.scheduleService.getSpecialistSchedule(user.id as number)
+			const foundSchedule = await this.scheduleService.getOne({ specialistId: user.id })
+
+			incomingSchedule = foundSchedule?.schedule
+		}
+
+		if (!user || !incomingSchedule) {
+			throw new BadRequestException(
+				await this.languageService.translate('schedule.user-not-authorized')
+			)
 		}
 
 		const { appointmentId } = params as { appointmentId: string }
 
 		const foundAppointment = await this.appointmentService.findById(+appointmentId)
 
-		if (
-			user.role === Role.Patient &&
-			incomingSchedule.scheduleId !== foundAppointment?.patientSchedId
-		) {
-			throw new BadRequestException(
-				await this.languageService.translate('schedule.user-not-authorized')
-			)
-		}
-
-		if (
-			user.role === Role.Specialist &&
-			incomingSchedule.scheduleId !== foundAppointment?.specialistSchedId
-		) {
+		if (!foundAppointment || incomingSchedule.scheduleId !== foundAppointment.scheduleId) {
 			throw new BadRequestException(
 				await this.languageService.translate('schedule.user-not-authorized')
 			)
