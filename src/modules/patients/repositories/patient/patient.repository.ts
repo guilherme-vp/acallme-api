@@ -1,10 +1,11 @@
 import { DefaultSelect, OmitProperties, RequireAtLeastOne } from '@core/types/'
+import { formatPatient } from '@modules/patients/utils'
 import { Injectable } from '@nestjs/common'
 import { DatabaseService } from '@services/database'
 import { Tables } from '@services/database/tables'
 import oracleDB from 'oracledb'
 
-import { PatientModel } from '../../entities'
+import { PatientFormatted, PatientModel } from '../../entities'
 
 export type PatientSelect = DefaultSelect<PatientModel>
 
@@ -13,9 +14,9 @@ export class PatientRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async create(
-		data: OmitProperties<PatientModel, 'CD_PACIENTE' | 'CD_AGENDA_PACIENTE'>,
+		data: OmitProperties<PatientModel, 'CD_PACIENTE'>,
 		select?: PatientSelect
-	): Promise<PatientModel> {
+	): Promise<PatientFormatted> {
 		const inputKeys = Object.keys(data)
 
 		const inputVars = inputKeys.map(key => `:${key}`)
@@ -36,24 +37,28 @@ export class PatientRepository {
 			{ id: result.returning_id[0] }
 		)
 
-		return createdUser
+		const formattedUser = formatPatient(createdUser)
+
+		return formattedUser
 	}
 
-	async getOneById(id: number, select?: PatientSelect): Promise<PatientModel> {
+	async getOneById(id: number, select?: PatientSelect): Promise<PatientFormatted> {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
 			Tables.Patient
 		} WHERE cd_paciente = :id`
 
 		const [result] = await this.databaseService.executeQuery<PatientModel>(query, { id })
 
-		return result
+		const formattedPatient = formatPatient(result)
+
+		return formattedPatient
 	}
 
 	async getOne(
 		where: RequireAtLeastOne<PatientModel>,
 		method: 'AND' | 'OR' = 'AND',
 		select?: PatientSelect
-	): Promise<PatientModel> {
+	): Promise<PatientFormatted> {
 		const whereKeys = Object.keys(where).map(key => `${key} = :${key}`)
 
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
@@ -62,10 +67,15 @@ export class PatientRepository {
 
 		const [result] = await this.databaseService.executeQuery<PatientModel>(query, where)
 
-		return result
+		const formattedPatient = formatPatient(result)
+
+		return formattedPatient
 	}
 
-	async getMany(where?: Partial<PatientModel>, select?: PatientSelect) {
+	async getMany(
+		where?: Partial<PatientModel>,
+		select?: PatientSelect
+	): Promise<PatientFormatted[]> {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Patient}`
 
 		if (where) {
@@ -76,7 +86,9 @@ export class PatientRepository {
 
 		const result = await this.databaseService.executeQuery<PatientModel>(query, [])
 
-		return result
+		const formattedPatients = result.map(patient => formatPatient(patient))
+
+		return formattedPatients
 	}
 
 	async existsEmailCpf(fields: {

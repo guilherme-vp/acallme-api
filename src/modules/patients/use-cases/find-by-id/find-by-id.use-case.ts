@@ -1,7 +1,6 @@
 import { BaseUseCase } from '@common/domain/base'
 import { PatientFormatted, PatientModel } from '@modules/patients/entities'
 import { PatientRepository, PatientSelect } from '@modules/patients/repositories'
-import { formatPatient } from '@modules/patients/utils'
 import { Injectable } from '@nestjs/common'
 
 @Injectable()
@@ -18,10 +17,8 @@ export class FindByIdUseCase implements BaseUseCase<PatientModel> {
 			return null
 		}
 
-		const patient = formatPatient(foundPatient)
-
 		return {
-			patient
+			patient: foundPatient
 		}
 	}
 }

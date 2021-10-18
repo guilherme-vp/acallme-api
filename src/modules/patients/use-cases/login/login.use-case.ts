@@ -2,7 +2,6 @@ import { splitCpf } from '@common/utils'
 import { LoginDto } from '@modules/patients/dtos'
 import { PatientFormatted } from '@modules/patients/entities'
 import { PatientRepository } from '@modules/patients/repositories'
-import { formatPatient } from '@modules/patients/utils'
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { CryptService } from '@services/crypt'
@@ -36,10 +35,9 @@ export class LoginUseCase {
 			)
 		}
 
-		const comparedPassword = await this.cryptService.compare(
-			password,
-			foundPatient.DS_SENHA as string
-		)
+		const { id, password: patientPassword } = foundPatient
+
+		const comparedPassword = await this.cryptService.compare(password, patientPassword)
 
 		if (!comparedPassword) {
 			throw new BadRequestException(
@@ -47,17 +45,13 @@ export class LoginUseCase {
 			)
 		}
 
-		const formattedPatient = formatPatient(foundPatient)
-
-		const { id } = formattedPatient
-
 		const payload = { id, email, sub: id, role: 'patient' }
 
 		const token = await this.jwtService.signAsync(payload)
 
 		return {
 			token,
-			patient: formattedPatient
+			patient: foundPatient
 		}
 	}
 }

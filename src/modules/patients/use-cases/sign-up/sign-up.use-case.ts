@@ -1,11 +1,9 @@
 import { BaseUseCase } from '@common/domain/base'
-import { Role } from '@common/domain/enums'
 import { splitCpf, splitPhone } from '@common/utils'
 import { welcomeEmailProps } from '@core/providers'
 import { SignUpDto } from '@modules/patients/dtos'
 import { PatientFormatted, PatientModel } from '@modules/patients/entities'
 import { PatientRepository } from '@modules/patients/repositories'
-import { formatPatient } from '@modules/patients/utils'
 import { SchedulesService } from '@modules/schedules/schedules.service'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
@@ -62,18 +60,10 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 			NR_TELEFONE: finalPhone[1]
 		})
 
-		const createdSchedule = await this.scheduleService.create(
-			createdPatient.CD_PACIENTE as number,
-			Role.Patient
-		)
-
-		const patient = formatPatient({
-			...createdPatient,
-			CD_AGENDA_PACIENTE: createdSchedule.scheduleId
-		})
+		const { id } = createdPatient
 
 		const createdToken = this.jwtService.sign({
-			id: patient.id,
+			id,
 			name,
 			email,
 			role: 'patient'
@@ -82,16 +72,16 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 		await this.mailerService.send({
 			to: {
 				address: email,
-				name: patient.name
+				name
 			},
 			...welcomeEmailProps({
-				name: patient.name
+				name
 			})
 		})
 
 		return {
 			token: createdToken,
-			patient
+			patient: createdPatient
 		}
 	}
 }
