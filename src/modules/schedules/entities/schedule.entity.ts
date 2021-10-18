@@ -6,5 +6,5 @@ export interface ScheduleModel {
 	DT_INI_RANGE: Date
 	DT_FIM_RANGE: Date
 	VL_CONFIRMADO?: number
-	NR_DESABILITADO?: boolean
+	NR_DESABILITADO?: number
 }

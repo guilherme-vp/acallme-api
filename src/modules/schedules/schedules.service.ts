@@ -1,14 +1,20 @@
 import { Injectable } from '@nestjs/common'
 
 import { CreateDto, FindManyDto } from './dtos'
-import { CreateUseCase, FindByIdUseCase, FindManyUseCase } from './use-cases'
+import {
+	ConfirmUseCase,
+	CreateUseCase,
+	FindByIdUseCase,
+	FindManyUseCase
+} from './use-cases'
 
 @Injectable()
 export class SchedulesService {
 	constructor(
 		private readonly createUseCase: CreateUseCase,
 		private readonly findByIdUseCase: FindByIdUseCase,
-		private readonly findManyUseCase: FindManyUseCase
+		private readonly findManyUseCase: FindManyUseCase,
+		private readonly confirmUseCase: ConfirmUseCase
 	) {}
 
 	async create(specialistId: number, data: CreateDto) {
@@ -21,5 +27,9 @@ export class SchedulesService {
 
 	async getMany(where: FindManyDto) {
 		return this.findManyUseCase.execute(where)
+	}
+
+	async confirm(specialistId: number, scheduleId: number) {
+		return this.confirmUseCase.execute(specialistId, scheduleId)
 	}
 }
