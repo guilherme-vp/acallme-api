@@ -1,14 +1,12 @@
-import { PatientFormatted } from '@modules/patients/entities'
-import { SpecialistFormatted } from '@modules/specialists/entities'
+import { RecordFormatted } from '@modules/record/entities'
+import { ScheduleFormatted } from '@modules/schedules/entities'
 
 export interface AppointmentFormatted {
 	id: number
-	recordId?: number
-	specialistSchedId: number
-	patientSchedId: number
-	cost: number
-	scheduled: string
-	confirmed?: boolean
-	patient: PatientFormatted
-	specialist: SpecialistFormatted
+	scheduleId: number
+	recordId: number
+	duration: number
+	rating: number
+	schedule: ScheduleFormatted
+	record: RecordFormatted
 }
