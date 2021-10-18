@@ -1,7 +1,9 @@
 export enum Tables {
+	Appointment = 't_clg_chamada',
+	Schedule = 't_clg_agenda',
 	Patient = 't_clg_paciente',
 	Specialist = 't_clg_especialista',
-	SchedulePatient = 't_clg_agenda_paciente',
-	ScheduleSpecialist = 't_clg_agenda_especialista',
-	Appointment = 't_clg_consulta'
+	Specialty = 't_clg_especialidade',
+	SpecialistSpecialty = 't_clg_especialista_especialidade',
+	Record = 't_clg_prontuario'
 }

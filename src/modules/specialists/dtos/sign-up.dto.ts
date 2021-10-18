@@ -5,6 +5,7 @@ import {
 	IsEnum,
 	IsOptional,
 	IsString,
+	IsUrl,
 	Length,
 	Matches
 } from 'class-validator'
@@ -21,20 +22,26 @@ export class SignUpDto {
 	@IsString()
 	password!: string
 
+	@IsUrl()
+	@IsOptional()
+	avatarUrl?: string
+
 	@IsString()
 	@Length(14, 14)
-	cnpj?: string
+	cnpj!: string
 
 	@IsString()
 	@Length(11, 11)
-	cpf?: string
+	cpf!: string
 
 	@IsString()
 	@Length(4, 8)
+	@IsOptional()
 	crp?: string
 
 	@IsString()
 	@Length(3, 6)
+	@IsOptional()
 	crm?: string
 
 	@IsEnum(UserGender)
@@ -44,7 +51,9 @@ export class SignUpDto {
 	birth!: string
 
 	@IsString()
-	@IsOptional()
 	@Length(11, 11)
-	phone?: number
+	phone!: number
+
+	@IsString({ each: true })
+	roles!: string[]
 }

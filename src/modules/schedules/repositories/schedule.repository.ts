@@ -1,5 +1,5 @@
 import { DefaultSelect, OmitProperties, RequireAtLeastOne } from '@core/types/'
-import { Injectable } from '@nestjs/common'
+import { Injectable, LoggerService } from '@nestjs/common'
 import { DatabaseService } from '@services/database'
 import { Tables } from '@services/database/tables'
 import OracleDB from 'oracledb'
@@ -11,7 +11,10 @@ export type ScheduleSelect = DefaultSelect<ScheduleModel>
 
 @Injectable()
 export class ScheduleRepository {
-	constructor(private readonly databaseService: DatabaseService) {}
+	constructor(
+		private readonly databaseService: DatabaseService,
+		private readonly logger: LoggerService
+	) {}
 
 	async create(
 		data: OmitProperties<ScheduleModel, 'CD_AGENDA'>
@@ -102,5 +105,19 @@ export class ScheduleRepository {
 		const formattedSchedules = result.map(sched => formatSchedule(sched))
 
 		return formattedSchedules
+	}
+
+	async confirmSchedule(scheduleId: number): Promise<boolean> {
+		try {
+			const query = `UPDATE ${Tables.Schedule} SET vl_confirmado = :confirmed WHERE cd_agenda = :scheduleId`
+
+			await this.databaseService.executeQuery(query, { scheduleId, confirmed: 1 })
+
+			return true
+		} catch (error) {
+			this.logger.error(error)
+
+			return false
+		}
 	}
 }

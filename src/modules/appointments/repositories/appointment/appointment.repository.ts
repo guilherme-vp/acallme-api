@@ -1,11 +1,12 @@
 import { DefaultSelect, OmitProperties, RequireAtLeastOne } from '@core/types/'
+import { formatAppointment } from '@modules/appointments/utils'
 import { Injectable } from '@nestjs/common'
 import { ScheduleModule } from '@nestjs/schedule'
 import { DatabaseService } from '@services/database'
 import { Tables } from '@services/database/tables'
 import OracleDB from 'oracledb'
 
-import { AppointmentModel } from '../../entities'
+import { AppointmentFormatted, AppointmentModel } from '../../entities'
 import { joinUsers } from './appointment.join'
 
 export type AppointmentSelect = DefaultSelect<AppointmentModel>
@@ -15,38 +16,37 @@ export class AppointmentRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async create(
-		data: OmitProperties<
-			AppointmentModel,
-			'CD_CONSULTA' | 'CD_PRONTUARIO' | 'VL_CONFIRMADO' | 'P' | 'S'
-		>,
+		data: OmitProperties<AppointmentModel, 'CD_CHAMADA' | 'CD_PRONTUARIO'>,
 		select?: AppointmentSelect
-	): Promise<AppointmentModel> {
+	): Promise<AppointmentFormatted> {
 		const inputKeys = Object.keys(data)
 
 		const inputVars = inputKeys.map(key => `:${key}`)
 
 		const query = `INSERT INTO ${Tables.Appointment} (${inputKeys.join(
 			', '
-		)}, vl_confirmado) VALUES (${inputVars.join(', ')}, 0) RETURNING ${
-			select ? select.join(`, `) : '*'
-		} RETURNING cd_consulta INTO :returning_id`
+		)}, vl_confirmado) VALUES (${inputVars.join(
+			', '
+		)}, 0) RETURNING cd_consulta INTO :returning_id`
 
 		const result = await this.databaseService.executeQuery(query, {
 			...data,
 			returning_id: { dir: OracleDB.BIND_OUT, type: OracleDB.NUMBER }
 		})
 
-		const [createdUser] = await this.databaseService.executeQuery<AppointmentModel>(
+		const [createdAppointment] = await this.databaseService.executeQuery<AppointmentModel>(
 			`SELECT ${select ? select.join(`, `) : '*'} FROM ${
 				Tables.Appointment
 			} WHERE cd_consulta = :id `,
 			{ id: result.returning_id[0] }
 		)
 
-		return createdUser
+		const formattedAppointment = formatAppointment(createdAppointment)
+
+		return formattedAppointment
 	}
 
-	async getOneById(id: number, select?: AppointmentSelect): Promise<AppointmentModel> {
+	async getOneById(id: number, select?: AppointmentSelect): Promise<AppointmentFormatted> {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
 			Tables.Appointment
 		} WHERE cd_paciente = :id`
@@ -55,14 +55,16 @@ export class AppointmentRepository {
 			id
 		})
 
-		return result
+		const formattedAppointment = formatAppointment(result)
+
+		return formattedAppointment
 	}
 
 	async getOne(
-		where: RequireAtLeastOne<Omit<AppointmentModel, 'P' | 'S'>>,
+		where: RequireAtLeastOne<AppointmentModel>,
 		method: 'AND' | 'OR' = 'AND',
 		select?: AppointmentSelect
-	): Promise<AppointmentModel> {
+	): Promise<AppointmentFormatted> {
 		const whereKeys = Object.keys(where).map(key => `${key} = :${key}`)
 
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
@@ -71,14 +73,16 @@ export class AppointmentRepository {
 
 		const [result] = await this.databaseService.executeQuery<AppointmentModel>(query, where)
 
-		return result
+		const formattedAppointment = formatAppointment(result)
+
+		return formattedAppointment
 	}
 
 	async getMany(
 		where?: RequireAtLeastOne<Omit<AppointmentModel, 'P' | 'S'>>,
 		join = true,
 		select?: AppointmentSelect
-	): Promise<AppointmentModel[]> {
+	): Promise<AppointmentFormatted[]> {
 		let query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Appointment}`
 
 		if (join) {
@@ -93,14 +97,16 @@ export class AppointmentRepository {
 
 		const result = await this.databaseService.executeQuery<AppointmentModel>(query, where)
 
-		return result
+		const formattedAppointments = result.map(appointment => formatAppointment(appointment))
+
+		return formattedAppointments
 	}
 
 	async getManyTodayWithUsers(
 		dates: { startDate: Date; endDate: Date },
 		join = true
-	): Promise<AppointmentModel[]> {
-		let query = `SELECT * FROM ${Tables.Appointment} AP`
+	): Promise<AppointmentFormatted[]> {
+		let query = `SELECT * FROM ${Tables.Appointment} appointment`
 
 		if (join) {
 			query = query.concat(joinUsers)
@@ -115,7 +121,9 @@ export class AppointmentRepository {
 			confirm: 1
 		})
 
-		return result
+		const formattedAppointments = result.map(appointment => formatAppointment(appointment))
+
+		return formattedAppointments
 	}
 
 	async isAlreadyScheduled(

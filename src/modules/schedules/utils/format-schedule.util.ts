@@ -1,21 +1,25 @@
-import {
-	ScheduleFormatted,
-	PatientScheduleModel,
-	SpecialistScheduleModel
-} from '../entities'
+import { ScheduleFormatted, ScheduleModel } from '../entities'
 
-export function formatSchedule(
-	data: Partial<PatientScheduleModel & SpecialistScheduleModel>
-): ScheduleFormatted {
-	const finalData: Partial<ScheduleFormatted> = {}
+export function formatSchedule(data: ScheduleModel): ScheduleFormatted {
+	const {
+		CD_AGENDA: scheduleId,
+		CD_CHAMADA: appointmentId,
+		CD_ESPECIALISTA: specialistId,
+		CD_PACIENTE: patientId,
+		DT_FIM_RANGE: rangeEnd,
+		DT_INI_RANGE: rangeStart,
+		VL_CONFIRMADO: confirmed
+	} = data
 
-	if (data.CD_PACIENTE && data.CD_AGENDA_PACIENTE) {
-		finalData.userId = +data.CD_PACIENTE
-		finalData.scheduleId = +data.CD_AGENDA_PACIENTE
-	} else if (data.CD_SPECIALIST && data.CD_AGENDA_SPECIALIST) {
-		finalData.userId = +data.CD_SPECIALIST
-		finalData.scheduleId = +data.CD_AGENDA_SPECIALIST
+	const formatted: ScheduleFormatted = {
+		appointmentId,
+		scheduleId,
+		patientId,
+		specialistId,
+		rangeStart,
+		rangeEnd,
+		confirmed: Boolean(confirmed)
 	}
 
-	return finalData as ScheduleFormatted
+	return formatted
 }
