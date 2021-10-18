@@ -1,26 +1,25 @@
-import { Role } from '@common/domain/enums'
 import { Injectable } from '@nestjs/common'
 
-import { FindPatientUseCase, FindSpecialistUseCase } from './use-cases'
-import { CreateUseCase } from './use-cases/create'
+import { CreateDto, FindManyDto } from './dtos'
+import { CreateUseCase, FindByIdUseCase, FindManyUseCase } from './use-cases'
 
 @Injectable()
 export class SchedulesService {
 	constructor(
 		private readonly createUseCase: CreateUseCase,
-		private readonly findSpecialistUseCase: FindSpecialistUseCase,
-		private readonly findPatientUseCase: FindPatientUseCase
+		private readonly findByIdUseCase: FindByIdUseCase,
+		private readonly findManyUseCase: FindManyUseCase
 	) {}
 
-	async create(userId: number, role: Role) {
-		return this.createUseCase.execute(userId, role)
+	async create(specialistId: number, data: CreateDto) {
+		return this.createUseCase.execute(specialistId, data)
 	}
 
-	async getPatientSchedule(patientId: number) {
-		return this.findPatientUseCase.execute(patientId)
+	async getById(scheduleId: number) {
+		return this.findByIdUseCase.execute(scheduleId)
 	}
 
-	async getSpecialistSchedule(specialistId: number) {
-		return this.findSpecialistUseCase.execute(specialistId)
+	async getMany(where: FindManyDto) {
+		return this.findManyUseCase.execute(where)
 	}
 }
