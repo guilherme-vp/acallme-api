@@ -56,6 +56,7 @@ export class ScheduleRepository {
 
 	async getOne(
 		where: RequireAtLeastOne<ScheduleModel>,
+		method: 'AND' | 'OR' = 'AND',
 		select?: ScheduleSelect
 	): Promise<ScheduleFormatted> {
 		const inputVars = Object.entries(where).map(([key, value]) => `${key} = ${value}`)
@@ -64,7 +65,7 @@ export class ScheduleRepository {
 
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
 			Tables.Schedule
-		} WHERE ${inputVars.join(', ')}`
+		} WHERE ${inputVars.join(` ${method} `)}`
 
 		const [result] = await this.databaseService.executeQuery<ScheduleModel>(query, where)
 
