@@ -73,9 +73,7 @@ export class SpecialistRepository {
 		specialtyNames?: string[],
 		select?: SpecialistSelect
 	): Promise<SpecialistFormatted[]> {
-		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
-			Tables.Specialist
-		} specialist`
+		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Specialist}`
 
 		if (where) {
 			const inputVars = Object.entries(where).map(([key, value]) => `${key} = ${value}`)
