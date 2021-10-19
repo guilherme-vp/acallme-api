@@ -45,11 +45,11 @@ export class WsAuthGuard implements CanActivate {
 		}
 
 		if (patient) {
-			request.handshake.auth = { ...patient.patient, role: Role.Patient }
+			request.handshake.auth = { ...patient, role: Role.Patient }
 		}
 
 		if (specialist) {
-			request.handshake.auth = { ...specialist.specialist, role: Role.Specialist }
+			request.handshake.auth = { ...specialist, role: Role.Specialist }
 		}
 
 		return true

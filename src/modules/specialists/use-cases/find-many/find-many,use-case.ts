@@ -13,7 +13,7 @@ export class FindManyUseCase implements BaseUseCase<SpecialistModel> {
 		private readonly languageService: I18nService
 	) {}
 
-	async execute(where: FindManyDto): Promise<{ specialist: SpecialistFormatted } | null> {
+	async execute(where: FindManyDto): Promise<SpecialistFormatted[]> {
 		const keys: RequireAtLeastOne<SpecialistModel> | undefined = undefined
 
 		if (where.email) {
@@ -27,14 +27,8 @@ export class FindManyUseCase implements BaseUseCase<SpecialistModel> {
 			throw new BadRequestException(await this.languageService.translate('no-field'))
 		}
 
-		const foundSpecialist = await this.specialistRepository.getOne(keys, 'OR')
+		const foundSpecialists = await this.specialistRepository.getMany(keys, 'OR')
 
-		if (!foundSpecialist) {
-			return null
-		}
-
-		return {
-			specialist: foundSpecialist
-		}
+		return foundSpecialists
 	}
 }

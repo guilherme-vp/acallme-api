@@ -4,7 +4,6 @@ import { welcomeEmailProps } from '@core/providers'
 import { SignUpDto } from '@modules/patients/dtos'
 import { PatientFormatted, PatientModel } from '@modules/patients/entities'
 import { PatientRepository } from '@modules/patients/repositories'
-import { SchedulesService } from '@modules/schedules/schedules.service'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { CryptService } from '@services/crypt'
@@ -16,7 +15,6 @@ import { I18nService } from 'nestjs-i18n'
 export class SignUpUseCase implements BaseUseCase<PatientModel> {
 	constructor(
 		private readonly patientRepository: PatientRepository,
-		private readonly scheduleService: SchedulesService,
 		private readonly languageService: I18nService,
 		private readonly cryptService: CryptService,
 		private readonly jwtService: JwtService,

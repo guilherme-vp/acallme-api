@@ -7,18 +7,13 @@ import { Injectable } from '@nestjs/common'
 export class FindByIdUseCase implements BaseUseCase<PatientModel> {
 	constructor(private readonly patientRepository: PatientRepository) {}
 
-	async execute(
-		id: number,
-		select?: PatientSelect
-	): Promise<{ patient: PatientFormatted } | null> {
+	async execute(id: number, select?: PatientSelect): Promise<PatientFormatted | null> {
 		const foundPatient = await this.patientRepository.getOneById(id, select)
 
 		if (!foundPatient) {
 			return null
 		}
 
-		return {
-			patient: foundPatient
-		}
+		return foundPatient
 	}
 }

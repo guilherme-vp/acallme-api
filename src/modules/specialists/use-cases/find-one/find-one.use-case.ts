@@ -13,7 +13,7 @@ export class FindOneUseCase implements BaseUseCase<SpecialistModel> {
 		private readonly languageService: I18nService
 	) {}
 
-	async execute(where: FindOneDto): Promise<{ specialist: SpecialistFormatted } | null> {
+	async execute(where: FindOneDto): Promise<SpecialistFormatted | null> {
 		const keys: RequireAtLeastOne<SpecialistModel> | undefined = undefined
 
 		if (where.email) {
@@ -49,8 +49,6 @@ export class FindOneUseCase implements BaseUseCase<SpecialistModel> {
 			return null
 		}
 
-		return {
-			specialist: foundSpecialist
-		}
+		return foundSpecialist
 	}
 }

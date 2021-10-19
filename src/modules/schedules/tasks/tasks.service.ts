@@ -1,7 +1,6 @@
-import { formatCall } from '@modules/calls/utils'
-import { PatientRepository } from '@modules/patients/repositories'
+import { PatientService } from '@modules/patients/patients.service'
 import { ScheduleRepository } from '@modules/schedules/repositories'
-import { SpecialistRepository } from '@modules/specialists/repositories'
+import { SpecialistService } from '@modules/specialists/specialists.service'
 import { Injectable } from '@nestjs/common'
 import { Cron } from '@nestjs/schedule'
 import { MailerService } from '@services/mail'
@@ -12,8 +11,8 @@ import { VideoCallGateway } from '../websockets'
 @Injectable()
 export class TaskService {
 	constructor(
-		private readonly specialistRepository: SpecialistRepository,
-		private readonly patientRepository: PatientRepository,
+		private readonly specialistService: SpecialistService,
+		private readonly patientService: PatientService,
 		private readonly scheduleRepository: ScheduleRepository,
 		private readonly mailerService: MailerService,
 		private readonly videoCallGateway: VideoCallGateway
@@ -35,8 +34,12 @@ export class TaskService {
 					return
 				}
 
-				const specialist = await this.specialistRepository.getOneById(specialistId)
-				const patient = await this.patientRepository.getOneById(patientId)
+				const specialist = await this.specialistService.findById(specialistId)
+				const patient = await this.patientService.findById(patientId)
+
+				if (!specialist || !patient) {
+					return
+				}
 
 				const formattedDate = datefns.format(rangeStart, 'haaa')
 
@@ -71,8 +74,12 @@ export class TaskService {
 					return
 				}
 
-				const specialist = await this.specialistRepository.getOneById(specialistId)
-				const patient = await this.patientRepository.getOneById(patientId)
+				const specialist = await this.specialistService.findById(specialistId)
+				const patient = await this.patientService.findById(patientId)
+
+				if (!specialist || !patient) {
+					return
+				}
 
 				this.videoCallGateway.sendCallNotifications(schedule)
 
@@ -114,8 +121,12 @@ export class TaskService {
 					return
 				}
 
-				const specialist = await this.specialistRepository.getOneById(specialistId)
-				const patient = await this.patientRepository.getOneById(patientId)
+				const specialist = await this.specialistService.findById(specialistId)
+				const patient = await this.patientService.findById(patientId)
+
+				if (!specialist || !patient) {
+					return
+				}
 
 				this.videoCallGateway.sendUsersCall({
 					scheduleId: id,
@@ -156,8 +167,12 @@ export class TaskService {
 					return
 				}
 
-				const specialist = await this.specialistRepository.getOneById(specialistId)
-				const patient = await this.patientRepository.getOneById(patientId)
+				const specialist = await this.specialistService.findById(specialistId)
+				const patient = await this.patientService.findById(patientId)
+
+				if (!specialist || !patient) {
+					return
+				}
 
 				this.videoCallGateway.sendUsersCall({
 					scheduleId: id,

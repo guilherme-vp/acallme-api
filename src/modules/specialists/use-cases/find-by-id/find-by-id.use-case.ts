@@ -7,15 +7,13 @@ import { Injectable } from '@nestjs/common'
 export class FindByIdUseCase implements BaseUseCase<SpecialistModel> {
 	constructor(private readonly specialistRepository: SpecialistRepository) {}
 
-	async execute(id: number): Promise<{ specialist: SpecialistFormatted } | null> {
+	async execute(id: number): Promise<SpecialistFormatted | null> {
 		const foundSpecialist = await this.specialistRepository.getOneById(id)
 
 		if (!foundSpecialist) {
 			return null
 		}
 
-		return {
-			specialist: foundSpecialist
-		}
+		return foundSpecialist
 	}
 }

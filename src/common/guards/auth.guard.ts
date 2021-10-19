@@ -58,11 +58,11 @@ export class AuthGuard implements CanActivate {
 		}
 
 		if (patient) {
-			request.user = { ...patient.patient, role: Role.Patient }
+			request.user = { ...patient, role: Role.Patient }
 		}
 
 		if (specialist) {
-			request.user = { ...specialist.specialist, role: Role.Specialist }
+			request.user = { ...specialist, role: Role.Specialist }
 		}
 
 		return true
