@@ -5,7 +5,7 @@ export interface UserFormattedModel {
 	id?: number
 	email: string
 	name: string
-	password: string
+	password?: string
 	avatarUrl?: string
 	birth: string
 	gender: UserGender
