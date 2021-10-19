@@ -1,9 +1,9 @@
 import { DefaultSelect, OmitProperties, RequireAtLeastOne } from '@core/types/'
+import { SpecialistFormatted, SpecialistModel } from '@modules/specialists/entities'
+import { formatSpecialist } from '@modules/specialists/utils'
 import { Injectable } from '@nestjs/common'
 import { DatabaseService } from '@services/database'
 import { Tables } from '@services/database/tables'
-
-import { SpecialistModel } from '../../entities'
 
 export type SpecialistSelect = DefaultSelect<SpecialistModel>
 
@@ -12,9 +12,9 @@ export class SpecialistRepository {
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async create(
-		data: OmitProperties<SpecialistModel, 'CD_ESPECIALISTA' | 'CD_AGENDA_ESPECIALISTA'>,
+		data: OmitProperties<SpecialistModel, 'CD_ESPECIALISTA'>,
 		select?: SpecialistSelect
-	): Promise<SpecialistModel> {
+	): Promise<SpecialistFormatted> {
 		const inputKeys = Object.keys(data)
 
 		const inputVars = inputKeys.map(key => `:${key}`)
@@ -32,24 +32,28 @@ export class SpecialistRepository {
 			{ email: data.DS_EMAIL }
 		)
 
-		return createdUser
+		const formattedSpecialist = formatSpecialist(createdUser)
+
+		return formattedSpecialist
 	}
 
-	async getOneById(id: number, select?: SpecialistSelect): Promise<SpecialistModel> {
+	async getOneById(id: number, select?: SpecialistSelect): Promise<SpecialistFormatted> {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
 			Tables.Specialist
 		} WHERE cd_especialista = :id`
 
 		const [result] = await this.databaseService.executeQuery<SpecialistModel>(query, { id })
 
-		return result
+		const formattedSpecialist = formatSpecialist(result)
+
+		return formattedSpecialist
 	}
 
 	async getOne(
 		where: RequireAtLeastOne<SpecialistModel>,
 		method: 'AND' | 'OR' = 'AND',
 		select?: SpecialistSelect
-	): Promise<SpecialistModel> {
+	): Promise<SpecialistFormatted> {
 		const whereKeys = Object.keys(where).map(key => `${key} = :${key}`)
 
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
@@ -58,10 +62,15 @@ export class SpecialistRepository {
 
 		const [result] = await this.databaseService.executeQuery<SpecialistModel>(query, where)
 
-		return result
+		const formattedSpecialist = formatSpecialist(result)
+
+		return formattedSpecialist
 	}
 
-	async getMany(where?: Partial<SpecialistModel>, select?: SpecialistSelect) {
+	async getMany(
+		where?: Partial<SpecialistModel>,
+		select?: SpecialistSelect
+	): Promise<SpecialistFormatted[]> {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Specialist}`
 
 		if (where) {
@@ -72,7 +81,9 @@ export class SpecialistRepository {
 
 		const result = await this.databaseService.executeQuery<SpecialistModel>(query, [])
 
-		return result
+		const formattedSpecialists = result.map(specialist => formatSpecialist(specialist))
+
+		return formattedSpecialists
 	}
 
 	async existsEmailCnpj(fields: {
