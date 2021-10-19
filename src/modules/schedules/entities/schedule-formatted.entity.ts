@@ -3,7 +3,7 @@ import { PatientFormatted } from '@modules/patients/entities'
 import { SpecialistFormatted } from '@modules/specialists/entities'
 
 export interface ScheduleFormatted {
-	scheduleId: number
+	id: number
 	specialistId: number
 	appointmentId?: number
 	patientId?: number
