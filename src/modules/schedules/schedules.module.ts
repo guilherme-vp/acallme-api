@@ -1,5 +1,7 @@
-import { Global, Module } from '@nestjs/common'
-import { ScheduleModule } from '@nestjs/schedule'
+import { PatientsModule } from '@modules/patients/patients.module'
+import { SpecialistsModule } from '@modules/specialists/specialists.module'
+import { forwardRef, Global, Logger, Module } from '@nestjs/common'
+import { ScheduleModule as NestScheduleModule } from '@nestjs/schedule'
 import { ServicesModule } from '@services/services.module'
 
 import { Repositories } from './repositories'
@@ -10,8 +12,20 @@ import { Gateways } from './websockets'
 
 @Global()
 @Module({
-	imports: [ServicesModule, ScheduleModule],
-	providers: [...UseCases, ...Gateways, ...Repositories, TaskService, SchedulesService],
+	imports: [
+		ServicesModule,
+		NestScheduleModule,
+		forwardRef(() => PatientsModule),
+		forwardRef(() => SpecialistsModule)
+	],
+	providers: [
+		...UseCases,
+		...Gateways,
+		...Repositories,
+		TaskService,
+		SchedulesService,
+		Logger
+	],
 	exports: [...UseCases, SchedulesService, TaskService]
 })
 export class SchedulesModule {}

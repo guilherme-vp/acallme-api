@@ -1,5 +1,5 @@
 import { SchedulesModule } from '@modules/schedules/schedules.module'
-import { Global, Module } from '@nestjs/common'
+import { forwardRef, Global, Module } from '@nestjs/common'
 import { ServicesModule } from '@services/services.module'
 
 import { SpecialistRepository } from './repositories'
@@ -9,7 +9,7 @@ import { UseCases } from './use-cases'
 
 @Global()
 @Module({
-	imports: [ServicesModule, SchedulesModule],
+	imports: [ServicesModule, forwardRef(() => SchedulesModule)],
 	controllers: [SpecialistsController],
 	providers: [...UseCases, SpecialistService, SpecialistRepository],
 	exports: [...UseCases, SpecialistService]
