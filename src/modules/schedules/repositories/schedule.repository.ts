@@ -121,4 +121,24 @@ export class ScheduleRepository {
 			return false
 		}
 	}
+
+	async getManyToday(dates: {
+		startDate: Date
+		endDate: Date
+	}): Promise<ScheduleFormatted[]> {
+		let query = `SELECT * FROM ${Tables.Schedule}`
+
+		query = query.concat(
+			'WHERE dt_ini_range BETWEEN :startDate AND :endDate AND vl_confirmado = :confirmed'
+		)
+
+		const result = await this.databaseService.executeQuery<ScheduleModel>(query, {
+			...dates,
+			confirmed: 1
+		})
+
+		const formattedSchedules = result.map(schedule => formatSchedule(schedule))
+
+		return formattedSchedules
+	}
 }
