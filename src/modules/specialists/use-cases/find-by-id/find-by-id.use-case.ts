@@ -1,7 +1,6 @@
 import { BaseUseCase } from '@common/domain/base'
 import { SpecialistFormatted, SpecialistModel } from '@modules/specialists/entities'
 import { SpecialistRepository } from '@modules/specialists/repositories'
-import { formatSpecialist } from '@modules/specialists/utils'
 import { Injectable } from '@nestjs/common'
 
 @Injectable()
@@ -15,10 +14,8 @@ export class FindByIdUseCase implements BaseUseCase<SpecialistModel> {
 			return null
 		}
 
-		const specialist = formatSpecialist(foundSpecialist)
-
 		return {
-			specialist
+			specialist: foundSpecialist
 		}
 	}
 }
