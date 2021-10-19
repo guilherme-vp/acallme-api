@@ -1,5 +1,6 @@
 import { Provider } from '@nestjs/common'
 
+export * from './create'
 export * from './confirm'
 export * from './find-by-id'
 export * from './find-many'
