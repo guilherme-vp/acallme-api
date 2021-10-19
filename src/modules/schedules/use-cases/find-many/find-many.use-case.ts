@@ -9,7 +9,7 @@ export class FindManyUseCase {
 	constructor(private readonly scheduleRepository: ScheduleRepository) {}
 
 	async execute(where: FindManyDto): Promise<ScheduleFormatted[]> {
-		let keys: RequireAtLeastOne<ScheduleModel> | undefined
+		const keys: RequireAtLeastOne<ScheduleModel> | undefined = undefined
 
 		if (where.callId) {
 			keys!.CD_CHAMADA = where.callId
