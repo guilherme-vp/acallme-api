@@ -9,5 +9,5 @@ export type SpecialistFormatted = UserFormattedModel & {
 	crm?: string
 	cost: number
 	about: string
-	specialties: SpecialtyFormatted[]
+	specialties?: SpecialtyFormatted[]
 }
