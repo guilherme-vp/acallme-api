@@ -1,5 +1,5 @@
 import { config } from '@common/config'
-import { AppointmentsModule } from '@modules/appointments/appointments.module'
+import { CallsModule } from '@modules/calls/calls.module'
 import { PatientsModule } from '@modules/patients/patients.module'
 import { SchedulesModule } from '@modules/schedules/schedules.module'
 import { SpecialistsModule } from '@modules/specialists/specialists.module'
@@ -13,7 +13,7 @@ import { ServicesModule } from '@services/services.module'
 		PatientsModule,
 		SpecialistsModule,
 		SchedulesModule,
-		AppointmentsModule,
+		CallsModule,
 		ConfigModule.forRoot({ isGlobal: true, load: [config] })
 	]
 })

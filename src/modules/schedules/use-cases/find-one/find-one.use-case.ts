@@ -15,8 +15,8 @@ export class FindOneUseCase {
 	async execute(where: FindOneDto): Promise<{ schedule: ScheduleFormatted } | null> {
 		const keys: RequireAtLeastOne<ScheduleModel> | undefined = undefined
 
-		if (where.appointmentId) {
-			keys!.CD_CHAMADA = where.appointmentId
+		if (where.callId) {
+			keys!.CD_CHAMADA = where.callId
 		}
 		if (where.patientId) {
 			keys!.CD_PACIENTE = where.patientId

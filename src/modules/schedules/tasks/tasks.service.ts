@@ -1,4 +1,4 @@
-import { formatAppointment } from '@modules/appointments/utils'
+import { formatCall } from '@modules/calls/utils'
 import { PatientRepository } from '@modules/patients/repositories'
 import { ScheduleRepository } from '@modules/schedules/repositories'
 import { SpecialistRepository } from '@modules/specialists/repositories'
@@ -19,8 +19,8 @@ export class TaskService {
 		private readonly videoCallGateway: VideoCallGateway
 	) {}
 
-	@Cron('0 5 * * *', { name: 'daily-appointments' })
-	async sendDailyAppointments() {
+	@Cron('0 5 * * *', { name: 'daily-calls' })
+	async sendDailyCalls() {
 		const todayStart = datefns.startOfToday()
 		const todayEnd = datefns.endOfToday()
 
@@ -45,8 +45,8 @@ export class TaskService {
 						address: specialist.email,
 						name: specialist.name
 					},
-					subject: 'Yours appointments today',
-					html: `<h2>Hello ${specialist.name}! You have an appointment at ${formattedDate} with ${patient.name}!</h2>`
+					subject: 'Yours calls today',
+					html: `<h2>Hello ${specialist.name}! You have an call at ${formattedDate} with ${patient.name}!</h2>`
 				})
 			})
 		)
@@ -54,8 +54,8 @@ export class TaskService {
 		// TODO: Create daily email and send it with mailer service
 	}
 
-	@Cron('0 6-20/1 * * *', { name: 'send-warn-appointment-notification' })
-	async sendWarnAppointmentNotification() {
+	@Cron('0 6-20/1 * * *', { name: 'send-warn-call-notification' })
+	async sendWarnCallNotification() {
 		const twoHoursAfterNow = datefns.addHours(new Date(), 2)
 
 		const schedules = await this.scheduleRepository.getMany({
@@ -74,15 +74,15 @@ export class TaskService {
 				const specialist = await this.specialistRepository.getOneById(specialistId)
 				const patient = await this.patientRepository.getOneById(patientId)
 
-				this.videoCallGateway.sendAppointmentNotifications(schedule)
+				this.videoCallGateway.sendCallNotifications(schedule)
 
 				await this.mailerService.send({
 					to: {
 						address: patient.email,
 						name: patient.name
 					},
-					subject: 'Yours appointments today',
-					html: `<h2>Hello ${patient.name}!You have an appointment in 2 hours</h2>`
+					subject: 'Yours calls today',
+					html: `<h2>Hello ${patient.name}!You have an call in 2 hours</h2>`
 				})
 
 				await this.mailerService.send({
@@ -90,15 +90,15 @@ export class TaskService {
 						address: specialist.email,
 						name: specialist.name
 					},
-					subject: 'Yours appointments today',
-					html: `<h2>Hello ${specialist.name}! You have an appointment in 2 hours</h2>`
+					subject: 'Yours calls today',
+					html: `<h2>Hello ${specialist.name}! You have an call in 2 hours</h2>`
 				})
 			})
 		)
 	}
 
-	@Cron('0 6-20/1 * * *', { name: 'send-appointment-notification' })
-	async sendAppointmentNotification() {
+	@Cron('0 6-20/1 * * *', { name: 'send-call-notification' })
+	async sendCallNotification() {
 		const hourStart = datefns.startOfHour(new Date())
 
 		const schedules = await this.scheduleRepository.getMany({
@@ -138,8 +138,8 @@ export class TaskService {
 		)
 	}
 
-	@Cron('0 6-20/1 * * *', { name: 'warn-close-appointment-notification' })
-	async warnCloseAppointment() {
+	@Cron('0 6-20/1 * * *', { name: 'warn-close-call-notification' })
+	async warnCloseCall() {
 		const hourBefore = datefns.subHours(new Date(), 1)
 		const startOfHourBefore = datefns.startOfHour(hourBefore)
 
@@ -180,8 +180,8 @@ export class TaskService {
 		)
 	}
 
-	@Cron('5 6-20/1 * * *', { name: 'close-appointment' })
-	async closeAppointment() {
+	@Cron('5 6-20/1 * * *', { name: 'close-call' })
+	async closeCall() {
 		const hourBefore = datefns.subHours(new Date(), 1)
 		const startOfHourBefore = datefns.startOfHour(hourBefore)
 		const duration = datefns.differenceInSeconds(startOfHourBefore, Date.now())

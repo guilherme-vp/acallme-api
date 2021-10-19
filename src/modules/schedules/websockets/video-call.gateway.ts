@@ -1,8 +1,8 @@
 /* eslint-disable indent */
 import { WsEvents } from '@common/domain/enums'
 import { WsAuthGuard } from '@common/guards'
-import { AppointmentService } from '@modules/appointments/appointments.service'
-import { AppointmentFormatted } from '@modules/appointments/entities'
+import { CallService } from '@modules/calls/calls.service'
+import { CallFormatted } from '@modules/calls/entities'
 import { PatientWs } from '@modules/patients/decorators'
 import { PatientFormatted } from '@modules/patients/entities'
 import { ScheduleFormatted } from '@modules/schedules/entities'
@@ -33,7 +33,7 @@ export class VideoCallGateway
 
 	constructor(
 		private readonly scheduleRepository: ScheduleRepository,
-		private readonly appointmentService: AppointmentService
+		private readonly callService: CallService
 	) {}
 
 	public afterInit(): void {
@@ -96,8 +96,8 @@ export class VideoCallGateway
 			.emit(WsEvents.SEND_USERS_CALL, { scheduleId })
 	}
 
-	async sendAppointmentCloseNotification(appointment: AppointmentFormatted) {
-		const { scheduleId } = appointment
+	async sendCallCloseNotification(call: CallFormatted) {
+		const { scheduleId } = call
 
 		const foundSchedule = await this.scheduleRepository.getById(scheduleId)
 
@@ -118,7 +118,7 @@ export class VideoCallGateway
 			.emit(WsEvents.SEND_NOTIFICATION)
 	}
 
-	async sendAppointmentNotifications(schedule: ScheduleFormatted) {
+	async sendCallNotifications(schedule: ScheduleFormatted) {
 		const { specialistId, patientId } = schedule
 
 		const { patientSocket, specialistSocket } = this.getSockets(
@@ -190,7 +190,7 @@ export class VideoCallGateway
 	@SubscribeMessage(WsEvents.END_CALL)
 	async endCall(
 		data: Pick<ScheduleFormatted, 'patientId' | 'specialistId'> &
-			Pick<AppointmentFormatted, 'duration' | 'scheduleId' | 'rating'>
+			Pick<CallFormatted, 'duration' | 'scheduleId' | 'rating'>
 	) {
 		const { patientId, specialistId, duration, scheduleId, rating } = data
 
@@ -200,7 +200,7 @@ export class VideoCallGateway
 
 		const { patientSocket, specialistSocket } = this.getSockets(patientId, specialistId)
 
-		await this.appointmentService.create({
+		await this.callService.create({
 			scheduleId,
 			duration,
 			rating

@@ -11,7 +11,7 @@ export class FindManyDto {
 
 	@IsOptional()
 	@IsNumber()
-	appointmentId?: number
+	callId?: number
 
 	@IsOptional()
 	@IsNumber()

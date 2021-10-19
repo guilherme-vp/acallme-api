@@ -3,7 +3,7 @@ import { ScheduleFormatted, ScheduleModel } from '../entities'
 export function formatSchedule(data: ScheduleModel): ScheduleFormatted {
 	const {
 		CD_AGENDA: id,
-		CD_CHAMADA: appointmentId,
+		CD_CHAMADA: callId,
 		CD_ESPECIALISTA: specialistId,
 		CD_PACIENTE: patientId,
 		DT_FIM_RANGE: rangeEnd,
@@ -14,7 +14,7 @@ export function formatSchedule(data: ScheduleModel): ScheduleFormatted {
 
 	const formatted: ScheduleFormatted = {
 		id,
-		appointmentId,
+		callId,
 		patientId,
 		specialistId,
 		rangeStart,

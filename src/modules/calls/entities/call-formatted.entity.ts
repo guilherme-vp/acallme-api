@@ -1,7 +1,7 @@
 import { RecordFormatted } from '@modules/record/entities'
 import { ScheduleFormatted } from '@modules/schedules/entities'
 
-export interface AppointmentFormatted {
+export interface CallFormatted {
 	id: number
 	scheduleId: number
 	recordId: number

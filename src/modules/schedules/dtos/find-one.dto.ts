@@ -11,7 +11,7 @@ export class FindOneDto {
 
 	@IsOptional()
 	@IsNumber()
-	appointmentId?: number
+	callId?: number
 
 	@IsOptional()
 	@IsNumber()

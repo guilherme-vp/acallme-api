@@ -1,9 +1,9 @@
-import { AppointmentFormatted } from '@modules/appointments/entities'
+import { CallFormatted } from '@modules/calls/entities'
 
 export interface RecordFormatted {
 	id: number
-	appointmentId: number
+	callId: number
 	observation?: string
 	diagnosis: string
-	appointment?: AppointmentFormatted
+	call?: CallFormatted
 }

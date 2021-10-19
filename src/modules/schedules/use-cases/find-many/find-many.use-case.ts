@@ -11,8 +11,8 @@ export class FindManyUseCase {
 	async execute(where: FindManyDto): Promise<ScheduleFormatted[]> {
 		let keys: RequireAtLeastOne<ScheduleModel> | undefined
 
-		if (where.appointmentId) {
-			keys!.CD_CHAMADA = where.appointmentId
+		if (where.callId) {
+			keys!.CD_CHAMADA = where.callId
 		}
 		if (where.patientId) {
 			keys!.CD_PACIENTE = where.patientId

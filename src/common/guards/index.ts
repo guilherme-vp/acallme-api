@@ -1,5 +1,5 @@
-export * from './appointment.guard'
+export * from './call.guard'
 export * from './auth.guard'
 export * from './roles.guard'
-export * from './ws-appointment.guard'
+export * from './ws-call.guard'
 export * from './ws-auth.guard'

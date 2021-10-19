@@ -1,6 +1,6 @@
-import { AppointmentFormatted, AppointmentModel } from '../entities'
+import { CallFormatted, CallModel } from '../entities'
 
-export function formatAppointment(data: AppointmentModel): AppointmentFormatted {
+export function formatCall(data: CallModel): CallFormatted {
 	const {
 		CD_CHAMADA: id,
 		CD_AGENDA: scheduleId,

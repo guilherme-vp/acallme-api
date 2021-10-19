@@ -1,26 +1,24 @@
 import { Role } from '@common/domain/enums'
-import { AppointmentService } from '@modules/appointments/appointments.service'
+import { CallService } from '@modules/calls/calls.service'
 import { ScheduleFormatted } from '@modules/schedules/entities'
 import { SchedulesService } from '@modules/schedules/schedules.service'
-import {
-	Injectable,
-	CanActivate,
-	ExecutionContext,
-	BadRequestException
-} from '@nestjs/common'
-import { FastifyRequest } from 'fastify'
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common'
+import { WsException } from '@nestjs/websockets'
 import { I18nService } from 'nestjs-i18n'
+import { Socket } from 'socket.io'
 
 @Injectable()
-export class AppointmentGuard implements CanActivate {
+export class WsCallGuard implements CanActivate {
 	constructor(
 		private readonly scheduleService: SchedulesService,
-		private readonly appointmentService: AppointmentService,
+		private readonly callService: CallService,
 		private readonly languageService: I18nService
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const { user, params } = context.switchToHttp().getRequest() as FastifyRequest
+		const request = context.switchToWs().getClient() as Socket
+
+		const user = request.handshake.auth
 
 		let incomingSchedule: ScheduleFormatted | undefined
 
@@ -35,17 +33,17 @@ export class AppointmentGuard implements CanActivate {
 		}
 
 		if (!user || !incomingSchedule) {
-			throw new BadRequestException(
+			throw new WsException(
 				await this.languageService.translate('schedule.user-not-authorized')
 			)
 		}
 
-		const { appointmentId } = params as { appointmentId: string }
+		const { callId } = request.handshake.query as { callId: string }
 
-		const foundAppointment = await this.appointmentService.findById(+appointmentId)
+		const foundCall = await this.callService.findById(+callId)
 
-		if (!foundAppointment || incomingSchedule.scheduleId !== foundAppointment.scheduleId) {
-			throw new BadRequestException(
+		if (!foundCall || incomingSchedule.id !== foundCall.scheduleId) {
+			throw new WsException(
 				await this.languageService.translate('schedule.user-not-authorized')
 			)
 		}

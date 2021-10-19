@@ -1,4 +1,4 @@
-export interface AppointmentModel {
+export interface CallModel {
 	CD_CHAMADA: number
 	CD_AGENDA: number
 	CD_PRONTUARIO: number
