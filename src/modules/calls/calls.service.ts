@@ -1,8 +1,6 @@
-import { RequireAtLeastOne } from '@core/types'
 import { Injectable } from '@nestjs/common'
 
-import { CreateDto } from './dtos'
-import { CallModel } from './entities'
+import { CreateDto, FindManyDto } from './dtos'
 import { CreateUseCase, FindByIdUseCase, FindManyUseCase } from './use-cases'
 
 @Injectable()
@@ -13,8 +11,8 @@ export class CallService {
 		private createUseCase: CreateUseCase
 	) {}
 
-	async findMany(where?: RequireAtLeastOne<CallModel>) {
-		return this.findManyUseCase.execute(where)
+	async findMany(fields?: FindManyDto) {
+		return this.findManyUseCase.execute(fields)
 	}
 
 	async findById(callId: number) {
