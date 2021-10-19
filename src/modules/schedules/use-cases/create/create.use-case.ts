@@ -1,4 +1,4 @@
-import { PatientRepository } from '@modules/patients/repositories'
+import { PatientService } from '@modules/patients/patients.service'
 import { CreateDto } from '@modules/schedules/dtos'
 import { ScheduleFormatted } from '@modules/schedules/entities'
 import { ScheduleRepository } from '@modules/schedules/repositories'
@@ -10,7 +10,7 @@ import { I18nService } from 'nestjs-i18n'
 export class CreateUseCase {
 	constructor(
 		private readonly scheduleRepository: ScheduleRepository,
-		private readonly patientRepository: PatientRepository,
+		private readonly patientService: PatientService,
 		private readonly languageService: I18nService
 	) {}
 
@@ -20,7 +20,7 @@ export class CreateUseCase {
 		const rangeEnd = new Date(dateEnd)
 
 		if (data.patientId) {
-			const patient = await this.patientRepository.getOneById(data.patientId)
+			const patient = await this.patientService.findById(data.patientId)
 
 			if (!patient) {
 				throw new BadRequestException(
