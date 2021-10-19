@@ -69,14 +69,18 @@ export class SpecialistRepository {
 
 	async getMany(
 		where?: Partial<SpecialistModel>,
+		method: 'AND' | 'OR' = 'AND',
+		specialtyNames?: string[],
 		select?: SpecialistSelect
 	): Promise<SpecialistFormatted[]> {
-		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Specialist}`
+		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
+			Tables.Specialist
+		} specialist`
 
 		if (where) {
 			const inputVars = Object.entries(where).map(([key, value]) => `${key} = ${value}`)
 
-			query.concat(`WHERE ${inputVars.join(', ')}`)
+			query.concat(`WHERE ${inputVars.join(` ${method} `)}`)
 		}
 
 		const result = await this.databaseService.executeQuery<SpecialistModel>(query, [])
