@@ -1,9 +1,13 @@
-import { RequireAtLeastOne } from '@core/types/'
 import { Injectable } from '@nestjs/common'
 
-import { SignUpDto, LoginDto } from './dtos'
-import { SpecialistModel } from './entities'
-import { SignUpUseCase, LoginUseCase, FindByIdUseCase, FindOneUseCase } from './use-cases'
+import { SignUpDto, LoginDto, FindOneDto, FindManyDto } from './dtos'
+import {
+	SignUpUseCase,
+	LoginUseCase,
+	FindByIdUseCase,
+	FindOneUseCase,
+	FindManyUseCase
+} from './use-cases'
 
 @Injectable()
 export class SpecialistService {
@@ -11,7 +15,8 @@ export class SpecialistService {
 		private signUpUseCase: SignUpUseCase,
 		private loginUseCase: LoginUseCase,
 		private findByIdUseCase: FindByIdUseCase,
-		private findOneUseCase: FindOneUseCase
+		private findOneUseCase: FindOneUseCase,
+		private findManyUseCase: FindManyUseCase
 	) {}
 
 	async signUp(input: SignUpDto) {
@@ -26,7 +31,11 @@ export class SpecialistService {
 		return this.findByIdUseCase.execute(id)
 	}
 
-	async findOne(fields: RequireAtLeastOne<SpecialistModel>) {
+	async findOne(fields: FindOneDto) {
 		return this.findOneUseCase.execute(fields)
+	}
+
+	async findMany(fields: FindManyDto) {
+		return this.findManyUseCase.execute(fields)
 	}
 }
