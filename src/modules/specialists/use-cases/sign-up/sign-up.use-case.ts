@@ -1,12 +1,9 @@
 import { BaseUseCase } from '@common/domain/base'
-import { Role } from '@common/domain/enums'
 import { splitCnpj, splitCpf, splitPhone } from '@common/utils'
 import { welcomeEmailProps } from '@core/providers'
-import { SchedulesService } from '@modules/schedules/schedules.service'
 import { SignUpDto } from '@modules/specialists/dtos'
 import { SpecialistFormatted, SpecialistModel } from '@modules/specialists/entities'
 import { SpecialistRepository } from '@modules/specialists/repositories'
-import { formatSpecialist } from '@modules/specialists/utils'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { CryptService } from '@services/crypt'
@@ -19,7 +16,6 @@ export class SignUpUseCase implements BaseUseCase<SpecialistModel> {
 	constructor(
 		private readonly specialistRepository: SpecialistRepository,
 		private readonly languageService: I18nService,
-		private readonly scheduleService: SchedulesService,
 		private readonly cryptService: CryptService,
 		private readonly jwtService: JwtService,
 		private readonly mailerService: MailerService
@@ -38,7 +34,10 @@ export class SignUpUseCase implements BaseUseCase<SpecialistModel> {
 			birth,
 			gender,
 			name,
-			phone
+			phone,
+			avatarUrl,
+			about,
+			cost
 		} = input
 
 		const finalCnpj: number[] = []
@@ -59,6 +58,11 @@ export class SignUpUseCase implements BaseUseCase<SpecialistModel> {
 			throw new BadRequestException(
 				await this.languageService.translate('specialist.cpnj-cpf-not-given')
 			)
+		}
+
+		// TODO: Upload to IBM S3
+		// eslint-disable-next-line no-empty
+		if (avatarUrl) {
 		}
 
 		const specialistExists = await this.specialistRepository.existsEmailCnpj({
@@ -94,18 +98,13 @@ export class SignUpUseCase implements BaseUseCase<SpecialistModel> {
 			NR_TELEFONE: finalPhone[0],
 			NR_TELEFONE_DDD: finalPhone[1],
 			NR_CRM: Number(crm),
-			NR_CRP: Number(crp)
+			NR_CRP: Number(crp),
+			DS_SOBRE: about,
+			VL_CONSULTA: cost
 		})
 
-		const createdSchedule = await this.scheduleService.create(
-			createdSpecialist.CD_ESPECIALISTA as number,
-			Role.Patient
-		)
-
-		const specialist = formatSpecialist({ ...createdSpecialist, ...createdSchedule })
-
 		const createdToken = this.jwtService.sign({
-			id: specialist.id,
+			id: createdSpecialist.id,
 			name,
 			email,
 			role: 'specialist'
@@ -114,16 +113,16 @@ export class SignUpUseCase implements BaseUseCase<SpecialistModel> {
 		await this.mailerService.send({
 			to: {
 				address: email,
-				name: specialist.name
+				name: createdSpecialist.name
 			},
 			...welcomeEmailProps({
-				name: specialist.name
+				name: createdSpecialist.name
 			})
 		})
 
 		return {
 			token: createdToken,
-			specialist
+			specialist: createdSpecialist
 		}
 	}
 }
