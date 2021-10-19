@@ -6,8 +6,10 @@ import { SpecialistFormatted, SpecialistModel } from '../entities'
 export function formatSpecialist(data: SpecialistModel): SpecialistFormatted {
 	const {
 		CD_ESPECIALISTA: id,
-		CD_AGENDA_ESPECIALISTA: scheduleId,
 		DS_EMAIL: email,
+		DS_SOBRE: about,
+		IM_AVATAR_URL: avatarUrl,
+		VL_CONSULTA: cost,
 		NM_ESPECIALISTA: name,
 		DS_GENERO: gender,
 		NR_TELEFONE: phone,
@@ -39,7 +41,6 @@ export function formatSpecialist(data: SpecialistModel): SpecialistFormatted {
 
 	return {
 		id,
-		scheduleId,
 		email,
 		name,
 		gender,
@@ -48,6 +49,9 @@ export function formatSpecialist(data: SpecialistModel): SpecialistFormatted {
 		phone: String(formattedPhone),
 		birth: birthDate,
 		crm: String(crm),
-		crp: String(crp)
+		crp: String(crp),
+		about,
+		cost,
+		avatarUrl
 	}
 }
