@@ -2,7 +2,6 @@ import { splitCnpj } from '@common/utils'
 import { LoginDto } from '@modules/specialists/dtos'
 import { SpecialistFormatted } from '@modules/specialists/entities'
 import { SpecialistRepository } from '@modules/specialists/repositories'
-import { formatSpecialist } from '@modules/specialists/utils'
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { CryptService } from '@services/crypt'
@@ -40,7 +39,7 @@ export class LoginUseCase {
 
 		const comparedPassword = await this.cryptService.compare(
 			password,
-			foundSpecialist.DS_SENHA as string
+			foundSpecialist.password as string
 		)
 
 		if (!comparedPassword) {
@@ -49,9 +48,7 @@ export class LoginUseCase {
 			)
 		}
 
-		const formattedSpecialist = formatSpecialist(foundSpecialist)
-
-		const { id } = formattedSpecialist
+		const { id } = foundSpecialist
 
 		const payload = { id, email, sub: id, role: 'specialist' }
 
@@ -59,7 +56,7 @@ export class LoginUseCase {
 
 		return {
 			token,
-			specialist: formattedSpecialist
+			specialist: foundSpecialist
 		}
 	}
 }
