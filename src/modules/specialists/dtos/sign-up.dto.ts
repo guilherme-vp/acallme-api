@@ -3,11 +3,14 @@ import {
 	IsDateString,
 	IsEmail,
 	IsEnum,
+	IsNumber,
 	IsOptional,
 	IsString,
 	IsUrl,
 	Length,
-	Matches
+	Matches,
+	Min,
+	MinLength
 } from 'class-validator'
 
 export class SignUpDto {
@@ -54,6 +57,14 @@ export class SignUpDto {
 	@Length(11, 11)
 	phone!: number
 
+	@IsString()
+	@MinLength(0)
+	about!: string
+
+	@IsNumber({ maxDecimalPlaces: 2 })
+	@Min(1)
+	cost!: number
+
 	@IsString({ each: true })
-	roles!: string[]
+	specialties!: string[]
 }
