@@ -1,5 +1,4 @@
 import { RequireAtLeastOne } from '@core/types'
-import { PatientFormatted } from '@modules/patients/entities'
 import { Injectable } from '@nestjs/common'
 
 import { CreateDto } from './dtos'
@@ -28,8 +27,8 @@ export class AppointmentService {
 		return this.findByIdUseCase.execute(appointmentId)
 	}
 
-	async create(input: CreateDto, patient: PatientFormatted) {
-		return this.createUseCase.execute(input, patient)
+	async create(input: CreateDto) {
+		return this.createUseCase.execute(input)
 	}
 
 	async confirm(specialistId: number, appointmentId: number) {
