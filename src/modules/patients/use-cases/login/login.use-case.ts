@@ -37,7 +37,10 @@ export class LoginUseCase {
 
 		const { id, password: patientPassword } = foundPatient
 
-		const comparedPassword = await this.cryptService.compare(password, patientPassword)
+		const comparedPassword = await this.cryptService.compare(
+			password,
+			patientPassword as string
+		)
 
 		if (!comparedPassword) {
 			throw new BadRequestException(
