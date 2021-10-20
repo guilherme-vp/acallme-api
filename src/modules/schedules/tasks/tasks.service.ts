@@ -1,3 +1,4 @@
+import { VideoCallGateway } from '@modules/calls/websockets'
 import { PatientService } from '@modules/patients/patients.service'
 import { ScheduleRepository } from '@modules/schedules/repositories'
 import { SpecialistService } from '@modules/specialists/specialists.service'
@@ -5,8 +6,6 @@ import { Injectable } from '@nestjs/common'
 import { Cron } from '@nestjs/schedule'
 import { MailerService } from '@services/mail'
 import * as datefns from 'date-fns'
-
-import { VideoCallGateway } from '../websockets'
 
 @Injectable()
 export class TaskService {
