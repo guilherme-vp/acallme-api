@@ -48,6 +48,9 @@ export class WsCallGuard implements CanActivate {
 			)
 		}
 
+		request.schedule = incomingSchedule
+		request.call = foundCall
+
 		return true
 	}
 }
