@@ -1,3 +1,4 @@
+import { NotificationGateway } from '@common/gateways/notification.gateway'
 import { VideoCallGateway } from '@modules/calls/websockets'
 import { PatientService } from '@modules/patients/patients.service'
 import { ScheduleRepository } from '@modules/schedules/repositories'
@@ -14,7 +15,8 @@ export class TaskService {
 		private readonly patientService: PatientService,
 		private readonly scheduleRepository: ScheduleRepository,
 		private readonly mailerService: MailerService,
-		private readonly videoCallGateway: VideoCallGateway
+		private readonly videoCallGateway: VideoCallGateway,
+		private readonly notificationGateway: NotificationGateway
 	) {}
 
 	@Cron('0 5 * * *', { name: 'daily-calls' })
@@ -80,14 +82,14 @@ export class TaskService {
 					return
 				}
 
-				this.videoCallGateway.sendCallNotifications(schedule)
+				this.notificationGateway.sendCallNotifications(schedule)
 
 				await this.mailerService.send({
 					to: {
 						address: patient.email,
 						name: patient.name
 					},
-					subject: 'Yours calls today',
+					subject: 'Your calls today',
 					html: `<h2>Hello ${patient.name}!You have an call in 2 hours</h2>`
 				})
 
@@ -96,7 +98,7 @@ export class TaskService {
 						address: specialist.email,
 						name: specialist.name
 					},
-					subject: 'Yours calls today',
+					subject: 'Your calls today',
 					html: `<h2>Hello ${specialist.name}! You have an call in 2 hours</h2>`
 				})
 			})
@@ -209,7 +211,7 @@ export class TaskService {
 			schedules.map(async schedule => {
 				const { id, specialistId, patientId } = schedule
 
-				this.videoCallGateway.endCall({
+				await this.videoCallGateway.endCall({
 					scheduleId: id,
 					patientId,
 					specialistId,
