@@ -11,5 +11,5 @@ export interface UserFormattedModel {
 	gender: UserGender
 	cpf: string
 	phone: string
-	schedule?: ScheduleFormatted[]
+	schedules?: ScheduleFormatted[]
 }
