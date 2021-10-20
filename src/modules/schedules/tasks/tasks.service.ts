@@ -116,7 +116,7 @@ export class TaskService {
 
 		await Promise.all(
 			schedules.map(async schedule => {
-				const { id, patientId, specialistId, confirmed } = schedule
+				const { patientId, specialistId, confirmed } = schedule
 
 				if (!confirmed || !patientId) {
 					return
@@ -129,11 +129,7 @@ export class TaskService {
 					return
 				}
 
-				this.videoCallGateway.sendUsersCall({
-					scheduleId: id,
-					patientId: patient.id as number,
-					specialistId: specialist.id as number
-				})
+				this.notificationGateway.sendCallNotifications(schedule)
 
 				await this.mailerService.send({
 					to: { address: patient.email, name: patient.name },
@@ -175,23 +171,7 @@ export class TaskService {
 					return
 				}
 
-				this.videoCallGateway.sendUsersCall({
-					scheduleId: id,
-					patientId: patient.id as number,
-					specialistId: specialist.id as number
-				})
-
-				await this.mailerService.send({
-					to: { address: patient.email, name: patient.name },
-					subject: `${patient.name}, sua consulta está acontecendo agora`,
-					html: `Hey ${patient.name}! Sua consulta está acontecendo agora!!`
-				})
-
-				await this.mailerService.send({
-					to: { address: specialist.email, name: specialist.name },
-					subject: `${specialist.name}, sua consulta está acontecendo agora`,
-					html: `Hey ${specialist.name}! Sua consulta está acontecendo agora!!`
-				})
+				this.videoCallGateway.sendCallCloseNotification(id)
 			})
 		)
 	}
@@ -209,12 +189,11 @@ export class TaskService {
 
 		await Promise.all(
 			schedules.map(async schedule => {
-				const { id, specialistId, patientId } = schedule
+				const { id } = schedule
 
 				await this.videoCallGateway.endCall({
 					scheduleId: id,
-					patientId,
-					specialistId,
+					rating: 0,
 					duration
 				})
 			})
