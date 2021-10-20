@@ -5,8 +5,9 @@ export enum WsEvents {
 	UPDATE_MEDIA = 'update-media',
 	UPDATE_USER_MEDIA = 'update-user-media',
 	SEND_USERS_CALL = 'send-users-call',
-	ANSWER_CALL = 'answer-call',
+	ENTER_CALL = 'enter-call',
 	RECEIVE_CALL = 'receive-call',
 	END_CALL = 'end-call',
-	SEND_NOTIFICATION = 'send-notification'
+	SEND_NOTIFICATION = 'send-notification',
+	SEND_CLOSE_NOTIFICATION = 'send-close-notification'
 }
