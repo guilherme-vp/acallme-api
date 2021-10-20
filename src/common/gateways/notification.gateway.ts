@@ -7,8 +7,9 @@ import { ScheduleFormatted } from '@modules/schedules/entities'
 import { SpecialistWs } from '@modules/specialists/decorators'
 import { SpecialistFormatted } from '@modules/specialists/entities'
 import { SpecialistService } from '@modules/specialists/specialists.service'
-import { Logger, UseGuards } from '@nestjs/common'
+import { Logger, UseFilters, UseGuards } from '@nestjs/common'
 import {
+	BaseWsExceptionFilter,
 	ConnectedSocket,
 	OnGatewayConnection,
 	OnGatewayDisconnect,
@@ -22,6 +23,7 @@ import { Server, Socket } from 'socket.io'
 
 import { Notification } from '../domain/entities'
 
+@UseFilters(new BaseWsExceptionFilter())
 @WebSocketGateway({ cors: true })
 export class NotificationGateway
 	implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
