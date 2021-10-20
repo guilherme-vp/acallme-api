@@ -1,4 +1,3 @@
-import { RedisIoAdapter } from '@common/adapters'
 import { NestConfig } from '@common/config'
 import { HttpExceptionFilter } from '@common/filters'
 import { ValidationPipe } from '@common/pipes'
@@ -14,7 +13,6 @@ const bootstrap = async () => {
 		AppModule,
 		new FastifyAdapter()
 	)
-	app.useWebSocketAdapter(new RedisIoAdapter(app))
 
 	app.useGlobalFilters(new HttpExceptionFilter())
 	app.useGlobalPipes(new ValidationPipe())
