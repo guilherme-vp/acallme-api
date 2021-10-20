@@ -79,7 +79,7 @@ export class PatientRepository {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Patient}`
 
 		if (where) {
-			const inputVars = Object.entries(where).map(([key, value]) => `${key} = ${value}`)
+			const inputVars = Object.keys(where).map(key => `${key} = :${key}}`)
 
 			query.concat(`WHERE ${inputVars.join(', ')}`)
 		}

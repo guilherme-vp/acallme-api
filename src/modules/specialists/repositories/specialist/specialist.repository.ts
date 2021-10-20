@@ -76,7 +76,7 @@ export class SpecialistRepository {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Specialist}`
 
 		if (where) {
-			const inputVars = Object.entries(where).map(([key, value]) => `${key} = ${value}`)
+			const inputVars = Object.keys(where).map(key => `${key} = :${key}}`)
 
 			query.concat(`WHERE ${inputVars.join(` ${method} `)}`)
 		}

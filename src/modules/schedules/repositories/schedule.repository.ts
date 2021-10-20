@@ -56,7 +56,7 @@ export class ScheduleRepository {
 		method: 'AND' | 'OR' = 'AND',
 		select?: ScheduleSelect
 	): Promise<ScheduleFormatted> {
-		const inputVars = Object.entries(where).map(([key, value]) => `${key} = ${value}`)
+		const inputVars = Object.keys(where).map(key => `${key} = :${key}}`)
 
 		where.DT_INI_RANGE
 
@@ -93,9 +93,9 @@ export class ScheduleRepository {
 		let query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Schedule}`
 
 		if (where) {
-			const inputVars = Object.entries(where).map(([key, value]) => `${key} = ${value}`)
+			const inputVars = Object.keys(where).map(key => `${key} = :${key}`)
 
-			query = query.concat(`WHERE ${inputVars.join(', ')}`)
+			query = query.concat(` WHERE ${inputVars.join(' AND ')}`)
 		}
 
 		const result = await this.databaseService.executeQuery<ScheduleModel>(query, where)

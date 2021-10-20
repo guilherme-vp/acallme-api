@@ -81,9 +81,9 @@ export class CallRepository {
 		let query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Call}`
 
 		if (where) {
-			const inputVars = Object.entries(where).map(([key, value]) => `${key} = ${value}`)
+			const inputVars = Object.keys(where).map(key => `${key} = :${key}}`)
 
-			query = query.concat(`WHERE ${inputVars.join(', ')}`)
+			query = query.concat(` WHERE ${inputVars.join(' AND ')}`)
 		}
 
 		const result = await this.databaseService.executeQuery<CallModel>(query, where)
