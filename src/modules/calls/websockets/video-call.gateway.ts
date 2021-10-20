@@ -5,12 +5,11 @@ import { CallService } from '@modules/calls/calls.service'
 import { CallFormatted } from '@modules/calls/entities'
 import { PatientWs } from '@modules/patients/decorators'
 import { PatientFormatted } from '@modules/patients/entities'
-import { ScheduleFormatted } from '@modules/schedules/entities'
-import { ScheduleRepository } from '@modules/schedules/repositories'
 import { SpecialistWs } from '@modules/specialists/decorators'
 import { SpecialistFormatted } from '@modules/specialists/entities'
-import { Logger, UseGuards } from '@nestjs/common'
+import { Logger, UseFilters, UseGuards } from '@nestjs/common'
 import {
+	BaseWsExceptionFilter,
 	ConnectedSocket,
 	MessageBody,
 	OnGatewayConnection,
@@ -22,7 +21,8 @@ import {
 } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
 
-@WebSocketGateway({ namespace: 'video-call', cors: true })
+@UseFilters(new BaseWsExceptionFilter())
+@WebSocketGateway(4443, { namespace: 'videocall', cors: true })
 export class VideoCallGateway
 	implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
@@ -30,12 +30,9 @@ export class VideoCallGateway
 	private logger: Logger = new Logger('VideoCallGateway')
 	public patients: (PatientFormatted & { socketId: string })[] = []
 	public specialists: (SpecialistFormatted & { socketId: string })[] = []
-	public rooms: string[] = []
+	public rooms: Array<{ name: string; peers: any[] }> = []
 
-	constructor(
-		private readonly scheduleRepository: ScheduleRepository,
-		private readonly callService: CallService
-	) {}
+	constructor(private readonly callService: CallService) {}
 
 	public afterInit(): void {
 		return this.logger.warn(`Websocket namespace running in: /video-call`)
@@ -49,13 +46,6 @@ export class VideoCallGateway
 		return this.logger.log(`Client connected: ${client.id}`)
 	}
 
-	private getSockets(patientId: number, specialistId: number) {
-		const patientSocket = this.patients.find(({ id }) => patientId === id)
-		const specialistSocket = this.specialists.find(({ id }) => specialistId === id)
-
-		return { patientSocket, specialistSocket }
-	}
-
 	@UseGuards(WsAuthGuard)
 	@SubscribeMessage(WsEvents.ME)
 	me(
@@ -67,7 +57,7 @@ export class VideoCallGateway
 			const newPatient = { ...patient, socketId: client.id }
 
 			this.patients.push(newPatient)
-			return client.emit(WsEvents.ME, newPatient)
+			return client.emit(WsEvents.ME, client.id)
 		}
 
 		if (specialist) {
@@ -75,45 +65,13 @@ export class VideoCallGateway
 
 			this.specialists.push(newSpecialist)
 
-			return client.emit(WsEvents.ME, newSpecialist)
+			return client.emit(WsEvents.ME, client.id)
 		}
 
 		return
 	}
 
-	async sendUsersCall(data: {
-		scheduleId: number
-		patientId: number
-		specialistId: number
-	}) {
-		const { scheduleId, patientId, specialistId } = data
-
-		const { patientSocket, specialistSocket } = this.getSockets(patientId, specialistId)
-
-		if (!patientSocket || !specialistSocket) {
-			return
-		}
-
-		this.server
-			.to(patientSocket.socketId)
-			.to(specialistSocket.socketId)
-			.emit(WsEvents.SEND_USERS_CALL, { scheduleId })
-	}
-
-	async sendCallCloseNotification(scheduleId: number) {
-		const foundSchedule = await this.scheduleRepository.getById(scheduleId)
-
-		const { specialistId, patientId } = foundSchedule
-
-		const { patientSocket, specialistSocket } = this.getSockets(
-			patientId as number,
-			specialistId
-		)
-
-		if (!patientSocket && !specialistSocket) {
-			return
-		}
-
+	sendCallCloseNotification(scheduleId: number) {
 		this.server.to(`room-${scheduleId}`).emit(WsEvents.SEND_CLOSE_NOTIFICATION)
 	}
 
@@ -122,13 +80,14 @@ export class VideoCallGateway
 	sendMessage(
 		@MessageBody()
 		messageData: {
+			avatarUrl?: string
 			createdAt: Date
-			msg: string
+			message: string
 			room: string
 		},
 		@ConnectedSocket() client: Socket
 	) {
-		const { createdAt, msg, room } = messageData
+		const { room, ...data } = messageData
 
 		const userRole = client.handshake.auth.role
 
@@ -138,10 +97,9 @@ export class VideoCallGateway
 				: this.specialists.find(({ socketId }) => socketId === client.id)
 
 		this.server.to(room).emit(WsEvents.RECEIVE_MESSAGE, {
+			...data,
 			id: client.id,
-			name: sender?.name,
-			createdAt,
-			msg
+			name: sender?.name
 		})
 	}
 
@@ -150,46 +108,60 @@ export class VideoCallGateway
 	updateMedia(
 		@MessageBody()
 		data: {
-			type: 'audio' | 'video'
-			currentMediaStatus: { type: 'mic' | 'video'; status: boolean }
+			type: 'audio' | 'video' | 'both'
+			statuses: boolean[]
 			room: string
-		}
+		},
+		@ConnectedSocket() client: Socket
 	) {
-		const { room } = data
+		const { room, ...rest } = data
 
-		this.server.to(room).emit(WsEvents.UPDATE_USER_MEDIA, data)
+		this.server.to(room).emit(WsEvents.UPDATE_USER_MEDIA, { ...rest, socketId: client.id })
 	}
 
 	@SubscribeMessage(WsEvents.ENTER_CALL)
 	@UseGuards(WsAuthGuard)
 	enterCall(
-		@MessageBody() data: { room: string; signalData: any },
+		@MessageBody()
+		data: {
+			room: string
+			signal: any
+			mediaStatus: { video?: boolean; audio?: boolean }
+		},
 		@ConnectedSocket() client: Socket
 	) {
-		const { signalData, room } = data
+		const { mediaStatus, signal, room } = data
 
 		const { auth } = client.handshake
 
-		this.server.to(room).emit(WsEvents.RECEIVE_CALL, {
-			signal: signalData,
-			from: client.id,
+		const roomIndex = this.rooms.findIndex(({ name }) => name === room)
+
+		if (roomIndex === -1) {
+			this.rooms.push({ name: room, peers: [signal] })
+		} else {
+			const roomPosition = this.rooms[roomIndex]
+
+			this.rooms[roomIndex] = {
+				...roomPosition,
+				peers: [...roomPosition.peers, signal]
+			}
+		}
+
+		client.join(room)
+
+		this.server.to(room).emit(WsEvents.RECEIVE_USER, {
+			socketId: client.id,
+			signal,
 			name: auth.name,
-			avatarUrl: auth.avatarUrl
+			avatarUrl: auth.avatarUrl,
+			mediaStatus,
+			signals: this.rooms.find(({ name }) => name === room)?.peers
 		})
 	}
 
 	@SubscribeMessage(WsEvents.END_CALL)
-	async endCall(
-		data: Pick<ScheduleFormatted, 'patientId' | 'specialistId'> &
-			Pick<CallFormatted, 'duration' | 'scheduleId' | 'rating'>
-	) {
-		const { patientId, specialistId, duration, scheduleId, rating } = data
-
-		if (!patientId) {
-			return
-		}
-
-		const { patientSocket, specialistSocket } = this.getSockets(patientId, specialistId)
+	async endCall(data: Pick<CallFormatted, 'duration' | 'scheduleId' | 'rating'>) {
+		const { duration, scheduleId, rating } = data
 
 		await this.callService.create({
 			scheduleId,
@@ -197,12 +169,6 @@ export class VideoCallGateway
 			rating
 		})
 
-		if (patientSocket) {
-			this.server.to(patientSocket.socketId).emit(WsEvents.END_CALL)
-		}
-
-		if (specialistSocket) {
-			this.server.to(specialistSocket.socketId).emit(WsEvents.END_CALL)
-		}
+		this.server.to(`room-${scheduleId}`).emit(WsEvents.END_CALL)
 	}
 }
