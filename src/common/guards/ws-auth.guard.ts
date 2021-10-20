@@ -22,16 +22,23 @@ export class WsAuthGuard implements CanActivate {
 
 		const authHeader = request.handshake.headers['authorization']
 
-		const splitted = (authHeader as string).split(' ')
+		if (!authHeader) {
+			throw new WsException(await this.languageService.translate('auth.not-authorized'))
+		}
 
-		if (!authHeader || !splitted[1]) {
+		const splitted = authHeader.split(' ')
+
+		if (!splitted[1]) {
 			throw new WsException(await this.languageService.translate('auth.not-authorized'))
 		}
 
 		const token = splitted[1]
-		const decoded: UserToken = await this.jwtService.verifyAsync(token)
 
-		if (!decoded) {
+		let decoded: UserToken
+
+		try {
+			decoded = await this.jwtService.verifyAsync(token)
+		} catch {
 			throw new WsException(await this.languageService.translate('auth.not-authorized'))
 		}
 
