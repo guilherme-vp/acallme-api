@@ -1,4 +1,6 @@
+import { Gateways as CommonGateways } from '@common/gateways'
 import { CallsModule } from '@modules/calls/calls.module'
+import { Gateways as CallGateways } from '@modules/calls/websockets'
 import { PatientsModule } from '@modules/patients/patients.module'
 import { SpecialistsModule } from '@modules/specialists/specialists.module'
 import { forwardRef, Global, Logger, Module } from '@nestjs/common'
@@ -15,11 +17,19 @@ import { UseCases } from './use-cases'
 	imports: [
 		ServicesModule,
 		NestScheduleModule,
-		CallsModule,
+		forwardRef(() => CallsModule),
 		forwardRef(() => PatientsModule),
 		forwardRef(() => SpecialistsModule)
 	],
-	providers: [...UseCases, ...Repositories, TaskService, SchedulesService, Logger],
+	providers: [
+		...UseCases,
+		...Repositories,
+		...CommonGateways,
+		...CallGateways,
+		TaskService,
+		SchedulesService,
+		Logger
+	],
 	exports: [...UseCases, SchedulesService, TaskService]
 })
 export class SchedulesModule {}
