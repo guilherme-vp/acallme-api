@@ -22,7 +22,7 @@ import {
 import { Server, Socket } from 'socket.io'
 
 @UseFilters(new BaseWsExceptionFilter())
-@WebSocketGateway(4443, { namespace: 'videocall', cors: true })
+@WebSocketGateway({ namespace: 'videocall', cors: true })
 export class VideoCallGateway
 	implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
