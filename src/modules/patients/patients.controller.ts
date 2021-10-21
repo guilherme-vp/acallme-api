@@ -26,18 +26,30 @@ export class PatientsController {
 	@Roles(Role.Patient)
 	@Get('me')
 	async me(@Patient('id') id: number) {
-		return this.patientService.findById(id)
+		const data = await this.patientService.findById(id)
+
+		return {
+			me: data
+		}
 	}
 
 	@UseGuards(AuthGuard, RolesGuard)
 	@Get(':id')
 	async findById(@Param('id') id: string) {
-		return this.patientService.findById(+id)
+		const data = await this.patientService.findById(+id)
+
+		return {
+			patient: data
+		}
 	}
 
 	@UseGuards(AuthGuard)
 	@Get()
 	async findOne(@Query() query: PatientModel) {
-		return this.patientService.findOne(query)
+		const data = await this.patientService.findOne(query)
+
+		return {
+			patient: data
+		}
 	}
 }
