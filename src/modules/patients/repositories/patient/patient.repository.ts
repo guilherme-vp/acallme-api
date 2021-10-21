@@ -1,6 +1,6 @@
 import { DefaultSelect, OmitProperties, RequireAtLeastOne } from '@core/types/'
 import { formatPatient } from '@modules/patients/utils'
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { DatabaseService } from '@services/database'
 import { Tables } from '@services/database/tables'
 import oracleDB from 'oracledb'
@@ -11,6 +11,8 @@ export type PatientSelect = DefaultSelect<PatientModel>
 
 @Injectable()
 export class PatientRepository {
+	private logger: Logger = new Logger('PatientRepository')
+
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async create(
@@ -25,11 +27,15 @@ export class PatientRepository {
 			', '
 		)}) VALUES (${inputVars.join(', ')}) RETURNING cd_paciente INTO :returning_id`
 
+		this.logger.debug(`SQL Query: ${query}`)
+
+		this.logger.log('Creating patient with given query and data')
 		const result = await this.databaseService.executeQuery(query, {
 			...data,
 			returning_id: { dir: oracleDB.BIND_OUT, type: oracleDB.NUMBER }
 		})
 
+		this.logger.log('Returning created user')
 		const [createdUser] = await this.databaseService.executeQuery<PatientModel>(
 			`SELECT ${select ? select.join(`, `) : '*'} FROM ${
 				Tables.Patient
@@ -37,6 +43,7 @@ export class PatientRepository {
 			{ id: result.returning_id[0] }
 		)
 
+		this.logger.log('Formatting created user')
 		const formattedUser = formatPatient(createdUser)
 
 		return formattedUser
@@ -49,6 +56,7 @@ export class PatientRepository {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
 			Tables.Patient
 		} WHERE cd_paciente = :id`
+		this.logger.debug(`SQL Query: ${query}`)
 
 		const [result] = await this.databaseService.executeQuery<PatientModel>(query, { id })
 
@@ -67,6 +75,7 @@ export class PatientRepository {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
 			Tables.Patient
 		} WHERE ${whereKeys.join(` ${method} `)}`
+		this.logger.debug(`SQL Query: ${query}`)
 
 		const [result] = await this.databaseService.executeQuery<PatientModel>(query, where)
 
@@ -80,6 +89,7 @@ export class PatientRepository {
 		select?: PatientSelect
 	): Promise<PatientFormatted[]> {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Patient}`
+		this.logger.debug(`SQL Query: ${query}`)
 
 		if (where) {
 			const inputVars = Object.keys(where).map(key => `${key} = :${key}}`)
@@ -107,6 +117,7 @@ export class PatientRepository {
 		const { cpf, email } = fields
 
 		const query = `SELECT cd_paciente FROM ${Tables.Patient} WHERE ds_email = :email OR (nr_cpf = :cpf AND nr_cpf_digito = :digits)`
+		this.logger.debug(`SQL Query: ${query}`)
 
 		const [result] = await this.databaseService.executeQuery<PatientModel>(query, {
 			email,
