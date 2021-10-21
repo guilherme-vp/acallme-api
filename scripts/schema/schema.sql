@@ -20,7 +20,7 @@ CREATE TABLE t_clg_agenda (
 CREATE TABLE t_clg_chamada (
     cd_chamada    NUMBER GENERATED ALWAYS AS IDENTITY,
     cd_agenda     NUMBER(5) NOT NULL,
-    cd_prontuario NUMBER(5) NOT NULL,
+    cd_prontuario NUMBER(5),
     vl_duracao    NUMBER(4, 2),
     vl_avaliacao  FLOAT(2)
 );
