@@ -1,4 +1,4 @@
-import { RecordFormatted } from '@modules/record/entities'
+import { RecordFormatted } from '@modules/records/entities'
 import { ScheduleFormatted } from '@modules/schedules/entities'
 
 export interface CallFormatted {
