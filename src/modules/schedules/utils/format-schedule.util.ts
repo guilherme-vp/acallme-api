@@ -1,6 +1,10 @@
 import { ScheduleFormatted, ScheduleModel } from '../entities'
 
-export function formatSchedule(data: ScheduleModel): ScheduleFormatted {
+export function formatSchedule(data: ScheduleModel): ScheduleFormatted | undefined {
+	if (!data || !data.CD_AGENDA) {
+		return
+	}
+
 	const {
 		CD_AGENDA: id,
 		CD_CHAMADA: callId,

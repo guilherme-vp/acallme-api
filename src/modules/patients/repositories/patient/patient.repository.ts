@@ -16,7 +16,7 @@ export class PatientRepository {
 	async create(
 		data: OmitProperties<PatientModel, 'CD_PACIENTE'>,
 		select?: PatientSelect
-	): Promise<PatientFormatted> {
+	): Promise<PatientFormatted | undefined> {
 		const inputKeys = Object.keys(data)
 
 		const inputVars = inputKeys.map(key => `:${key}`)
@@ -42,7 +42,10 @@ export class PatientRepository {
 		return formattedUser
 	}
 
-	async getOneById(id: number, select?: PatientSelect): Promise<PatientFormatted> {
+	async getOneById(
+		id: number,
+		select?: PatientSelect
+	): Promise<PatientFormatted | undefined> {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
 			Tables.Patient
 		} WHERE cd_paciente = :id`
@@ -58,7 +61,7 @@ export class PatientRepository {
 		where: RequireAtLeastOne<PatientModel>,
 		method: 'AND' | 'OR' = 'AND',
 		select?: PatientSelect
-	): Promise<PatientFormatted> {
+	): Promise<PatientFormatted | undefined> {
 		const whereKeys = Object.keys(where).map(key => `${key} = :${key}`)
 
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
@@ -86,7 +89,13 @@ export class PatientRepository {
 
 		const result = await this.databaseService.executeQuery<PatientModel>(query, [])
 
-		const formattedPatients = result.map(patient => formatPatient(patient))
+		if (!result[0]) {
+			return []
+		}
+
+		const formattedPatients = result.map(patient =>
+			formatPatient(patient)
+		) as PatientFormatted[]
 
 		return formattedPatients
 	}

@@ -15,7 +15,7 @@ export class ScheduleRepository {
 
 	async create(
 		data: OmitProperties<ScheduleModel, 'CD_AGENDA'>
-	): Promise<ScheduleFormatted> {
+	): Promise<ScheduleFormatted | undefined> {
 		const inputKeys = Object.keys(data)
 
 		const inputVars = inputKeys.map(key => `:${key}`)
@@ -39,7 +39,7 @@ export class ScheduleRepository {
 		return formattedSchedule
 	}
 
-	async getById(id: number): Promise<ScheduleFormatted> {
+	async getById(id: number): Promise<ScheduleFormatted | undefined> {
 		const query = `SELECT * FROM ${Tables.Schedule} WHERE cd_agenda = :id`
 
 		const [result] = await this.databaseService.executeQuery<ScheduleModel>(query, {
@@ -55,7 +55,7 @@ export class ScheduleRepository {
 		where: RequireAtLeastOne<ScheduleModel>,
 		method: 'AND' | 'OR' = 'AND',
 		select?: ScheduleSelect
-	): Promise<ScheduleFormatted> {
+	): Promise<ScheduleFormatted | undefined> {
 		const inputVars = Object.keys(where).map(key => `${key} = :${key}}`)
 
 		where.DT_INI_RANGE
@@ -100,7 +100,13 @@ export class ScheduleRepository {
 
 		const result = await this.databaseService.executeQuery<ScheduleModel>(query, where)
 
-		const formattedSchedules = result.map(sched => formatSchedule(sched))
+		if (!result[0]) {
+			return []
+		}
+
+		const formattedSchedules = result.map(sched =>
+			formatSchedule(sched)
+		) as ScheduleFormatted[]
 
 		return formattedSchedules
 	}
@@ -132,7 +138,13 @@ export class ScheduleRepository {
 			confirmed: 1
 		})
 
-		const formattedSchedules = result.map(schedule => formatSchedule(schedule))
+		if (!result[0]) {
+			return []
+		}
+
+		const formattedSchedules = result.map(schedule =>
+			formatSchedule(schedule)
+		) as ScheduleFormatted[]
 
 		return formattedSchedules
 	}

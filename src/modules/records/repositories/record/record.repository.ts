@@ -16,7 +16,7 @@ export class RecordRepository {
 	async create(
 		data: OmitProperties<RecordModel, 'CD_PRONTUARIO'>,
 		select?: RecordSelect
-	): Promise<RecordFormatted> {
+	): Promise<RecordFormatted | undefined> {
 		const inputKeys = Object.keys(data)
 
 		const inputVars = inputKeys.map(key => `:${key}`)
@@ -42,7 +42,10 @@ export class RecordRepository {
 		return formattedRecord
 	}
 
-	async getOneById(id: number, select?: RecordSelect): Promise<RecordFormatted> {
+	async getOneById(
+		id: number,
+		select?: RecordSelect
+	): Promise<RecordFormatted | undefined> {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
 			Tables.Record
 		} WHERE cd_chamada = :id`
@@ -60,7 +63,7 @@ export class RecordRepository {
 		where: RequireAtLeastOne<RecordModel>,
 		method: 'AND' | 'OR' = 'AND',
 		select?: RecordSelect
-	): Promise<RecordFormatted> {
+	): Promise<RecordFormatted | undefined> {
 		const whereKeys = Object.keys(where).map(key => `${key} = :${key}`)
 
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
@@ -88,7 +91,11 @@ export class RecordRepository {
 
 		const result = await this.databaseService.executeQuery<RecordModel>(query, where)
 
-		const formattedRecords = result.map(record => formatRecord(record))
+		if (!result[0]) {
+			return []
+		}
+
+		const formattedRecords = result.map(record => formatRecord(record)) as RecordFormatted[]
 
 		return formattedRecords
 	}

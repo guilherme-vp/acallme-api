@@ -55,6 +55,10 @@ export class CreateUseCase {
 			VL_CONFIRMADO: 0
 		})
 
+		if (!createdSchedule) {
+			throw new BadRequestException()
+		}
+
 		return createdSchedule
 	}
 }

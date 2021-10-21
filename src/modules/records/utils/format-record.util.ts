@@ -1,6 +1,10 @@
 import { RecordFormatted, RecordModel } from '../entities'
 
-export function formatRecord(data: RecordModel): RecordFormatted {
+export function formatRecord(data: RecordModel): RecordFormatted | undefined {
+	if (!data || !data.CD_PRONTUARIO) {
+		return
+	}
+
 	const {
 		CD_PRONTUARIO: id,
 		CD_CHAMADA: callId,

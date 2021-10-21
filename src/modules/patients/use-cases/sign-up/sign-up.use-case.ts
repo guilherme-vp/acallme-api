@@ -58,6 +58,10 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 			NR_TELEFONE: finalPhone[1]
 		})
 
+		if (!createdPatient) {
+			throw new BadRequestException()
+		}
+
 		const { id } = createdPatient
 
 		const createdToken = this.jwtService.sign({
@@ -76,6 +80,8 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 				name
 			})
 		})
+
+		delete createdPatient.password
 
 		return {
 			token: createdToken,

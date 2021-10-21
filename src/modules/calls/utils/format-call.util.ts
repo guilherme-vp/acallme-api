@@ -1,6 +1,10 @@
 import { CallFormatted, CallModel } from '../entities'
 
-export function formatCall(data: CallModel): CallFormatted {
+export function formatCall(data: CallModel): CallFormatted | undefined {
+	if (!data || !data.CD_CHAMADA) {
+		return
+	}
+
 	const {
 		CD_CHAMADA: id,
 		CD_AGENDA: scheduleId,

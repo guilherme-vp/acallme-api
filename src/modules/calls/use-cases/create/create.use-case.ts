@@ -4,7 +4,7 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { I18nService } from 'nestjs-i18n'
 
 import { CreateDto } from '../../dtos'
-
+import { CallFormatted } from '../../entities'
 @Injectable()
 export class CreateUseCase {
 	constructor(
@@ -13,7 +13,7 @@ export class CreateUseCase {
 		private readonly languageService: I18nService
 	) {}
 
-	async execute(input: CreateDto) {
+	async execute(input: CreateDto): Promise<CallFormatted> {
 		const { scheduleId, duration, rating } = input
 
 		const foundSchedule = await this.scheduleService.getById(scheduleId)
@@ -29,6 +29,10 @@ export class CreateUseCase {
 			VL_AVALIACAO: rating,
 			VL_DURACAO: duration
 		})
+
+		if (!createdCall) {
+			throw new BadRequestException()
+		}
 
 		return createdCall
 	}

@@ -3,7 +3,12 @@ import * as datefns from 'date-fns'
 
 import { PatientFormatted, PatientModel } from '../entities'
 
-export function formatPatient(data: PatientModel): PatientFormatted {
+export function formatPatient(data: PatientModel): PatientFormatted | undefined {
+	console.log(data)
+	if (!data || !data.CD_PACIENTE) {
+		return
+	}
+
 	const {
 		CD_PACIENTE: id,
 		DS_SENHA: password,

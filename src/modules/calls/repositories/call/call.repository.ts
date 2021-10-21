@@ -16,7 +16,7 @@ export class CallRepository {
 	async create(
 		data: OmitProperties<CallModel, 'CD_CHAMADA' | 'CD_PRONTUARIO'>,
 		select?: CallSelect
-	): Promise<CallFormatted> {
+	): Promise<CallFormatted | undefined> {
 		const inputKeys = Object.keys(data)
 
 		const inputVars = inputKeys.map(key => `:${key}`)
@@ -42,7 +42,7 @@ export class CallRepository {
 		return formattedCall
 	}
 
-	async getOneById(id: number, select?: CallSelect): Promise<CallFormatted> {
+	async getOneById(id: number, select?: CallSelect): Promise<CallFormatted | undefined> {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
 			Tables.Call
 		} WHERE cd_chamada = :id`
@@ -60,7 +60,7 @@ export class CallRepository {
 		where: RequireAtLeastOne<CallModel>,
 		method: 'AND' | 'OR' = 'AND',
 		select?: CallSelect
-	): Promise<CallFormatted> {
+	): Promise<CallFormatted | undefined> {
 		const whereKeys = Object.keys(where).map(key => `${key} = :${key}`)
 
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
@@ -88,7 +88,11 @@ export class CallRepository {
 
 		const result = await this.databaseService.executeQuery<CallModel>(query, where)
 
-		const formattedCalls = result.map(call => formatCall(call))
+		if (!result[0]) {
+			return []
+		}
+
+		const formattedCalls = result.map(call => formatCall(call)) as CallFormatted[]
 
 		return formattedCalls
 	}

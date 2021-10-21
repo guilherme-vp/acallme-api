@@ -103,6 +103,10 @@ export class SignUpUseCase implements BaseUseCase<SpecialistModel> {
 			VL_CONSULTA: cost
 		})
 
+		if (!createdSpecialist) {
+			throw new BadRequestException()
+		}
+
 		const createdToken = this.jwtService.sign({
 			id: createdSpecialist.id,
 			name,

@@ -3,12 +3,15 @@ import * as datefns from 'date-fns'
 
 import { SpecialistFormatted, SpecialistModel } from '../entities'
 
-export function formatSpecialist(data: SpecialistModel): SpecialistFormatted {
+export function formatSpecialist(data: SpecialistModel): SpecialistFormatted | undefined {
+	if (!data || !data.CD_ESPECIALISTA) {
+		return
+	}
+
 	const {
 		CD_ESPECIALISTA: id,
 		DS_EMAIL: email,
 		DS_SOBRE: about,
-		IM_AVATAR_URL: avatarUrl,
 		VL_CONSULTA: cost,
 		NM_ESPECIALISTA: name,
 		DS_GENERO: gender,
@@ -18,23 +21,21 @@ export function formatSpecialist(data: SpecialistModel): SpecialistFormatted {
 		NR_CPF_DIGITO: digits,
 		DT_NASCIMENTO: birth,
 		NR_CNPJ: cnpj,
-		NR_CNPJ_DIGITO: cnpjDigits,
-		NR_CRM: crm,
-		NR_CRP: crp
+		NR_CNPJ_DIGITO: cnpjDigits
 	} = data
 
-	const formattedCpf = formatCpf(cpf, digits)
+	const formattedCpf = formatCpf(cpf, digits).toString()
 
-	let formattedCnpj: number | undefined = undefined
+	let formattedCnpj: string | undefined = undefined
 
 	if (cnpj && cnpjDigits) {
-		formattedCnpj = formatCnpj(cnpj, cnpjDigits)
+		formattedCnpj = formatCnpj(cnpj, cnpjDigits).toString()
 	}
 
-	let formattedPhone: number | undefined = undefined
+	let formattedPhone = ''
 
 	if (ddd && phone) {
-		formattedPhone = formatPhone(ddd, phone)
+		formattedPhone = formatPhone(ddd, phone).toString()
 	}
 
 	const birthDate = datefns.format(birth, 'dd/MM/yyyy')
@@ -44,14 +45,14 @@ export function formatSpecialist(data: SpecialistModel): SpecialistFormatted {
 		email,
 		name,
 		gender,
-		cpf: String(formattedCpf),
-		cnpj: String(formattedCnpj),
-		phone: String(formattedPhone),
+		cpf: formattedCpf,
+		cnpj: formattedCnpj,
+		phone: formattedPhone,
 		birth: birthDate,
-		crm: String(crm),
-		crp: String(crp),
+		crm: data.NR_CRM?.toString(),
+		crp: data.NR_CRP?.toString(),
 		about,
 		cost,
-		avatarUrl
+		avatarUrl: data.IM_AVATAR_URL?.toString()
 	}
 }

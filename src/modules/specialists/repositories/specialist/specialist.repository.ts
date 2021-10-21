@@ -14,7 +14,7 @@ export class SpecialistRepository {
 	async create(
 		data: OmitProperties<SpecialistModel, 'CD_ESPECIALISTA'>,
 		select?: SpecialistSelect
-	): Promise<SpecialistFormatted> {
+	): Promise<SpecialistFormatted | undefined> {
 		const inputKeys = Object.keys(data)
 
 		const inputVars = inputKeys.map(key => `:${key}`)
@@ -37,7 +37,10 @@ export class SpecialistRepository {
 		return formattedSpecialist
 	}
 
-	async getOneById(id: number, select?: SpecialistSelect): Promise<SpecialistFormatted> {
+	async getOneById(
+		id: number,
+		select?: SpecialistSelect
+	): Promise<SpecialistFormatted | undefined> {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
 			Tables.Specialist
 		} WHERE cd_especialista = :id`
@@ -53,7 +56,7 @@ export class SpecialistRepository {
 		where: RequireAtLeastOne<SpecialistModel>,
 		method: 'AND' | 'OR' = 'AND',
 		select?: SpecialistSelect
-	): Promise<SpecialistFormatted> {
+	): Promise<SpecialistFormatted | undefined> {
 		const whereKeys = Object.keys(where).map(key => `${key} = :${key}`)
 
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
@@ -81,9 +84,15 @@ export class SpecialistRepository {
 			query.concat(`WHERE ${inputVars.join(` ${method} `)}`)
 		}
 
-		const result = await this.databaseService.executeQuery<SpecialistModel>(query, [])
+		const result = await this.databaseService.executeQuery<SpecialistModel>(query, where)
 
-		const formattedSpecialists = result.map(specialist => formatSpecialist(specialist))
+		if (!result[0]) {
+			return []
+		}
+
+		const formattedSpecialists = result.map(specialist =>
+			formatSpecialist(specialist)
+		) as SpecialistFormatted[]
 
 		return formattedSpecialists
 	}

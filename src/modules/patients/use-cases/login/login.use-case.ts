@@ -17,14 +17,20 @@ export class LoginUseCase {
 	) {}
 
 	async execute(input: LoginDto): Promise<{ patient: PatientFormatted; token: string }> {
-		const { password, cpf = '', email = '' } = input
+		const { password, username } = input
 
-		const [full] = splitCpf(cpf)
+		let cpf = 0
+
+		if (username.replace(/.-/, '').length === 11) {
+			const [full] = splitCpf(username)
+
+			cpf = full
+		}
 
 		const foundPatient = await this.patientRepository.getOne(
 			{
-				DS_EMAIL: email,
-				NR_CPF: full
+				DS_EMAIL: username,
+				NR_CPF: cpf
 			},
 			'OR'
 		)
@@ -48,7 +54,7 @@ export class LoginUseCase {
 			)
 		}
 
-		const payload = { id, email, sub: id, role: 'patient' }
+		const payload = { id, email: foundPatient.email, sub: id, role: 'patient' }
 
 		const token = await this.jwtService.signAsync(payload)
 
