@@ -1,4 +1,4 @@
-import { SECRET, mailConfig, NODE_ENV } from '@common/constants/configuration'
+import { SECRET, mailConfig } from '@common/constants/configuration'
 import { MailerOptions } from '@nestjs-modules/mailer'
 
 export interface AppConfig {
