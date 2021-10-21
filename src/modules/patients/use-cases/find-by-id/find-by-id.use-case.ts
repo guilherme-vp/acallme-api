@@ -14,6 +14,8 @@ export class FindByIdUseCase implements BaseUseCase<PatientModel> {
 			return null
 		}
 
+		delete foundPatient.password
+
 		return foundPatient
 	}
 }

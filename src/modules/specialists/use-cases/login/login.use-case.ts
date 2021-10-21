@@ -54,6 +54,8 @@ export class LoginUseCase {
 
 		const token = await this.jwtService.signAsync(payload)
 
+		delete foundSpecialist.password
+
 		return {
 			token,
 			specialist: foundSpecialist
