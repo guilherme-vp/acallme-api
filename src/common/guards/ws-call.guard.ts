@@ -38,6 +38,10 @@ export class WsCallGuard implements CanActivate {
 			)
 		}
 
+		if (!incomingSchedule.confirmed) {
+			throw new WsException(await this.languageService.translate('schedule.not-confirmed'))
+		}
+
 		const { callId } = request.handshake.query as { callId: string }
 
 		const foundCall = await this.callService.findById(+callId)
