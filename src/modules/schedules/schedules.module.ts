@@ -18,6 +18,6 @@ import { UseCases } from './use-cases'
 		SchedulesService,
 		Logger
 	],
-	exports: [...UseCases, SchedulesService, TaskService]
+	exports: [SchedulesService, TaskService]
 })
 export class SchedulesModule {}

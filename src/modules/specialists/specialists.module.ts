@@ -9,6 +9,6 @@ import { UseCases } from './use-cases'
 @Module({
 	controllers: [SpecialistsController],
 	providers: [...UseCases, SpecialistService, SpecialistRepository],
-	exports: [...UseCases, SpecialistService]
+	exports: [SpecialistService]
 })
 export class SpecialistsModule {}
