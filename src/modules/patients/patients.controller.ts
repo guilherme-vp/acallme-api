@@ -19,7 +19,6 @@ export class PatientsController {
 
 	@Post('login')
 	async login(@Body() input: LoginDto) {
-		console.log(input)
 		return this.patientService.login(input)
 	}
 

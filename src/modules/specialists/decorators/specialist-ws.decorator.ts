@@ -13,8 +13,6 @@ export const SpecialistWs = createParamDecorator(
 
 			const { auth, headers } = request.handshake
 
-			console.log(auth)
-
 			if (auth) {
 				return data ? auth[data] : auth
 			}
