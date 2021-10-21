@@ -4,7 +4,7 @@ import { AuthGuard, RolesGuard } from '@common/guards'
 import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common'
 
 import { Specialist } from './decorators'
-import { FindManyDto, FindOneDto, LoginDto, SignUpDto } from './dtos'
+import { FindManyDto, LoginDto, SignUpDto } from './dtos'
 import { SpecialistService } from './specialists.service'
 
 @Controller('specialists')
@@ -33,13 +33,6 @@ export class SpecialistsController {
 	@Get(':id')
 	async findById(@Param('id') id: string) {
 		return this.specialistService.findById(+id)
-	}
-
-	@UseGuards(AuthGuard, RolesGuard)
-	@Roles(Role.Specialist)
-	@Get()
-	async findOne(@Query() query: FindOneDto) {
-		return this.specialistService.findOne(query)
 	}
 
 	@UseGuards(AuthGuard, RolesGuard)
