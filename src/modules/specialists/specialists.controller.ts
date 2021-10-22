@@ -28,15 +28,13 @@ export class SpecialistsController {
 		return this.specialistService.findById(id)
 	}
 
-	@UseGuards(AuthGuard, RolesGuard)
-	@Roles(Role.Patient, Role.Specialist)
+	@UseGuards(AuthGuard)
 	@Get(':id')
 	async findById(@Param('id') id: string) {
 		return this.specialistService.findById(+id)
 	}
 
-	@UseGuards(AuthGuard, RolesGuard)
-	@Roles(Role.Specialist)
+	@UseGuards(AuthGuard)
 	@Get()
 	async findMany(@Query() queries: FindManyDto) {
 		return this.specialistService.findMany(queries)
