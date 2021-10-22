@@ -1,11 +1,10 @@
 import { Roles } from '@common/decorators'
 import { Role } from '@common/domain/enums'
 import { AuthGuard, RolesGuard } from '@common/guards'
-import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common'
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common'
 
 import { Patient } from './decorators'
 import { LoginDto, SignUpDto } from './dtos'
-import { PatientModel } from './entities'
 import { PatientService } from './patients.service'
 
 @Controller('patients')
@@ -37,16 +36,6 @@ export class PatientsController {
 	@Get(':id')
 	async findById(@Param('id') id: string) {
 		const data = await this.patientService.findById(+id)
-
-		return {
-			patient: data
-		}
-	}
-
-	@UseGuards(AuthGuard)
-	@Get()
-	async findOne(@Query() query: PatientModel) {
-		const data = await this.patientService.findOne(query)
 
 		return {
 			patient: data
