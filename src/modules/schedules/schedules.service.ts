@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common'
 
-import { CreateDto, FindManyDto, FindOneDto } from './dtos'
+import { CreateDto, DisableDto, FindManyDto, FindOneDto } from './dtos'
 import {
 	ConfirmUseCase,
 	CreateUseCase,
+	DisableUseCase,
 	FindByIdUseCase,
 	FindManyUseCase,
 	FindOneUseCase
@@ -12,15 +13,20 @@ import {
 @Injectable()
 export class SchedulesService {
 	constructor(
-		private readonly createUseCase: CreateUseCase,
 		private readonly confirmUseCase: ConfirmUseCase,
+		private readonly createUseCase: CreateUseCase,
+		private readonly disableUseCase: DisableUseCase,
 		private readonly findByIdUseCase: FindByIdUseCase,
 		private readonly findManyUseCase: FindManyUseCase,
 		private readonly findOneUseCase: FindOneUseCase
 	) {}
 
-	async create(specialistId: number, data: CreateDto) {
-		return this.createUseCase.execute(specialistId, data)
+	async create(data: CreateDto, patientId: number) {
+		return this.createUseCase.execute(data, patientId)
+	}
+
+	async disable(data: DisableDto, specialistId: number) {
+		return this.disableUseCase.execute(data, specialistId)
 	}
 
 	async getById(scheduleId: number) {
@@ -35,7 +41,7 @@ export class SchedulesService {
 		return this.findManyUseCase.execute(where)
 	}
 
-	async confirm(specialistId: number, scheduleId: number) {
-		return this.confirmUseCase.execute(specialistId, scheduleId)
+	async confirm(specialistId: number, scheduleId: number, confirmed: boolean) {
+		return this.confirmUseCase.execute(specialistId, scheduleId, confirmed)
 	}
 }
