@@ -77,7 +77,7 @@ export class SpecialistRepository {
 		where?: Partial<SpecialistModel>,
 		method: 'AND' | 'OR' = 'AND',
 		page = '1',
-		limit = '9',
+		limit = '6',
 		select?: SpecialistSelect
 	): Promise<SpecialistFormatted[]> {
 		let query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Specialist} `
@@ -86,7 +86,7 @@ export class SpecialistRepository {
 		if (where) {
 			const inputVars = Object.keys(where).map(key => {
 				if (key === 'NM_ESPECIALISTA') {
-					return `nm_especialista LIKE '${where.NM_ESPECIALISTA}%'`
+					return `UPPER(nm_especialista) LIKE UPPER('${where.NM_ESPECIALISTA}%')`
 				}
 
 				return `${key} = :${key}`

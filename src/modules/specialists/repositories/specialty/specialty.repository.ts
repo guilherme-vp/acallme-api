@@ -44,14 +44,14 @@ export class SpecialtyRepository {
 
 		if (names) {
 			const inputVars = names.map(
-				name => `${join && 'specialty.'}tp_especialidade = '${name}'}`
+				name => `${join && 'specialty.'}tp_especialidade LIKE '%${name}%'`
 			)
 
 			query = query.concat(`WHERE ${inputVars.join(' OR ')}`)
 			this.logger.debug(`SQL Query with where: ${query}`)
 		}
 
-		const result = await this.databaseService.executeQuery<SpecialtyModel>(query, names)
+		const result = await this.databaseService.executeQuery<SpecialtyModel>(query)
 
 		if (!result[0]) {
 			return []

@@ -33,7 +33,7 @@ export class FindManyUseCase implements BaseUseCase<SpecialistModel> {
 		)
 
 		const foundSpecialties = await this.specialtyRepository.getManyByNames(
-			where.specialties
+			typeof where.specialties === 'string' ? [where.specialties] : where.specialties
 		)
 
 		const specialistsWithSpecialties = foundSpecialists
