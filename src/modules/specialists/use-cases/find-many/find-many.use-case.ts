@@ -27,7 +27,7 @@ export class FindManyUseCase implements BaseUseCase<SpecialistModel> {
 
 		const foundSpecialists = await this.specialistRepository.getMany(
 			!_.isEmpty(keys) ? keys : undefined,
-			'OR',
+			'AND',
 			where.page,
 			where.limit
 		)
