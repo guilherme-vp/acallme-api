@@ -1,22 +1,12 @@
 import { Roles } from '@common/decorators'
 import { Role } from '@common/domain/enums'
 import { AuthGuard, RolesGuard } from '@common/guards'
-import {
-	Body,
-	CacheInterceptor,
-	Controller,
-	Get,
-	Param,
-	Post,
-	UseGuards,
-	UseInterceptors
-} from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common'
 
 import { CreateDto } from './dtos'
 import { RecordService } from './records.service'
 
 @Controller('records')
-@UseInterceptors(CacheInterceptor)
 export class RecordsController {
 	constructor(private readonly recordService: RecordService) {}
 

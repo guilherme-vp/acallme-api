@@ -24,33 +24,9 @@ services:
     networks:
       - app-network
 
-  cache:
-    image: redislabs/rejson:latest
-    restart: unless-stopped
-    container_name: acallme_cache
-    ports:
-      - '6381:6379'
-    networks:
-      - app-network
-      - cache-network
-
-  redisinsight:
-    image: redislabs/redisinsight:latest
-    restart: unless-stopped
-    container_name: acallme_cache_insight
-    ports:
-      - '8001:8001'
-    volumes:
-      - cache-data:/var/lib/redis/data
-    networks:
-      - cache-network
-
 volumes:
-  cache-data:
   db-data:
 
 networks:
   app-network:
-    driver: bridge
-  cache-network:
     driver: bridge

@@ -1,5 +1,5 @@
 import { SecurityConfig } from '@common/config'
-import { CacheModule, Global, Module } from '@nestjs/common'
+import { Global, Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
 import { ScheduleModule } from '@nestjs/schedule'
@@ -22,20 +22,10 @@ const jwtModule = JwtModule.registerAsync({
 	inject: [ConfigService]
 })
 
-const cacheModule = CacheModule.registerAsync({
-	useFactory: async (configService: ConfigService) => {
-		const securityConfig = configService.get<SecurityConfig>('security')
-		return {
-			ttl: securityConfig?.expiresIn
-		}
-	},
-	inject: [ConfigService]
-})
-
 @Global()
 @Module({
-	imports: [jwtModule, cacheModule, LanguageModule, ScheduleModule.forRoot(), MailerModule],
+	imports: [jwtModule, LanguageModule, ScheduleModule.forRoot(), MailerModule],
 	providers: [CryptService, DatabaseService],
-	exports: [CryptService, DatabaseService, jwtModule, cacheModule]
+	exports: [CryptService, DatabaseService, jwtModule]
 })
 export class ServicesModule {}
