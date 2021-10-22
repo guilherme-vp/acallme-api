@@ -86,7 +86,7 @@ export class SpecialistRepository {
 		if (where) {
 			const inputVars = Object.keys(where).map(key => {
 				if (key === 'NM_ESPECIALISTA') {
-					return `NM_ESPECIALISTA LIKE '${where.NM_ESPECIALISTA}%'`
+					return `nm_especialista LIKE '${where.NM_ESPECIALISTA}%'`
 				}
 
 				return `${key} = :${key}`
@@ -104,7 +104,16 @@ export class SpecialistRepository {
 		this.logger.log(`Sql Query with pagination: ${query}`)
 
 		this.logger.log(`Querying the results`)
-		const result = await this.databaseService.executeQuery<SpecialistModel>(query, where)
+		let result: SpecialistModel[]
+
+		if (where) {
+			const { NM_ESPECIALISTA, ...rest } = where
+			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+			// @ts-ignore
+			result = await this.databaseService.executeQuery(query, rest)
+		} else {
+			result = await this.databaseService.executeQuery<SpecialistModel>(query)
+		}
 
 		this.logger.log('Checking if results are empty')
 		if (!result[0]) {
