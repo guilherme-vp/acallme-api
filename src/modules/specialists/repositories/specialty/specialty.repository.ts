@@ -9,7 +9,7 @@ export type SpecialtieSelect = DefaultSelect<SpecialtyModel>
 
 @Injectable()
 export class SpecialtyRepository {
-	private logger!: Logger
+	private logger: Logger = new Logger('SpecialtyRepository')
 
 	constructor(private readonly databaseService: DatabaseService) {}
 
@@ -29,27 +29,29 @@ export class SpecialtyRepository {
 		return formattedSpecialties as SpecialtyFormatted[]
 	}
 
-	async getManyByNames(names: string[], join = false, select?: SpecialtieSelect) {
-		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Specialty} ${
-			join && 'specialty'
+	async getManyByNames(names?: string[], join = true, select?: SpecialtieSelect) {
+		let query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Specialty} ${
+			join ? 'specialty ' : ''
 		}`
 		this.logger.debug(`SQL Query: ${query}`)
+
+		if (join) {
+			query = query.concat(
+				`JOIN ${Tables.SpecialistSpecialty} joined ON joined.cd_especialidade = specialty.cd_especialidade `
+			)
+			this.logger.debug(`SQL Query with join: ${query}`)
+		}
 
 		if (names) {
 			const inputVars = names.map(
 				name => `${join && 'specialty.'}tp_especialidade = '${name}'}`
 			)
 
-			query.concat(`WHERE ${inputVars.join(' OR ')}`)
+			query = query.concat(`WHERE ${inputVars.join(' OR ')}`)
+			this.logger.debug(`SQL Query with where: ${query}`)
 		}
 
-		if (join) {
-			query.concat(
-				`JOIN ${Tables.SpecialistSpecialty} joined ON joined.cd_especialidade = specialty.cd_especialidade`
-			)
-		}
-
-		const result = await this.databaseService.executeQuery<SpecialtyModel>(query, [])
+		const result = await this.databaseService.executeQuery<SpecialtyModel>(query, names)
 
 		if (!result[0]) {
 			return []
