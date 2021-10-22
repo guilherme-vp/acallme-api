@@ -25,18 +25,30 @@ export class SpecialistsController {
 	@Roles(Role.Specialist)
 	@Get('me')
 	async me(@Specialist('id') id: number) {
-		return this.specialistService.findById(id)
+		const data = await this.specialistService.findById(id)
+
+		return {
+			me: data
+		}
 	}
 
 	@UseGuards(AuthGuard)
 	@Get(':id')
 	async findById(@Param('id') id: string) {
-		return this.specialistService.findById(+id)
+		const data = await this.specialistService.findById(+id)
+
+		return {
+			specialist: data
+		}
 	}
 
 	@UseGuards(AuthGuard)
 	@Get()
 	async findMany(@Query() queries: FindManyDto) {
-		return this.specialistService.findMany(queries)
+		const data = await this.specialistService.findMany(queries)
+
+		return {
+			specialists: data
+		}
 	}
 }
