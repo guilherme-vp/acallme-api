@@ -1,4 +1,4 @@
-import { IsOptional, IsEmail, IsString, Length, IsNumber, Min } from 'class-validator'
+import { IsOptional, IsEmail, IsString, Length, IsNumberString } from 'class-validator'
 
 export class FindManyDto {
 	@IsEmail()
@@ -14,13 +14,11 @@ export class FindManyDto {
 	@IsOptional()
 	specialties?: string[]
 
-	@IsNumber()
+	@IsNumberString({ no_symbols: true })
 	@IsOptional()
-	@Min(1)
-	page?: number
+	page?: string
 
-	@IsNumber()
+	@IsNumberString({ no_symbols: true })
 	@IsOptional()
-	@Min(1)
-	limit?: number
+	limit?: string
 }
