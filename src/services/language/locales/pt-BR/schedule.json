@@ -3,5 +3,6 @@
 	"already-confimed": "Essa consulta já foi confirmada",
 	"not-confirmed": "Essa consulta não foi confirmada ainda ou foi rejeitada",
 	"user-not-authorized": "Você não tem o acesso necessário para realizar essa ação",
-	"dont-exist": "Esse agendamento não existe"
+	"dont-exist": "Esse agendamento não existe",
+	"cant-disable-confirmed": "Você não pode desabilitar uma consulta já confirmada"
 }
