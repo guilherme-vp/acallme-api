@@ -1,4 +1,4 @@
-import { SECRET, mailConfig } from '@common/constants/configuration'
+import { SECRET, mailConfig, PORT } from '@common/constants/configuration'
 import { MailerOptions } from '@nestjs-modules/mailer'
 
 export interface AppConfig {
@@ -21,7 +21,7 @@ export type MailerConfig = MailerOptions
 
 const config: AppConfig = {
 	nest: {
-		port: 5005
+		port: +(PORT as string) ?? 5005
 	},
 	security: {
 		expiresIn: '1d',

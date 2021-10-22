@@ -4,6 +4,7 @@ import { ConnectionAttributes } from 'oracledb'
 type Envs = 'development' | 'production'
 
 const {
+	PORT,
 	NODE_ENV: ProcessEnv,
 	DATABASE_USER,
 	DATABASE_PASS,
@@ -32,4 +33,4 @@ const mailConfig: MailerOptions['transport'] = {
 	}
 }
 
-export { NODE_ENV, dbConfig, mailConfig, SECRET }
+export { NODE_ENV, dbConfig, mailConfig, SECRET, PORT }
