@@ -1,38 +1,32 @@
 import { BaseUseCase } from '@common/domain/base'
-import { RequireAtLeastOne } from '@core/types/require-at-least-one'
 import { FindManyDto } from '@modules/specialists/dtos'
 import { SpecialistFormatted, SpecialistModel } from '@modules/specialists/entities'
 import {
 	SpecialistRepository,
 	SpecialtyRepository
 } from '@modules/specialists/repositories'
-import { BadRequestException, Injectable } from '@nestjs/common'
-import { I18nService } from 'nestjs-i18n'
+import { Injectable } from '@nestjs/common'
+import _ from 'lodash'
 
 @Injectable()
 export class FindManyUseCase implements BaseUseCase<SpecialistModel> {
 	constructor(
 		private readonly specialistRepository: SpecialistRepository,
-		private readonly specialtyRepository: SpecialtyRepository,
-		private readonly languageService: I18nService
+		private readonly specialtyRepository: SpecialtyRepository
 	) {}
 
 	async execute(where: FindManyDto): Promise<SpecialistFormatted[]> {
-		const keys: RequireAtLeastOne<SpecialistModel> | undefined = undefined
+		const keys: Partial<SpecialistModel> = {}
 
 		if (where.email) {
-			keys!.DS_EMAIL = where.email
+			keys.DS_EMAIL = where.email
 		}
 		if (where.name) {
-			keys!.NM_ESPECIALISTA = where.name
-		}
-
-		if (!keys) {
-			throw new BadRequestException(await this.languageService.translate('no-field'))
+			keys.NM_ESPECIALISTA = where.name
 		}
 
 		const foundSpecialists = await this.specialistRepository.getMany(
-			keys,
+			!_.isEmpty(keys) ? keys : undefined,
 			'OR',
 			where.page,
 			where.limit
@@ -49,7 +43,9 @@ export class FindManyUseCase implements BaseUseCase<SpecialistModel> {
 					({ specialistId }) => specialistId === id
 				)
 
-				return { ...rest, specialties }
+				delete rest.password
+
+				return { id, ...rest, specialties }
 			})
 
 		return specialistsWithSpecialties

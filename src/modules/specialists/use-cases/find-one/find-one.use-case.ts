@@ -14,7 +14,9 @@ export class FindOneUseCase implements BaseUseCase<SpecialistModel> {
 	) {}
 
 	async execute(where: FindOneDto): Promise<SpecialistFormatted | null> {
-		const keys: RequireAtLeastOne<SpecialistModel> | undefined = undefined
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		const keys: RequireAtLeastOne<SpecialistModel> = {}
 
 		if (where.email) {
 			keys!.DS_EMAIL = where.email
