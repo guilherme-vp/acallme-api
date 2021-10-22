@@ -4,7 +4,7 @@ import { PatientService } from '@modules/patients/patients.service'
 import { ScheduleRepository } from '@modules/schedules/repositories'
 import { SpecialistService } from '@modules/specialists/specialists.service'
 import { Injectable } from '@nestjs/common'
-import { Cron } from '@nestjs/schedule'
+import { Cron, CronExpression, Interval } from '@nestjs/schedule'
 import { MailerService } from '@services/mail'
 import * as datefns from 'date-fns'
 
@@ -18,6 +18,11 @@ export class TaskService {
 		private readonly videoCallGateway: VideoCallGateway,
 		private readonly notificationGateway: NotificationGateway
 	) {}
+
+	@Cron(CronExpression.EVERY_5_MINUTES, { name: 'db-refresh' })
+	async dbRefresh() {
+		await this.specialistService.findOne({ name: 'refreshed' })
+	}
 
 	@Cron('0 5 * * *', { name: 'daily-calls' })
 	async sendDailyCalls() {
