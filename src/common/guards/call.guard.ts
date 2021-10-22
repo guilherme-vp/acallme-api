@@ -1,6 +1,3 @@
-import { Role } from '@common/domain/enums'
-import { CallService } from '@modules/calls/calls.service'
-import { ScheduleFormatted } from '@modules/schedules/entities'
 import { SchedulesService } from '@modules/schedules/schedules.service'
 import {
 	Injectable,
@@ -15,36 +12,29 @@ import { I18nService } from 'nestjs-i18n'
 export class CallGuard implements CanActivate {
 	constructor(
 		private readonly scheduleService: SchedulesService,
-		private readonly callService: CallService,
 		private readonly languageService: I18nService
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		const { user, params } = context.switchToHttp().getRequest() as FastifyRequest
 
-		let incomingSchedule: ScheduleFormatted | undefined
-
-		if (user.role === Role.Patient) {
-			const foundSchedule = await this.scheduleService.getOne({ patientId: user.id })
-
-			incomingSchedule = foundSchedule?.schedule
-		} else {
-			const foundSchedule = await this.scheduleService.getOne({ specialistId: user.id })
-
-			incomingSchedule = foundSchedule?.schedule
-		}
-
-		if (!user || !incomingSchedule) {
+		if (!(params as any).id) {
 			throw new BadRequestException(
 				await this.languageService.translate('schedule.user-not-authorized')
 			)
 		}
 
-		const { callId } = params as { callId: string }
+		const { id: scheduleId } = params as { id: string }
 
-		const foundCall = await this.callService.findById(+callId)
+		const foundSchedule = await this.scheduleService.getById(+scheduleId)
 
-		if (!foundCall || incomingSchedule.id !== foundCall.scheduleId) {
+		if (!foundSchedule) {
+			throw new BadRequestException(
+				await this.languageService.translate('schedule.user-not-authorized')
+			)
+		}
+
+		if (foundSchedule.specialistId !== user.id && foundSchedule.patientId !== user.id) {
 			throw new BadRequestException(
 				await this.languageService.translate('schedule.user-not-authorized')
 			)
