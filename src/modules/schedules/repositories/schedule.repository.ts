@@ -58,8 +58,6 @@ export class ScheduleRepository {
 	): Promise<ScheduleFormatted | undefined> {
 		const inputVars = Object.keys(where).map(key => `${key} = :${key}}`)
 
-		where.DT_INI_RANGE
-
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
 			Tables.Schedule
 		} WHERE ${inputVars.join(` ${method} `)}`
@@ -111,11 +109,14 @@ export class ScheduleRepository {
 		return formattedSchedules
 	}
 
-	async confirmSchedule(scheduleId: number): Promise<boolean> {
+	async confirmSchedule(scheduleId: number, confirmed: boolean): Promise<boolean> {
 		try {
 			const query = `UPDATE ${Tables.Schedule} SET vl_confirmado = :confirmed WHERE cd_agenda = :scheduleId`
 
-			await this.databaseService.executeQuery(query, { scheduleId, confirmed: 1 })
+			await this.databaseService.executeQuery(query, {
+				scheduleId,
+				confirmed: confirmed ? 1 : 0
+			})
 
 			return true
 		} catch {
@@ -147,5 +148,38 @@ export class ScheduleRepository {
 		) as ScheduleFormatted[]
 
 		return formattedSchedules
+	}
+
+	async updateById(
+		id: number,
+		data: OmitProperties<ScheduleModel, 'CD_AGENDA'>
+		// where: RequireAtLeastOne<ScheduleModel>,
+		// method: 'OR' | 'AND' = 'AND'
+	) {
+		const inputKeys = Object.keys(data)
+
+		const inputVars = inputKeys.map(key => `:${key}`)
+		// const whereVars = Object.keys(where).map(key => `${key} = :where-${key}}`)
+		// const whereValues = Object.fromEntries(Object.entries(where).map(([key, value]) => [`where-${key}`, value]))
+
+		// const query = `UPDATE ${Tables.Schedule} (${inputKeys.join(', ')}) VALUES (${inputVars.join(', ')}) WHERE ${whereVars.join(` ${method} `)}`
+
+		const query = `UPDATE ${Tables.Schedule} (${inputKeys.join(
+			', '
+		)}) VALUES (${inputVars.join(', ')}) WHERE cd_agenda = :id`
+
+		await this.databaseService.executeQuery(query, {
+			...data,
+			id
+		})
+
+		const [createdSchedule] = await this.databaseService.executeQuery<ScheduleModel>(
+			`SELECT * FROM ${Tables.Schedule} WHERE cd_agenda = :id`,
+			{ id }
+		)
+
+		const formattedSchedule = formatSchedule(createdSchedule)
+
+		return formattedSchedule
 	}
 }
