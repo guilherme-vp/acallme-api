@@ -9,6 +9,7 @@ export function formatSpecialty(data: SpecialtyModel): SpecialtyFormatted | unde
 
 	return {
 		id,
-		name
+		name,
+		specialistId: data.CD_ESPECIALISTA
 	}
 }
