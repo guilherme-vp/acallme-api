@@ -1,3 +1,4 @@
+import { NotificationGateway } from '@common/gateways'
 import { ScheduleRepository } from '@modules/schedules/repositories'
 import { BadRequestException, Injectable } from '@nestjs/common'
 import { I18nService } from 'nestjs-i18n'
@@ -6,10 +7,11 @@ import { I18nService } from 'nestjs-i18n'
 export class ConfirmUseCase {
 	constructor(
 		private readonly scheduleRepository: ScheduleRepository,
-		private readonly languageService: I18nService
+		private readonly languageService: I18nService,
+		private readonly notificationGateway: NotificationGateway
 	) {}
 
-	async execute(specialistId: number, scheduledId: number) {
+	async execute(specialistId: number, scheduledId: number, confirmed: boolean) {
 		const foundSchedule = await this.scheduleRepository.getOne({
 			CD_ESPECIALISTA: specialistId,
 			CD_AGENDA: scheduledId
@@ -27,7 +29,9 @@ export class ConfirmUseCase {
 			)
 		}
 
-		await this.scheduleRepository.confirmSchedule(scheduledId)
+		await this.scheduleRepository.confirmSchedule(scheduledId, confirmed)
+
+		this.notificationGateway.sendAppointmentConfirmation({ ...foundSchedule, confirmed })
 
 		return true
 	}
