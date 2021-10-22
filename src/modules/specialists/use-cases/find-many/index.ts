@@ -1,1 +1,1 @@
-export * from './find-many,use-case'
+export * from './find-many.use-case'

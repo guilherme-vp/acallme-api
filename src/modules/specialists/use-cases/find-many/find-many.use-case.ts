@@ -31,23 +31,27 @@ export class FindManyUseCase implements BaseUseCase<SpecialistModel> {
 			throw new BadRequestException(await this.languageService.translate('no-field'))
 		}
 
-		let foundSpecialists = await this.specialistRepository.getMany(
+		const foundSpecialists = await this.specialistRepository.getMany(
 			keys,
 			'OR',
 			where.page,
 			where.limit
 		)
 
-		if (where.specialties) {
-			const foundSpecialties = await this.specialtyRepository.getManyByNames(
-				where.specialties
-			)
+		const foundSpecialties = await this.specialtyRepository.getManyByNames(
+			where.specialties
+		)
 
-			foundSpecialists = foundSpecialists.filter(({ id }) =>
-				foundSpecialties.some(({ specialistId }) => id === specialistId)
-			)
-		}
+		const specialistsWithSpecialties = foundSpecialists
+			.filter(({ id }) => foundSpecialties.some(({ specialistId }) => id === specialistId))
+			.map(({ id, ...rest }) => {
+				const specialties = foundSpecialties.filter(
+					({ specialistId }) => specialistId === id
+				)
 
-		return foundSpecialists
+				return { ...rest, specialties }
+			})
+
+		return specialistsWithSpecialties
 	}
 }
