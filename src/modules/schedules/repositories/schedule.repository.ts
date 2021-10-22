@@ -1,5 +1,5 @@
 import { DefaultSelect, OmitProperties, RequireAtLeastOne } from '@core/types/'
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { DatabaseService } from '@services/database'
 import { Tables } from '@services/database/tables'
 import OracleDB from 'oracledb'
@@ -11,6 +11,7 @@ export type ScheduleSelect = DefaultSelect<ScheduleModel>
 
 @Injectable()
 export class ScheduleRepository {
+	private logger: Logger = new Logger('FindManySchedules')
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async create(
@@ -22,18 +23,22 @@ export class ScheduleRepository {
 
 		const query = `INSERT INTO ${Tables.Schedule} (${inputKeys.join(
 			', '
-		)}) VALUES (${inputVars.join(', ')})`
+		)}) VALUES (${inputVars.join(', ')}) RETURNING cd_agenda INTO :returning_id`
+		this.logger.log(`SQL Query: ${query}`)
 
+		this.logger.log('Executing the query with given data:', data)
 		const result = await this.databaseService.executeQuery(query, {
 			...data,
 			returning_id: { dir: OracleDB.BIND_OUT, type: OracleDB.NUMBER }
 		})
 
+		this.logger.log('Searching for creating data')
 		const [createdSchedule] = await this.databaseService.executeQuery<ScheduleModel>(
 			`SELECT * FROM ${Tables.Schedule} WHERE cd_agenda = :id`,
 			{ id: result.returning_id[0] }
 		)
 
+		this.logger.log('Formatting data')
 		const formattedSchedule = formatSchedule(createdSchedule)
 
 		return formattedSchedule
@@ -56,7 +61,7 @@ export class ScheduleRepository {
 		method: 'AND' | 'OR' = 'AND',
 		select?: ScheduleSelect
 	): Promise<ScheduleFormatted | undefined> {
-		const inputVars = Object.keys(where).map(key => `${key} = :${key}}`)
+		const inputVars = Object.keys(where).map(key => `${key} = :${key}`)
 
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
 			Tables.Schedule
@@ -88,26 +93,43 @@ export class ScheduleRepository {
 		where?: Partial<ScheduleModel>,
 		select?: ScheduleSelect
 	): Promise<ScheduleFormatted[]> {
-		let query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
-			Tables.Schedule
-		} ORDER BY dt_ini_range ASC`
+		let query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Schedule}`
+		this.logger.log(`SQL Query: ${query}`)
 
 		if (where) {
-			const inputVars = Object.keys(where).map(key => `${key} = :${key}`)
+			const inputVars = Object.keys(where)
+				.map(key => {
+					if (key === 'DT_FIM_RANGE') {
+						return
+					}
+
+					if (key === 'DT_INI_RANGE') {
+						return `${key} BETWEEN :${key} AND :DT_FIM_RANGE`
+					}
+
+					return `${key} = :${key}`
+				})
+				.filter(Boolean)
 
 			query = query.concat(` WHERE ${inputVars.join(' AND ')}`)
+			this.logger.log(`SQL Query with Where: ${query}`)
 		}
 
+		query = query.concat(` ORDER BY dt_ini_range ASC`)
+
+		this.logger.log(`Realizando o fetch com os fields:`, where)
 		const result = await this.databaseService.executeQuery<ScheduleModel>(query, where)
 
 		if (!result[0]) {
 			return []
 		}
 
+		this.logger.log(`Formatting results`)
 		const formattedSchedules = result.map(sched =>
 			formatSchedule(sched)
 		) as ScheduleFormatted[]
 
+		this.logger.log(`Returning Data`)
 		return formattedSchedules
 	}
 
