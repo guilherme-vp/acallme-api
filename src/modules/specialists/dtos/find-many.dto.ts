@@ -1,4 +1,4 @@
-import { IsOptional, IsEmail, IsString, Length } from 'class-validator'
+import { IsOptional, IsEmail, IsString, Length, IsNumber, Min } from 'class-validator'
 
 export class FindManyDto {
 	@IsEmail()
@@ -13,4 +13,14 @@ export class FindManyDto {
 	@IsString({ each: true })
 	@IsOptional()
 	specialties?: string[]
+
+	@IsNumber()
+	@IsOptional()
+	@Min(1)
+	page?: number
+
+	@IsNumber()
+	@IsOptional()
+	@Min(1)
+	limit?: number
 }
