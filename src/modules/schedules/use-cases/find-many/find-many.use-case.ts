@@ -29,6 +29,9 @@ export class FindManyUseCase {
 		if (where.rangeStart) {
 			keys!.DT_INI_RANGE = new Date(where.rangeStart)
 		}
+		if (where.disabled) {
+			keys!.VL_CONFIRMADO = where.disabled ? 1 : 0
+		}
 
 		const foundSchedules = await this.scheduleRepository.getMany(keys)
 
