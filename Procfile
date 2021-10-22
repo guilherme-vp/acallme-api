@@ -1,1 +1,2 @@
-web: yarn remove oracledb && yarn start:prod
+web: yarn remove oracledb
+web: yarn start:prod
