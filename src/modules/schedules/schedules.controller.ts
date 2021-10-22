@@ -1,9 +1,9 @@
 import { Roles } from '@common/decorators'
 import { Role } from '@common/domain/enums'
-import { AuthGuard, RolesGuard } from '@common/guards'
+import { AuthGuard, CallGuard, RolesGuard } from '@common/guards'
 import { Patient } from '@modules/patients/decorators'
 import { Specialist } from '@modules/specialists/decorators'
-import { Body, Controller, Get, Param, Post, Query, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common'
 
 import { CreateDto, DisableDto, FindManyDto } from './dtos'
 import { SchedulesService } from './schedules.service'
@@ -12,7 +12,7 @@ import { SchedulesService } from './schedules.service'
 export class SchedulesController {
 	constructor(private readonly schedulesService: SchedulesService) {}
 
-	@UseGuards(AuthGuard, RolesGuard)
+	@UseGuards(AuthGuard, RolesGuard, CallGuard)
 	@Roles(Role.Specialist)
 	@Post('confirm/:scheduleId')
 	async confirmSchedule(
@@ -37,6 +37,16 @@ export class SchedulesController {
 		}
 	}
 
+	@UseGuards(AuthGuard, CallGuard)
+	@Get(':id')
+	async findById(@Param('id') id: string) {
+		const data = await this.schedulesService.getById(+id)
+
+		return {
+			schedule: data
+		}
+	}
+
 	@UseGuards(AuthGuard, RolesGuard)
 	@Roles(Role.Patient)
 	@Post()
@@ -48,9 +58,9 @@ export class SchedulesController {
 		}
 	}
 
-	@UseGuards(AuthGuard, RolesGuard)
+	@UseGuards(AuthGuard, RolesGuard, CallGuard)
 	@Roles(Role.Specialist)
-	@Post('disable')
+	@Put('disable')
 	async disable(@Body() input: DisableDto, @Specialist('id') specialistId: number) {
 		const data = await this.schedulesService.disable(input, specialistId)
 
