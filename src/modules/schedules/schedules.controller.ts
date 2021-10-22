@@ -16,11 +16,11 @@ export class SchedulesController {
 	@Roles(Role.Specialist)
 	@Post('confirm/:scheduleId')
 	async confirmSchedule(
-		@Param('scheduleId') scheduleId: string,
+		@Param('id') id: string,
 		@Specialist('id') specialistId: number,
 		@Body('confirmed') confirmed: boolean
 	) {
-		const data = await this.schedulesService.confirm(specialistId, +scheduleId, confirmed)
+		const data = await this.schedulesService.confirm(specialistId, +id, confirmed)
 
 		return {
 			ok: data
@@ -58,7 +58,7 @@ export class SchedulesController {
 		}
 	}
 
-	@UseGuards(AuthGuard, RolesGuard, CallGuard)
+	@UseGuards(AuthGuard, RolesGuard)
 	@Roles(Role.Specialist)
 	@Put('disable')
 	async disable(@Body() input: DisableDto, @Specialist('id') specialistId: number) {
