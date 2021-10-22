@@ -24,4 +24,8 @@ export class FindManyDto {
 	@IsOptional()
 	@IsBoolean()
 	confirmed?: boolean
+
+	@IsOptional()
+	@IsBoolean()
+	disabled?: boolean
 }

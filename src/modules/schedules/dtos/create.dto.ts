@@ -1,4 +1,4 @@
-import { IsOptional, IsDateString, IsNumber } from 'class-validator'
+import { IsDateString, IsNumber, Min } from 'class-validator'
 
 export class CreateDto {
 	@IsDateString()
@@ -7,7 +7,7 @@ export class CreateDto {
 	@IsDateString()
 	dateEnd!: string
 
-	@IsOptional()
 	@IsNumber()
-	patientId?: number
+	@Min(1)
+	specialistId!: number
 }
