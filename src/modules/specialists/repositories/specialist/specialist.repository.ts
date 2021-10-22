@@ -73,7 +73,8 @@ export class SpecialistRepository {
 	async getMany(
 		where?: Partial<SpecialistModel>,
 		method: 'AND' | 'OR' = 'AND',
-		specialtyNames?: string[],
+		page = 1,
+		limit = 9,
 		select?: SpecialistSelect
 	): Promise<SpecialistFormatted[]> {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Specialist}`
@@ -83,6 +84,10 @@ export class SpecialistRepository {
 
 			query.concat(`WHERE ${inputVars.join(` ${method} `)}`)
 		}
+
+		query.concat(
+			`ORDER BY ds_name ASC OFFSET ${(page - 1) * limit} ROWS FETCH NEXT ${limit} ROWS ONLY`
+		)
 
 		const result = await this.databaseService.executeQuery<SpecialistModel>(query, where)
 
