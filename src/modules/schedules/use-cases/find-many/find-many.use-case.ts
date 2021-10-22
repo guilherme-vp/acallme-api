@@ -2,6 +2,7 @@ import { FindManyDto } from '@modules/schedules/dtos'
 import { ScheduleFormatted, ScheduleModel } from '@modules/schedules/entities'
 import { ScheduleRepository } from '@modules/schedules/repositories'
 import { Injectable } from '@nestjs/common'
+import _ from 'lodash'
 
 @Injectable()
 export class FindManyUseCase {
