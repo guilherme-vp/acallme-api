@@ -1,7 +1,7 @@
 import { DefaultSelect, OmitProperties, RequireAtLeastOne } from '@core/types/'
 import { SpecialistFormatted, SpecialistModel } from '@modules/specialists/entities'
 import { formatSpecialist } from '@modules/specialists/utils'
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { DatabaseService } from '@services/database'
 import { Tables } from '@services/database/tables'
 
@@ -9,6 +9,8 @@ export type SpecialistSelect = DefaultSelect<SpecialistModel>
 
 @Injectable()
 export class SpecialistRepository {
+	private logger: Logger = new Logger('SpecialistRepository')
+
 	constructor(private readonly databaseService: DatabaseService) {}
 
 	async create(
@@ -62,6 +64,7 @@ export class SpecialistRepository {
 		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
 			Tables.Specialist
 		} WHERE ${whereKeys.join(` ${method} `)}`
+		this.logger.debug(`SQL Query: ${query}`)
 
 		const [result] = await this.databaseService.executeQuery<SpecialistModel>(query, where)
 
@@ -73,11 +76,12 @@ export class SpecialistRepository {
 	async getMany(
 		where?: Partial<SpecialistModel>,
 		method: 'AND' | 'OR' = 'AND',
-		page = 1,
-		limit = 9,
+		page = '1',
+		limit = '9',
 		select?: SpecialistSelect
 	): Promise<SpecialistFormatted[]> {
-		const query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Specialist}`
+		let query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Specialist} `
+		this.logger.log(`Sql Query: ${query}`)
 
 		if (where) {
 			const inputVars = Object.keys(where).map(key => {
@@ -88,23 +92,31 @@ export class SpecialistRepository {
 				return `${key} = :${key}`
 			})
 
-			query.concat(`WHERE ${inputVars.join(` ${method} `)}`)
+			query = query.concat(`WHERE ${inputVars.join(` ${method} `)} `)
+			this.logger.log(`Sql Query with Where: ${query}`)
 		}
 
-		query.concat(
-			`ORDER BY ds_name ASC OFFSET ${(page - 1) * limit} ROWS FETCH NEXT ${limit} ROWS ONLY`
+		query = query.concat(
+			`ORDER BY vl_consulta ASC OFFSET ${
+				(+page - 1) * +limit
+			} ROWS FETCH NEXT ${limit} ROWS ONLY`
 		)
+		this.logger.log(`Sql Query with pagination: ${query}`)
 
+		this.logger.log(`Querying the results`)
 		const result = await this.databaseService.executeQuery<SpecialistModel>(query, where)
 
+		this.logger.log('Checking if results are empty')
 		if (!result[0]) {
 			return []
 		}
 
+		this.logger.log('Formatting returned specialists')
 		const formattedSpecialists = result.map(specialist =>
 			formatSpecialist(specialist)
 		) as SpecialistFormatted[]
 
+		this.logger.log('Returning specialists')
 		return formattedSpecialists
 	}
 
