@@ -1,4 +1,4 @@
-import { IsOptional, IsDateString, IsNumber, IsBoolean } from 'class-validator'
+import { IsOptional, IsDateString, IsBoolean, IsString } from 'class-validator'
 
 export class FindManyDto {
 	@IsDateString()
@@ -10,16 +10,16 @@ export class FindManyDto {
 	rangeEnd?: string
 
 	@IsOptional()
-	@IsNumber()
-	callId?: number
+	@IsString()
+	callId?: string
 
 	@IsOptional()
-	@IsNumber()
-	specialistId?: number
+	@IsString()
+	specialistId?: string
 
 	@IsOptional()
-	@IsNumber()
-	patientId?: number
+	@IsString()
+	patientId?: string
 
 	@IsOptional()
 	@IsBoolean()
