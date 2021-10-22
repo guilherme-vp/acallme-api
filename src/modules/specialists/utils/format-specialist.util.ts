@@ -21,7 +21,8 @@ export function formatSpecialist(data: SpecialistModel): SpecialistFormatted | u
 		NR_CPF_DIGITO: digits,
 		DT_NASCIMENTO: birth,
 		NR_CNPJ: cnpj,
-		NR_CNPJ_DIGITO: cnpjDigits
+		NR_CNPJ_DIGITO: cnpjDigits,
+		DS_SENHA: password
 	} = data
 
 	const formattedCpf = formatCpf(cpf, digits).toString()
@@ -53,6 +54,7 @@ export function formatSpecialist(data: SpecialistModel): SpecialistFormatted | u
 		crp: data.NR_CRP?.toString(),
 		about,
 		cost,
-		avatarUrl: data.IM_AVATAR_URL?.toString()
+		avatarUrl: data.IM_AVATAR_URL?.toString(),
+		password
 	}
 }
