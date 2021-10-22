@@ -2,6 +2,7 @@ import { RequireAtLeastOne } from '@core/types'
 import { CallModel } from '@modules/calls/entities'
 import { CallRepository } from '@modules/calls/repositories'
 import { Injectable } from '@nestjs/common'
+import _ from 'lodash'
 
 import { FindManyDto } from '../../dtos'
 
@@ -10,7 +11,7 @@ export class FindManyUseCase {
 	constructor(private readonly callRepository: CallRepository) {}
 
 	async execute(where?: FindManyDto) {
-		const keys: RequireAtLeastOne<CallModel> | undefined = undefined
+		const keys: Partial<CallModel> = {}
 
 		if (where?.recordId) {
 			keys!.CD_PRONTUARIO = where.recordId
@@ -19,7 +20,7 @@ export class FindManyUseCase {
 			keys!.CD_AGENDA = where.scheduleId
 		}
 
-		const calls = await this.callRepository.getMany(keys)
+		const calls = await this.callRepository.getMany(!_.isEmpty(keys) ? keys : undefined)
 
 		return calls
 	}

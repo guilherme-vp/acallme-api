@@ -85,7 +85,7 @@ export class ScheduleRepository {
 	}
 
 	async getMany(
-		where?: RequireAtLeastOne<ScheduleModel>,
+		where?: Partial<ScheduleModel>,
 		select?: ScheduleSelect
 	): Promise<ScheduleFormatted[]> {
 		let query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Schedule}`

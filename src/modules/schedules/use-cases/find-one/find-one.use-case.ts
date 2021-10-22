@@ -13,7 +13,9 @@ export class FindOneUseCase {
 	) {}
 
 	async execute(where: FindOneDto): Promise<{ schedule: ScheduleFormatted } | null> {
-		const keys: RequireAtLeastOne<ScheduleModel> | undefined = undefined
+		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+		// @ts-ignore
+		const keys: RequireAtLeastOne<ScheduleModel> = {}
 
 		if (where.callId) {
 			keys!.CD_CHAMADA = where.callId

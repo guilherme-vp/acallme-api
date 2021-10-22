@@ -74,10 +74,7 @@ export class CallRepository {
 		return formattedCall
 	}
 
-	async getMany(
-		where?: RequireAtLeastOne<CallModel>,
-		select?: CallSelect
-	): Promise<CallFormatted[]> {
+	async getMany(where?: Partial<CallModel>, select?: CallSelect): Promise<CallFormatted[]> {
 		let query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Call}`
 
 		if (where) {

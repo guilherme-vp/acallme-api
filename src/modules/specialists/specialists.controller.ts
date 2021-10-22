@@ -38,7 +38,7 @@ export class SpecialistsController {
 	@UseGuards(AuthGuard, RolesGuard)
 	@Roles(Role.Specialist)
 	@Get()
-	async findMany(@Query() query: FindManyDto) {
-		return this.specialistService.findMany(query)
+	async findMany(@Query() queries: FindManyDto) {
+		return this.specialistService.findMany(queries)
 	}
 }

@@ -1,4 +1,3 @@
-import { RequireAtLeastOne } from '@core/types'
 import { FindManyDto } from '@modules/schedules/dtos'
 import { ScheduleFormatted, ScheduleModel } from '@modules/schedules/entities'
 import { ScheduleRepository } from '@modules/schedules/repositories'
@@ -9,7 +8,7 @@ export class FindManyUseCase {
 	constructor(private readonly scheduleRepository: ScheduleRepository) {}
 
 	async execute(where: FindManyDto): Promise<ScheduleFormatted[]> {
-		const keys: RequireAtLeastOne<ScheduleModel> | undefined = undefined
+		const keys: Partial<ScheduleModel> = {}
 
 		if (where.callId) {
 			keys!.CD_CHAMADA = where.callId
@@ -33,7 +32,9 @@ export class FindManyUseCase {
 			keys!.VL_CONFIRMADO = where.disabled ? 1 : 0
 		}
 
-		const foundSchedules = await this.scheduleRepository.getMany(keys)
+		const foundSchedules = await this.scheduleRepository.getMany(
+			!_.isEmpty(keys) ? keys : undefined
+		)
 
 		return foundSchedules
 	}
