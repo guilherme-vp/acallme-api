@@ -88,7 +88,9 @@ export class ScheduleRepository {
 		where?: Partial<ScheduleModel>,
 		select?: ScheduleSelect
 	): Promise<ScheduleFormatted[]> {
-		let query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${Tables.Schedule}`
+		let query = `SELECT ${select ? select.join(`, `) : '*'} FROM ${
+			Tables.Schedule
+		} ORDER BY dt_ini_range ASC`
 
 		if (where) {
 			const inputVars = Object.keys(where).map(key => `${key} = :${key}`)
