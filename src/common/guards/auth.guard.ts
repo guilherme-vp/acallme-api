@@ -8,7 +8,8 @@ import {
 	CanActivate,
 	ExecutionContext,
 	HttpException,
-	HttpStatus
+	HttpStatus,
+	Logger
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { FastifyRequest } from 'fastify'
@@ -16,6 +17,8 @@ import { I18nService } from 'nestjs-i18n'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
+	private logger: Logger = new Logger('AuthGuard')
+
 	constructor(
 		private readonly jwtService: JwtService,
 		private readonly languageService: I18nService,
@@ -24,20 +27,24 @@ export class AuthGuard implements CanActivate {
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
+		this.logger.log('Getting HTTP Request')
 		const request = context.switchToHttp().getRequest() as FastifyRequest
 
 		const authHeader = request.headers['authorization']
 
 		if (!authHeader) {
+			this.logger.error('No authorization header given')
 			throw new HttpException(
 				await this.languageService.translate('auth.not-authorized'),
 				HttpStatus.UNAUTHORIZED
 			)
 		}
 
+		this.logger.log('Split authorization header')
 		const splitted = authHeader.split(' ')
 
 		if (!splitted[1]) {
+			this.logger.error('Header not valid or without first word')
 			throw new HttpException(
 				await this.languageService.translate('auth.not-authorized'),
 				HttpStatus.UNAUTHORIZED
@@ -51,27 +58,38 @@ export class AuthGuard implements CanActivate {
 		try {
 			decoded = await this.jwtService.verifyAsync(token)
 		} catch {
+			this.logger.error('Token invalid or expired')
 			throw new HttpException(
 				await this.languageService.translate('auth.not-authorized'),
 				HttpStatus.UNAUTHORIZED
 			)
 		}
 
-		const patient = await this.patientService.findById(decoded.id)
-		const specialist = await this.specialistService.findById(decoded.id)
+		if (decoded.role === Role.Patient) {
+			const patient = await this.patientService.findById(decoded.id)
 
-		if (!patient && !specialist) {
-			throw new HttpException(
-				await this.languageService.translate('auth.user-does-not-exists'),
-				HttpStatus.UNAUTHORIZED
-			)
-		}
+			if (!patient) {
+				this.logger.error('Role patient but user does not exists')
+				throw new HttpException(
+					await this.languageService.translate('auth.user-does-not-exists'),
+					HttpStatus.UNAUTHORIZED
+				)
+			}
 
-		if (patient) {
 			request.user = { ...patient, role: Role.Patient }
 		}
 
-		if (specialist) {
+		if (decoded.role === Role.Specialist) {
+			const specialist = await this.specialistService.findById(decoded.id)
+
+			if (!specialist) {
+				this.logger.error('Role specialist but user does not exists')
+				throw new HttpException(
+					await this.languageService.translate('auth.user-does-not-exists'),
+					HttpStatus.UNAUTHORIZED
+				)
+			}
+
 			request.user = { ...specialist, role: Role.Specialist }
 		}
 

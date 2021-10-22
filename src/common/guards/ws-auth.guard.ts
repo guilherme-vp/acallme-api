@@ -42,20 +42,27 @@ export class WsAuthGuard implements CanActivate {
 			throw new WsException(await this.languageService.translate('auth.not-authorized'))
 		}
 
-		const patient = await this.patientService.findById(decoded.id)
-		const specialist = await this.specialistService.findById(decoded.id)
+		if (decoded.role === Role.Patient) {
+			const patient = await this.patientService.findById(decoded.id)
 
-		if (!patient && !specialist) {
-			throw new WsException(
-				await this.languageService.translate('auth.user-does-not-exists')
-			)
-		}
+			if (!patient) {
+				throw new WsException(
+					await this.languageService.translate('auth.user-does-not-exists')
+				)
+			}
 
-		if (patient) {
 			request.handshake.auth = { ...patient, role: Role.Patient }
 		}
 
-		if (specialist) {
+		if (decoded.role === Role.Specialist) {
+			const specialist = await this.specialistService.findById(decoded.id)
+
+			if (!specialist) {
+				throw new WsException(
+					await this.languageService.translate('auth.user-does-not-exists')
+				)
+			}
+
 			request.handshake.auth = { ...specialist, role: Role.Specialist }
 		}
 
