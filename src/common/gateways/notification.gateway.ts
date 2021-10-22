@@ -1,13 +1,12 @@
 /* eslint-disable indent */
 import { WsEvents } from '@common/domain/enums'
-import { WsAuthGuard } from '@common/guards'
 import { PatientWs } from '@modules/patients/decorators'
 import { PatientFormatted } from '@modules/patients/entities'
 import { ScheduleFormatted } from '@modules/schedules/entities'
 import { SpecialistWs } from '@modules/specialists/decorators'
 import { SpecialistFormatted } from '@modules/specialists/entities'
 import { SpecialistService } from '@modules/specialists/specialists.service'
-import { Logger, UseFilters, UseGuards } from '@nestjs/common'
+import { Logger, UseFilters } from '@nestjs/common'
 import {
 	BaseWsExceptionFilter,
 	ConnectedSocket,
@@ -55,8 +54,8 @@ export class NotificationGateway
 		return { patientSocket, specialistSocket }
 	}
 
-	@UseGuards(WsAuthGuard)
 	@SubscribeMessage(WsEvents.ME)
+	// @UseGuards(WsAuthGuard)
 	me(
 		@ConnectedSocket() client: Socket,
 		@PatientWs() patient: PatientFormatted,
