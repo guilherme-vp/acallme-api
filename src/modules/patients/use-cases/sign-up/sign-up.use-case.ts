@@ -42,7 +42,7 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 		const finalPhone: number[] = []
 
 		if (phone) {
-			const [dddPhone, fullPhone] = splitPhone(phone)
+			const [dddPhone, fullPhone] = splitPhone(+phone.replace(/() -/g, ''))
 			finalPhone.push(dddPhone, fullPhone)
 		}
 
@@ -51,7 +51,7 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 			DS_EMAIL: email,
 			DS_SENHA: password,
 			DS_GENERO: gender,
-			DT_NASCIMENTO: datefns.parse(birth, 'yyyy-dd-MM', new Date()),
+			DT_NASCIMENTO: new Date(birth),
 			NR_CPF: fullCpf,
 			NR_CPF_DIGITO: digitsCpf,
 			NR_TELEFONE_DDD: finalPhone[0],

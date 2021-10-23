@@ -3,6 +3,7 @@ import {
 	IsDateString,
 	IsEmail,
 	IsNumber,
+	IsNumberString,
 	IsOptional,
 	IsString,
 	IsUrl,
@@ -29,7 +30,6 @@ export class SignUpDto {
 	avatarUrl?: string
 
 	@IsString()
-	@Length(7, 14)
 	cnpj!: string
 
 	@IsString()
@@ -37,12 +37,10 @@ export class SignUpDto {
 	cpf!: string
 
 	@IsString()
-	@Length(2, 8)
 	@IsOptional()
 	crp?: string
 
 	@IsString()
-	@Length(2, 6)
 	@IsOptional()
 	crm?: string
 
@@ -54,16 +52,14 @@ export class SignUpDto {
 	birth!: string
 
 	@IsString()
-	@Length(7, 11)
-	phone!: number
+	phone!: string
 
 	@IsString()
 	@MinLength(0)
 	about!: string
 
-	@IsNumber({ maxDecimalPlaces: 2 })
-	@Min(1)
-	cost!: number
+	@IsNumberString()
+	cost!: string
 
 	@IsString({ each: true })
 	specialties!: string[]

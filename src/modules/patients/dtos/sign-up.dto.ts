@@ -33,6 +33,6 @@ export class SignUpDto {
 
 	@IsString()
 	@IsOptional()
-	@Length(11)
-	phone?: number
+	@Length(7, 11)
+	phone?: string
 }

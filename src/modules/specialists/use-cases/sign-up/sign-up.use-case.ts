@@ -8,7 +8,6 @@ import { BadRequestException, Injectable } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { CryptService } from '@services/crypt'
 import { MailerService } from '@services/mail'
-import * as datefns from 'date-fns'
 import { I18nService } from 'nestjs-i18n'
 
 @Injectable()
@@ -81,7 +80,9 @@ export class SignUpUseCase implements BaseUseCase<SpecialistModel> {
 		const finalPhone: number[] = []
 
 		if (phone) {
-			const [dddPhone, fullPhone] = splitPhone(phone)
+			const [dddPhone, fullPhone] = splitPhone(
+				+phone.replace('(', '').replace(')', '').replace(' ', '').replace('-', '')
+			)
 			finalPhone.push(dddPhone, fullPhone)
 		}
 
@@ -90,7 +91,7 @@ export class SignUpUseCase implements BaseUseCase<SpecialistModel> {
 			DS_EMAIL: email,
 			DS_SENHA: password,
 			DS_GENERO: gender,
-			DT_NASCIMENTO: datefns.parse(birth, 'dd/MM/yyyy', new Date()),
+			DT_NASCIMENTO: new Date(birth),
 			NR_CPF: finalCpf[0],
 			NR_CPF_DIGITO: finalCpf[1],
 			NR_CNPJ: finalCnpj[0],
@@ -100,7 +101,7 @@ export class SignUpUseCase implements BaseUseCase<SpecialistModel> {
 			NR_CRM: Number(crm),
 			NR_CRP: Number(crp),
 			DS_SOBRE: about,
-			VL_CONSULTA: cost
+			VL_CONSULTA: +cost
 		})
 
 		if (!createdSpecialist) {
