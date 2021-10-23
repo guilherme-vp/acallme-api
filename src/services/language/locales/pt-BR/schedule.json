@@ -1,5 +1,5 @@
 {
-	"date-not-valid": "Você não pode agendar consultas com menos de 24 horas ou que já tenham uma data marcada",
+	"date-not-valid": "Você não pode agendar consultas com menos de 1 hora ou que já tenham uma data marcada",
 	"already-confimed": "Essa consulta já foi confirmada",
 	"not-confirmed": "Essa consulta não foi confirmada ainda ou foi rejeitada",
 	"user-not-authorized": "Você não tem o acesso necessário para realizar essa ação",
