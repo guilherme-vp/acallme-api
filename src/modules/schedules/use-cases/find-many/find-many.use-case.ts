@@ -27,7 +27,7 @@ export class FindManyUseCase {
 		}
 		if (where.confirmed) {
 			this.logger.log('Adding confirmed')
-			keys!.VL_CONFIRMADO = where.confirmed ? 1 : 0
+			keys!.VL_CONFIRMADO = JSON.parse(where.confirmed) ? 1 : 0
 		}
 		if (where.rangeEnd) {
 			this.logger.log('Adding rangeEnd')
@@ -39,7 +39,7 @@ export class FindManyUseCase {
 		}
 		if (where.disabled) {
 			this.logger.log('Adding disabled')
-			keys!.VL_CONFIRMADO = where.disabled ? 1 : 0
+			keys!.VL_CONFIRMADO = JSON.parse(where.disabled) ? 1 : 0
 		}
 
 		const foundSchedules = await this.scheduleRepository.getMany(
