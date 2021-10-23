@@ -2,7 +2,6 @@ import { UserGender } from '@common/domain/enums'
 import {
 	IsDateString,
 	IsEmail,
-	IsEnum,
 	IsOptional,
 	IsString,
 	Length,
@@ -22,10 +21,11 @@ export class SignUpDto {
 	password!: string
 
 	@IsString()
-	@Length(11, 11)
+	@Length(11, 14)
 	cpf!: string
 
-	@IsEnum(UserGender)
+	@IsString()
+	@Length(1, 2)
 	gender!: UserGender
 
 	@IsDateString()

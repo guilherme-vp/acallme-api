@@ -2,7 +2,6 @@ import { UserGender } from '@common/domain/enums'
 import {
 	IsDateString,
 	IsEmail,
-	IsEnum,
 	IsNumber,
 	IsOptional,
 	IsString,
@@ -30,31 +29,32 @@ export class SignUpDto {
 	avatarUrl?: string
 
 	@IsString()
-	@Length(14, 14)
+	@Length(7, 14)
 	cnpj!: string
 
 	@IsString()
-	@Length(11, 11)
+	@Length(11, 14)
 	cpf!: string
 
 	@IsString()
-	@Length(4, 8)
+	@Length(2, 8)
 	@IsOptional()
 	crp?: string
 
 	@IsString()
-	@Length(3, 6)
+	@Length(2, 6)
 	@IsOptional()
 	crm?: string
 
-	@IsEnum(UserGender)
+	@IsString()
+	@Length(1, 2)
 	gender!: UserGender
 
 	@IsDateString()
 	birth!: string
 
 	@IsString()
-	@Length(11, 11)
+	@Length(7, 11)
 	phone!: number
 
 	@IsString()
