@@ -75,11 +75,11 @@ export class ScheduleRepository {
 	}
 
 	async existsAtTheSameTime(date: Date, specialistId: number) {
-		const query = `SELECT  FROM ${Tables.Schedule} WHERE cd_especialista = :specialistId AND dt_ini_range = :date`
+		const query = `SELECT * FROM ${Tables.Schedule} WHERE cd_especialista = :specialistId AND dt_ini_range = :rangeStart`
 
 		const [result] = await this.databaseService.executeQuery<ScheduleModel>(query, {
 			specialistId,
-			date
+			rangeStart: date
 		})
 
 		if (!result) {
@@ -117,7 +117,7 @@ export class ScheduleRepository {
 
 		query = query.concat(` ORDER BY dt_ini_range ASC`)
 
-		this.logger.log(`Realizando o fetch com os fields:`, where)
+		this.logger.log(`Doing the fetch with the following fields:`, where)
 		const result = await this.databaseService.executeQuery<ScheduleModel>(query, where)
 
 		if (!result[0]) {
