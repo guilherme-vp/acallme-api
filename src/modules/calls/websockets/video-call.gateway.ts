@@ -76,7 +76,7 @@ export class VideoCallGateway
 	}
 
 	@SubscribeMessage(WsEvents.SEND_MESSAGE)
-	@UseGuards(WsAuthGuard)
+	// @UseGuards(WsAuthGuard)
 	sendMessage(
 		@MessageBody()
 		messageData: {
@@ -104,7 +104,7 @@ export class VideoCallGateway
 	}
 
 	@SubscribeMessage(WsEvents.UPDATE_MEDIA)
-	@UseGuards(WsAuthGuard)
+	// @UseGuards(WsAuthGuard)
 	updateMedia(
 		@MessageBody()
 		data: {
@@ -120,7 +120,7 @@ export class VideoCallGateway
 	}
 
 	@SubscribeMessage(WsEvents.ENTER_CALL)
-	@UseGuards(WsAuthGuard)
+	// @UseGuards(WsAuthGuard)
 	enterCall(
 		@MessageBody()
 		data: {
