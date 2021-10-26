@@ -1,11 +1,12 @@
 import { UserGender } from '@common/domain/enums'
+import { Exclude } from 'class-transformer'
 import {
 	IsDateString,
 	IsEmail,
-	IsOptional,
 	IsString,
 	Length,
-	Matches
+	Matches,
+	MinLength
 } from 'class-validator'
 
 export class SignUpDto {
@@ -20,6 +21,9 @@ export class SignUpDto {
 	@IsString()
 	password!: string
 
+	@Exclude()
+	file?: Express.Multer.File
+
 	@IsString()
 	@Length(11, 14)
 	cpf!: string
@@ -32,7 +36,6 @@ export class SignUpDto {
 	birth!: string
 
 	@IsString()
-	@IsOptional()
-	@Length(7, 11)
-	phone?: string
+	@MinLength(8)
+	phone!: string
 }
