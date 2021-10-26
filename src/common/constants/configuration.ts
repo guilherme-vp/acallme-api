@@ -18,7 +18,7 @@ const {
 
 const NODE_ENV: Envs = (ProcessEnv as Envs) || 'development'
 
-const dbConfig: ConnectionAttributes = {
+const dbConfig: Pick<ConnectionAttributes, 'user' | 'password' | 'connectionString'> = {
 	user: DATABASE_USER ?? 'oracle',
 	password: DATABASE_PASS ?? 'oracle',
 	connectionString: DATABASE_URI ?? 'localhost:1521/ORCLCDB.localdomain'
