@@ -1,9 +1,7 @@
-import { RequireAtLeastOne } from '@core/types/'
 import { Injectable } from '@nestjs/common'
 
-import { SignUpDto, LoginDto } from './dtos'
-import { PatientModel } from './entities'
-import { PatientSelect } from './repositories'
+import { SignUpDto, LoginDto, FindOneDto } from './dtos'
+import { Patient } from './entities'
 import { SignUpUseCase, LoginUseCase, FindByIdUseCase, FindOneUseCase } from './use-cases'
 
 @Injectable()
@@ -23,11 +21,11 @@ export class PatientService {
 		return this.loginUseCase.execute(input)
 	}
 
-	async findById(id: number, select?: PatientSelect) {
+	async findById(id: number, select?: (keyof Patient)[]) {
 		return this.findByIdUseCase.execute(id, select)
 	}
 
-	async findOne(fields: RequireAtLeastOne<PatientModel>) {
-		return this.findOneUseCase.execute(fields)
+	async findOne(fields: FindOneDto, method?: 'AND' | 'OR') {
+		return this.findOneUseCase.execute(fields, method)
 	}
 }
