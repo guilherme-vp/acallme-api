@@ -1,7 +1,18 @@
 import { Roles } from '@common/decorators'
 import { Role } from '@common/domain/enums'
 import { AuthGuard, RolesGuard } from '@common/guards'
-import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common'
+import {
+	Controller,
+	Get,
+	Post,
+	Body,
+	Param,
+	Query,
+	UseGuards,
+	UseInterceptors,
+	UploadedFile
+} from '@nestjs/common'
+import { FileInterceptor } from '@nestjs/platform-express'
 
 import { Specialist } from './decorators'
 import { FindManyDto, LoginDto, SignUpDto } from './dtos'
@@ -12,8 +23,11 @@ export class SpecialistsController {
 	constructor(private readonly specialistService: SpecialistService) {}
 
 	@Post('signup')
-	async signUp(@Body() input: SignUpDto) {
-		return this.specialistService.signUp(input)
+	@UseInterceptors(
+		FileInterceptor('avatarUrl', { limits: { files: 1, fileSize: 2000000 } }) // 2MB
+	)
+	async signUp(@Body() input: SignUpDto, @UploadedFile() file: Express.Multer.File) {
+		return this.specialistService.signUp({ ...input, file })
 	}
 
 	@Post('login')
