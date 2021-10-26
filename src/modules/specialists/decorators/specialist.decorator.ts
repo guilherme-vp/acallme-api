@@ -6,10 +6,10 @@ import {
 } from '@nestjs/common'
 import jwt from 'jsonwebtoken'
 
-import { SpecialistFormatted } from '../entities'
+import { Specialist as SpecialistEntity } from '../entities'
 
 export const Specialist = createParamDecorator(
-	(data: keyof SpecialistFormatted, ctx: ExecutionContext) => {
+	(data: keyof SpecialistEntity, ctx: ExecutionContext) => {
 		try {
 			const req = ctx.switchToHttp().getRequest()
 

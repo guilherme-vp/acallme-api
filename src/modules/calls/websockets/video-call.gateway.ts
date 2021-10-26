@@ -2,11 +2,11 @@
 import { Role, WsEvents } from '@common/domain/enums'
 import { WsAuthGuard } from '@common/guards'
 import { CallService } from '@modules/calls/calls.service'
-import { CallFormatted } from '@modules/calls/entities'
+import { Call } from '@modules/calls/entities'
 import { PatientWs } from '@modules/patients/decorators'
-import { PatientFormatted } from '@modules/patients/entities'
+import { Patient } from '@modules/patients/entities'
 import { SpecialistWs } from '@modules/specialists/decorators'
-import { SpecialistFormatted } from '@modules/specialists/entities'
+import { Specialist } from '@modules/specialists/entities'
 import { Logger, UseFilters, UseGuards } from '@nestjs/common'
 import {
 	BaseWsExceptionFilter,
@@ -28,8 +28,8 @@ export class VideoCallGateway
 {
 	@WebSocketServer() server!: Server
 	private logger: Logger = new Logger('VideoCallGateway')
-	public patients: (PatientFormatted & { socketId: string })[] = []
-	public specialists: (SpecialistFormatted & { socketId: string })[] = []
+	public patients: (Patient & { socketId: string })[] = []
+	public specialists: (Specialist & { socketId: string })[] = []
 	public rooms: Array<{ name: string; peers: any[] }> = []
 
 	constructor(private readonly callService: CallService) {}
@@ -50,8 +50,8 @@ export class VideoCallGateway
 	@SubscribeMessage(WsEvents.ME)
 	me(
 		@ConnectedSocket() client: Socket,
-		@PatientWs() patient: PatientFormatted,
-		@SpecialistWs() specialist: SpecialistFormatted
+		@PatientWs() patient: Patient,
+		@SpecialistWs() specialist: Specialist
 	) {
 		if (patient) {
 			const newPatient = { ...patient, socketId: client.id }
@@ -116,7 +116,9 @@ export class VideoCallGateway
 	) {
 		const { room, ...rest } = data
 
-		this.server.to(room).emit(WsEvents.UPDATE_USER_MEDIA, { ...rest, socketId: client.id })
+		this.server
+			.to(room)
+			.emit(WsEvents.RECEIVE_UPDATED_MEDIA, { ...rest, socketId: client.id })
 	}
 
 	@SubscribeMessage(WsEvents.ENTER_CALL)
@@ -149,7 +151,7 @@ export class VideoCallGateway
 
 		client.join(room)
 
-		this.server.to(room).emit(WsEvents.RECEIVE_USER, {
+		this.server.to(room).emit(WsEvents.ENTER_CALL, {
 			socketId: client.id,
 			signal,
 			name: auth.name,
@@ -160,7 +162,7 @@ export class VideoCallGateway
 	}
 
 	@SubscribeMessage(WsEvents.END_CALL)
-	async endCall(data: Pick<CallFormatted, 'duration' | 'scheduleId' | 'rating'>) {
+	async endCall(@MessageBody() data: Pick<Call, 'duration' | 'scheduleId' | 'rating'>) {
 		const { duration, scheduleId, rating } = data
 
 		await this.callService.create({

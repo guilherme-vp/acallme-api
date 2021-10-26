@@ -1,9 +1,9 @@
-import { CallFormatted } from '@modules/calls/entities'
+import { Call } from '@modules/calls/entities'
 import { createParamDecorator, ExecutionContext } from '@nestjs/common'
 import { Socket } from 'socket.io'
 
 export const CallWs = createParamDecorator(
-	(data: keyof CallFormatted, context: ExecutionContext) => {
+	(data: keyof Call, context: ExecutionContext) => {
 		const request = context.switchToWs().getClient() as Socket
 
 		const { call } = request

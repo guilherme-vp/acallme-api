@@ -4,10 +4,10 @@ import { WsException } from '@nestjs/websockets'
 import jwt from 'jsonwebtoken'
 import { Socket } from 'socket.io'
 
-import { PatientFormatted } from '../entities'
+import { Patient } from '../entities'
 
 export const PatientWs = createParamDecorator(
-	(data: keyof PatientFormatted, context: ExecutionContext) => {
+	(data: keyof Patient, context: ExecutionContext) => {
 		try {
 			const request = context.switchToWs().getClient() as Socket
 

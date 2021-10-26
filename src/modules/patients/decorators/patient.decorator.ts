@@ -6,10 +6,10 @@ import {
 } from '@nestjs/common'
 import jwt from 'jsonwebtoken'
 
-import { PatientFormatted } from '../entities'
+import { Patient as PatientEntity } from '../entities'
 
 export const Patient = createParamDecorator(
-	(data: keyof PatientFormatted, ctx: ExecutionContext) => {
+	(data: keyof PatientEntity, ctx: ExecutionContext) => {
 		try {
 			const req = ctx.switchToHttp().getRequest()
 

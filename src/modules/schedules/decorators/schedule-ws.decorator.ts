@@ -1,9 +1,9 @@
-import { ScheduleFormatted } from '@modules/schedules/entities'
+import { Schedule } from '@modules/schedules/entities'
 import { createParamDecorator, ExecutionContext } from '@nestjs/common'
 import { Socket } from 'socket.io'
 
 export const ScheduleWs = createParamDecorator(
-	(data: keyof ScheduleFormatted, context: ExecutionContext) => {
+	(data: keyof Schedule, context: ExecutionContext) => {
 		const request = context.switchToWs().getClient() as Socket
 
 		const { schedule } = request
