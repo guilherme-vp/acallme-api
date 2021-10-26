@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 
 import { SignUpDto, LoginDto, FindOneDto, FindManyDto } from './dtos'
+import { Specialist } from './entities'
 import {
 	SignUpUseCase,
 	LoginUseCase,
@@ -27,12 +28,12 @@ export class SpecialistService {
 		return this.loginUseCase.execute(input)
 	}
 
-	async findById(id: number) {
-		return this.findByIdUseCase.execute(id)
+	async findById(id: number, select?: (keyof Specialist)[]) {
+		return this.findByIdUseCase.execute(id, select)
 	}
 
-	async findOne(fields: FindOneDto) {
-		return this.findOneUseCase.execute(fields)
+	async findOne(fields: FindOneDto, method?: 'AND' | 'OR') {
+		return this.findOneUseCase.execute(fields, method)
 	}
 
 	async findMany(fields: FindManyDto) {
