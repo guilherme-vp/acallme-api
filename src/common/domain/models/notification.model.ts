@@ -1,4 +1,4 @@
-export interface Notification {
+export interface NotificationModel {
 	id: string
 	scheduleId: number
 	avatar?: string
