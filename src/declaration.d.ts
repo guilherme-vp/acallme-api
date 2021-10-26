@@ -1,17 +1,17 @@
-import { UserFormattedModel } from '@common/domain/entities'
 import { Role } from '@common/domain/enums'
-import { CallFormatted } from '@modules/calls/entities'
-import { ScheduleFormatted } from '@modules/schedules/entities'
+import { UserModel } from '@common/domain/models'
+import { Call } from '@modules/calls/entities'
+import { Schedule } from '@modules/schedules/entities'
 
-declare module 'fastify' {
-	export interface FastifyRequest {
-		user: UserFormattedModel & { role: Role }
+declare module 'express' {
+	export interface Request {
+		user: UserModel & { id: number; role: Role }
 	}
 }
 
 declare module 'socket.io' {
 	export interface Socket {
-		schedule?: ScheduleFormatted
-		call?: CallFormatted
+		schedule?: Schedule
+		call?: Call
 	}
 }

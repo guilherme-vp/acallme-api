@@ -1,12 +1,11 @@
 import { UserGender } from '@common/domain/enums'
+import { Exclude } from 'class-transformer'
 import {
 	IsDateString,
 	IsEmail,
 	IsNumber,
-	IsNumberString,
 	IsOptional,
 	IsString,
-	IsUrl,
 	Length,
 	Matches,
 	Min,
@@ -25,11 +24,11 @@ export class SignUpDto {
 	@IsString()
 	password!: string
 
-	@IsUrl()
-	@IsOptional()
-	avatarUrl?: string
+	@Exclude()
+	file?: Express.Multer.File
 
 	@IsString()
+	@Length(11, 14)
 	cnpj!: string
 
 	@IsString()
@@ -42,6 +41,7 @@ export class SignUpDto {
 
 	@IsString()
 	@IsOptional()
+	@MinLength(1)
 	crm?: string
 
 	@IsString()
@@ -52,14 +52,16 @@ export class SignUpDto {
 	birth!: string
 
 	@IsString()
+	@MinLength(8)
 	phone!: string
 
 	@IsString()
 	@MinLength(0)
 	about!: string
 
-	@IsNumberString()
-	cost!: string
+	@IsNumber()
+	@Min(1)
+	cost!: number
 
 	@IsString({ each: true })
 	specialties!: string[]

@@ -5,7 +5,7 @@ import {
 	ExecutionContext,
 	BadRequestException
 } from '@nestjs/common'
-import { FastifyRequest } from 'fastify'
+import { Request } from 'express'
 import { I18nService } from 'nestjs-i18n'
 
 @Injectable()
@@ -16,7 +16,7 @@ export class CallGuard implements CanActivate {
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const { user, params } = context.switchToHttp().getRequest() as FastifyRequest
+		const { user, params } = context.switchToHttp().getRequest() as Request
 
 		if (!(params as any).id) {
 			throw new BadRequestException(
