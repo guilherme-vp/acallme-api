@@ -86,9 +86,9 @@ ALTER TABLE t_clg_especialidade ADD CONSTRAINT pk_clg_especialidade PRIMARY KEY 
 
 ALTER TABLE t_clg_especialista ADD CONSTRAINT pk_clg_especialista PRIMARY KEY ( cd_especialista );
 
-ALTER TABLE t_clg_especialista ADD CONSTRAINT un_clg_especialista_cnpj UNIQUE ( nr_cnpj, nr_cnpj_digito );
+ALTER TABLE t_clg_especialista ADD CONSTRAINT un_clg_especialista_cnpj UNIQUE ( nr_cnpj );
 
-ALTER TABLE t_clg_especialista ADD CONSTRAINT un_clg_especialista_cpf UNIQUE ( nr_cpf, nr_cpf_digito );
+ALTER TABLE t_clg_especialista ADD CONSTRAINT un_clg_especialista_cpf UNIQUE ( nr_cpf );
 
 ALTER TABLE t_clg_especialista ADD CONSTRAINT un_clg_especialista_crm UNIQUE ( nr_crm );
 
@@ -98,11 +98,9 @@ ALTER TABLE t_clg_especialista ADD CONSTRAINT un_clg_especialista_email UNIQUE (
 
 ALTER TABLE t_clg_paciente ADD CONSTRAINT pk_clg_paciente PRIMARY KEY ( cd_paciente );
 
-ALTER TABLE t_clg_paciente ADD CONSTRAINT un_clg_paciente_cpf UNIQUE ( nr_cpf, nr_cpf_digito );
+ALTER TABLE t_clg_paciente ADD CONSTRAINT un_clg_paciente_cpf UNIQUE ( nr_cpf );
 
 ALTER TABLE t_clg_paciente ADD CONSTRAINT un_clg_paciente_email UNIQUE ( ds_email );
-
-ALTER TABLE t_clg_prontuario ADD CONSTRAINT pk_clg_prontuario PRIMARY KEY ( cd_prontuario );
 
 ALTER TABLE t_clg_agenda
     ADD CONSTRAINT fk_clg_agenda_chamada FOREIGN KEY ( cd_chamada )
