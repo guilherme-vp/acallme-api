@@ -1,10 +1,10 @@
 /* eslint-disable indent */
 import { WsEvents } from '@common/domain/enums'
 import { PatientWs } from '@modules/patients/decorators'
-import { PatientFormatted } from '@modules/patients/entities'
-import { ScheduleFormatted } from '@modules/schedules/entities'
+import { Patient } from '@modules/patients/entities'
+import { Schedule } from '@modules/schedules/entities'
 import { SpecialistWs } from '@modules/specialists/decorators'
-import { SpecialistFormatted } from '@modules/specialists/entities'
+import { Specialist } from '@modules/specialists/entities'
 import { SpecialistService } from '@modules/specialists/specialists.service'
 import { Logger, UseFilters } from '@nestjs/common'
 import {
@@ -20,7 +20,7 @@ import {
 import faker from 'faker'
 import { Server, Socket } from 'socket.io'
 
-import { Notification } from '../domain/entities'
+import { NotificationModel } from '../domain/models'
 
 @UseFilters(new BaseWsExceptionFilter())
 @WebSocketGateway({ cors: true })
@@ -32,8 +32,8 @@ export class NotificationGateway
 	@WebSocketServer() server!: Server
 	private logger: Logger = new Logger('NotificationGateway')
 
-	public patients: (PatientFormatted & { socketId: string })[] = []
-	public specialists: (SpecialistFormatted & { socketId: string })[] = []
+	public patients: (Patient & { socketId: string })[] = []
+	public specialists: (Specialist & { socketId: string })[] = []
 
 	public afterInit(): void {
 		return this.logger.warn(`Websocket namespace running in: /video-call`)
@@ -58,8 +58,8 @@ export class NotificationGateway
 	// @UseGuards(WsAuthGuard)
 	me(
 		@ConnectedSocket() client: Socket,
-		@PatientWs() patient: PatientFormatted,
-		@SpecialistWs() specialist: SpecialistFormatted
+		@PatientWs() patient: Patient,
+		@SpecialistWs() specialist: Specialist
 	) {
 		if (patient) {
 			const newPatient = { ...patient, socketId: client.id }
@@ -79,7 +79,7 @@ export class NotificationGateway
 		return
 	}
 
-	sendCallNotifications(schedule: ScheduleFormatted) {
+	sendCallNotifications(schedule: Schedule) {
 		const { id, specialistId, patientId } = schedule
 
 		const { patientSocket, specialistSocket } = this.getSockets(
@@ -93,7 +93,7 @@ export class NotificationGateway
 				createdAt: new Date(),
 				type: 'appointment_call',
 				scheduleId: id
-			} as Notification)
+			} as NotificationModel)
 		}
 
 		if (specialistSocket) {
@@ -102,11 +102,11 @@ export class NotificationGateway
 				createdAt: new Date(),
 				type: 'appointment_call',
 				scheduleId: id
-			} as Notification)
+			} as NotificationModel)
 		}
 	}
 
-	sendAppointmentConfirmation(schedule: ScheduleFormatted) {
+	sendAppointmentConfirmation(schedule: Schedule) {
 		const { id, patientId, rangeStart, confirmed } = schedule
 
 		const patientSocket = this.patients.find(patient => patient.id === patientId)
@@ -121,12 +121,12 @@ export class NotificationGateway
 			createdAt: new Date(),
 			type: 'appointment_confirmation',
 			scheduleId: id,
-			isConfirmed: confirmed,
+			isConfirmed: Boolean(confirmed),
 			when: rangeStart
-		} as Notification)
+		} as NotificationModel)
 	}
 
-	async sendNewAppointment(schedule: ScheduleFormatted) {
+	async sendNewAppointment(schedule: Schedule) {
 		const { id: scheduleId, patientId, specialistId, rangeStart } = schedule
 
 		const specialist = await this.specialistService.findById(specialistId)
@@ -145,6 +145,6 @@ export class NotificationGateway
 			name: specialist?.name,
 			when: rangeStart,
 			createdAt: new Date()
-		} as Notification)
+		} as NotificationModel)
 	}
 }
