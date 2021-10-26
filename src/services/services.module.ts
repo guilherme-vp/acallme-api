@@ -5,7 +5,7 @@ import { JwtModule } from '@nestjs/jwt'
 import { ScheduleModule } from '@nestjs/schedule'
 
 import { CryptService } from './crypt'
-import { DatabaseService } from './database'
+import { DatabaseModule } from './database'
 import { LanguageModule } from './language'
 import { MailerModule } from './mail'
 
@@ -24,8 +24,14 @@ const jwtModule = JwtModule.registerAsync({
 
 @Global()
 @Module({
-	imports: [jwtModule, LanguageModule, ScheduleModule.forRoot(), MailerModule],
-	providers: [CryptService, DatabaseService],
-	exports: [CryptService, DatabaseService, jwtModule]
+	imports: [
+		jwtModule,
+		LanguageModule,
+		ScheduleModule.forRoot(),
+		MailerModule,
+		DatabaseModule
+	],
+	providers: [CryptService],
+	exports: [CryptService, jwtModule, DatabaseModule]
 })
 export class ServicesModule {}
