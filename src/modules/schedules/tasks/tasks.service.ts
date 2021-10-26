@@ -1,22 +1,29 @@
 import { NotificationGateway } from '@common/gateways/notification.gateway'
 import { VideoCallGateway } from '@modules/calls/websockets'
 import { PatientService } from '@modules/patients/patients.service'
-import { ScheduleRepository } from '@modules/schedules/repositories'
 import { SpecialistService } from '@modules/specialists/specialists.service'
 import { Injectable } from '@nestjs/common'
-import { Cron, CronExpression, Interval } from '@nestjs/schedule'
+import { Cron, CronExpression } from '@nestjs/schedule'
+import { InjectRepository } from '@nestjs/typeorm'
 import { MailerService } from '@services/mail'
 import * as datefns from 'date-fns'
+import { Between, Repository } from 'typeorm'
+
+import { Schedule } from '../entities'
+import { SchedulesService } from '../schedules.service'
+
+export const BetweenDates = (startDate: Date, endDate: Date) => Between(startDate, endDate)
 
 @Injectable()
 export class TaskService {
 	constructor(
+		private readonly scheduleService: SchedulesService,
 		private readonly specialistService: SpecialistService,
 		private readonly patientService: PatientService,
-		private readonly scheduleRepository: ScheduleRepository,
 		private readonly mailerService: MailerService,
 		private readonly videoCallGateway: VideoCallGateway,
-		private readonly notificationGateway: NotificationGateway
+		private readonly notificationGateway: NotificationGateway,
+		@InjectRepository(Schedule) private readonly scheduleRepository: Repository<Schedule>
 	) {}
 
 	@Cron(CronExpression.EVERY_5_MINUTES, { name: 'db-refresh' })
@@ -29,9 +36,11 @@ export class TaskService {
 		const todayStart = datefns.startOfToday()
 		const todayEnd = datefns.endOfToday()
 
-		const dailySchedules = await this.scheduleRepository.getManyToday({
-			startDate: todayStart,
-			endDate: todayEnd
+		const dailySchedules = await this.scheduleRepository.find({
+			where: {
+				rangeStart: BetweenDates(todayStart, todayEnd),
+				rangeEnd: BetweenDates(todayStart, todayEnd)
+			}
 		})
 
 		await Promise.all(
@@ -67,9 +76,11 @@ export class TaskService {
 	async sendWarnCallNotification() {
 		const twoHoursAfterNow = datefns.addHours(new Date(), 2)
 
-		const schedules = await this.scheduleRepository.getMany({
-			VL_CONFIRMADO: 1,
-			DT_INI_RANGE: twoHoursAfterNow
+		const schedules = await this.scheduleRepository.find({
+			where: {
+				confirmed: 1,
+				rangeStart: twoHoursAfterNow
+			}
 		})
 
 		await Promise.all(
@@ -114,9 +125,9 @@ export class TaskService {
 	async sendCallNotification() {
 		const hourStart = datefns.startOfHour(new Date())
 
-		const schedules = await this.scheduleRepository.getMany({
-			VL_CONFIRMADO: 1,
-			DT_INI_RANGE: hourStart
+		const schedules = await this.scheduleService.getMany({
+			confirmed: String(true),
+			rangeStart: hourStart.toISOString()
 		})
 
 		await Promise.all(
@@ -156,9 +167,9 @@ export class TaskService {
 		const hourBefore = datefns.subHours(new Date(), 1)
 		const startOfHourBefore = datefns.startOfHour(hourBefore)
 
-		const schedules = await this.scheduleRepository.getMany({
-			DT_INI_RANGE: startOfHourBefore,
-			VL_CONFIRMADO: 1
+		const schedules = await this.scheduleService.getMany({
+			rangeStart: startOfHourBefore.toISOString(),
+			confirmed: String(true)
 		})
 
 		await Promise.all(
@@ -187,9 +198,9 @@ export class TaskService {
 		const startOfHourBefore = datefns.startOfHour(hourBefore)
 		const duration = datefns.differenceInSeconds(startOfHourBefore, Date.now())
 
-		const schedules = await this.scheduleRepository.getMany({
-			VL_CONFIRMADO: 1,
-			DT_INI_RANGE: startOfHourBefore
+		const schedules = await this.scheduleService.getMany({
+			rangeStart: startOfHourBefore.toISOString(),
+			confirmed: String(true)
 		})
 
 		await Promise.all(
