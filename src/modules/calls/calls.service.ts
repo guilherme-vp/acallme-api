@@ -6,9 +6,9 @@ import { CreateUseCase, FindByIdUseCase, FindManyUseCase } from './use-cases'
 @Injectable()
 export class CallService {
 	constructor(
-		private findManyUseCase: FindManyUseCase,
-		private findByIdUseCase: FindByIdUseCase,
-		private createUseCase: CreateUseCase
+		private readonly findManyUseCase: FindManyUseCase,
+		private readonly findByIdUseCase: FindByIdUseCase,
+		private readonly createUseCase: CreateUseCase
 	) {}
 
 	async findMany(fields?: FindManyDto) {
