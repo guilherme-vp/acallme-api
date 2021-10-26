@@ -1,29 +1,38 @@
 import { BaseUseCase } from '@common/domain/base'
-import { SpecialistFormatted, SpecialistModel } from '@modules/specialists/entities'
-import {
-	SpecialistRepository,
-	SpecialtyRepository
-} from '@modules/specialists/repositories'
-import { Injectable } from '@nestjs/common'
+import { Specialist } from '@modules/specialists/entities'
+import { Injectable, Logger, NotFoundException } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { I18nService } from 'nestjs-i18n'
+import { Repository } from 'typeorm'
 
 @Injectable()
-export class FindByIdUseCase implements BaseUseCase<SpecialistModel> {
+export class FindByIdUseCase implements BaseUseCase<Specialist> {
+	private logger: Logger = new Logger('FindSpecialtyById')
+
 	constructor(
-		private readonly specialistRepository: SpecialistRepository,
-		private readonly specialtyRepository: SpecialtyRepository
+		private readonly languageService: I18nService,
+		@InjectRepository(Specialist)
+		private readonly specialistRepository: Repository<Specialist>
 	) {}
 
-	async execute(id: number): Promise<SpecialistFormatted | null> {
-		const foundSpecialist = await this.specialistRepository.getOneById(id)
+	async execute(id: number, select?: (keyof Specialist)[]): Promise<Specialist | null> {
+		this.logger.log('Finding specialist by given id')
+		const foundSpecialist = await this.specialistRepository.findOne({
+			where: { id },
+			select
+		})
 
 		if (!foundSpecialist) {
-			return null
+			this.logger.log('Throwing because no specialist was found')
+			throw new NotFoundException(
+				await this.languageService.translate('specialist.specialist-not-found')
+			)
 		}
 
-		const specialties = await this.specialtyRepository.getAllSpecialtiesById(id)
-
+		this.logger.log('Remove specialist password')
 		delete foundSpecialist.password
 
-		return { ...foundSpecialist, specialties }
+		this.logger.log('Return specialist')
+		return foundSpecialist
 	}
 }

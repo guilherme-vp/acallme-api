@@ -1,28 +1,32 @@
 import { NotificationGateway } from '@common/gateways'
-import { ScheduleRepository } from '@modules/schedules/repositories'
+import { Schedule } from '@modules/schedules/entities'
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { startOfHour } from 'date-fns'
 import { I18nService } from 'nestjs-i18n'
+import { Repository } from 'typeorm'
 
 import { DisableDto } from '../../dtos'
 
 @Injectable()
 export class DisableUseCase {
-	private logger: Logger = new Logger('DisableScheduleUsecaSE')
+	private logger: Logger = new Logger('DisableSchedule')
+
 	constructor(
-		private readonly scheduleRepository: ScheduleRepository,
 		private readonly notificationGateway: NotificationGateway,
-		private readonly languageService: I18nService
+		private readonly languageService: I18nService,
+		@InjectRepository(Schedule) private readonly scheduleRepository: Repository<Schedule>
 	) {}
 
 	async execute(data: DisableDto, specialistId: number): Promise<boolean> {
 		const { dateEnd, dateStart } = data
-		const rangeStart = new Date(dateStart)
-		const rangeEnd = new Date(dateEnd)
+		const rangeStart = startOfHour(new Date(dateStart))
+		const rangeEnd = startOfHour(new Date(dateEnd))
 
 		this.logger.log('Searching for existing schedule')
-		const scheduleExist = await this.scheduleRepository.getOne({
-			CD_ESPECIALISTA: specialistId,
-			DT_INI_RANGE: rangeStart
+		const scheduleExist = await this.scheduleRepository.findOne({
+			specialistId,
+			rangeStart
 		})
 
 		if (scheduleExist && scheduleExist.confirmed) {
@@ -34,29 +38,31 @@ export class DisableUseCase {
 
 		if (!scheduleExist) {
 			this.logger.log('Creating schedule if it does not exist')
-			await this.scheduleRepository.create({
-				CD_ESPECIALISTA: specialistId,
-				DT_INI_RANGE: rangeStart,
-				DT_FIM_RANGE: rangeEnd,
-				NR_DESABILITADO: 1
+			await this.scheduleRepository.save({
+				specialistId,
+				rangeStart,
+				rangeEnd,
+				disabled: 1
 			})
 		} else {
-			const { id } = scheduleExist
-			this.logger.log('Updating current schedule if it does not exist')
-			const updatedSchedule = await this.scheduleRepository.updateById(id, {
-				CD_ESPECIALISTA: specialistId,
-				CD_CHAMADA: undefined,
-				DT_INI_RANGE: rangeStart,
-				DT_FIM_RANGE: rangeEnd,
-				NR_DESABILITADO: 1
-			})
+			this.logger.log('Updating found schedule')
+			const updatedSchedule = await this.scheduleRepository.update(
+				{ disabled: 1, confirmed: 0 },
+				{
+					id: scheduleExist.id
+				}
+			)
 
 			if (!updatedSchedule) {
 				return false
 			}
 
 			this.logger.log('Send appointment notification to patient and specialist')
-			this.notificationGateway.sendAppointmentConfirmation(updatedSchedule)
+			this.notificationGateway.sendAppointmentConfirmation({
+				...scheduleExist,
+				disabled: 1,
+				confirmed: 0
+			})
 		}
 
 		return true

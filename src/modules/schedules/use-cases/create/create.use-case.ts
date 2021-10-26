@@ -1,20 +1,21 @@
 import { CreateDto } from '@modules/schedules/dtos'
-import { ScheduleFormatted } from '@modules/schedules/entities'
-import { ScheduleRepository } from '@modules/schedules/repositories'
+import { Schedule } from '@modules/schedules/entities'
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
 import { differenceInHours, startOfHour } from 'date-fns'
 import { I18nService } from 'nestjs-i18n'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class CreateUseCase {
-	private logger: Logger = new Logger()
+	private logger: Logger = new Logger('CreateSchedule')
 
 	constructor(
-		private readonly scheduleRepository: ScheduleRepository,
-		private readonly languageService: I18nService
+		private readonly languageService: I18nService,
+		@InjectRepository(Schedule) private readonly scheduleRepository: Repository<Schedule>
 	) {}
 
-	async execute(data: CreateDto, patientId: number): Promise<ScheduleFormatted> {
+	async execute(data: CreateDto, patientId: number): Promise<Schedule> {
 		const { dateEnd, dateStart, specialistId } = data
 		const rangeStart = startOfHour(new Date(dateStart))
 		const rangeEnd = startOfHour(new Date(dateEnd))
@@ -29,10 +30,9 @@ export class CreateUseCase {
 		}
 
 		this.logger.log('Checking if schedules exists at the same time')
-		const scheduleExist = await this.scheduleRepository.existsAtTheSameTime(
-			rangeStart,
-			specialistId
-		)
+		const scheduleExist = await this.scheduleRepository.findOne({
+			where: { rangeStart, rangeEnd }
+		})
 
 		if (scheduleExist) {
 			this.logger.log('Schedule date is not valid')
@@ -42,19 +42,16 @@ export class CreateUseCase {
 		}
 
 		this.logger.log('Creating the schedule with confirmed value as false')
-		const createdSchedule = await this.scheduleRepository.create({
-			CD_ESPECIALISTA: specialistId,
-			CD_PACIENTE: patientId,
-			DT_INI_RANGE: rangeStart,
-			DT_FIM_RANGE: rangeEnd,
-			VL_CONFIRMADO: 0,
-			NR_DESABILITADO: 1
+		const createdSchedule = await this.scheduleRepository.save({
+			disabled: 1,
+			confirmed: 0,
+			patientId,
+			specialistId,
+			rangeStart,
+			rangeEnd
 		})
 
-		if (!createdSchedule) {
-			throw new BadRequestException()
-		}
-
+		this.logger.log('Returning created schedule')
 		return createdSchedule
 	}
 }

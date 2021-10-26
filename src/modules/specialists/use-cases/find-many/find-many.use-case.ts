@@ -1,53 +1,68 @@
 import { BaseUseCase } from '@common/domain/base'
 import { FindManyDto } from '@modules/specialists/dtos'
-import { SpecialistFormatted, SpecialistModel } from '@modules/specialists/entities'
-import {
-	SpecialistRepository,
-	SpecialtyRepository
-} from '@modules/specialists/repositories'
-import { Injectable } from '@nestjs/common'
-import _ from 'lodash'
+import { Specialist } from '@modules/specialists/entities'
+import { Injectable, Logger } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { ILike, In, Like, Repository } from 'typeorm'
 
 @Injectable()
-export class FindManyUseCase implements BaseUseCase<SpecialistModel> {
+export class FindManyUseCase implements BaseUseCase<Specialist> {
+	private logger: Logger = new Logger('FindManySpecialty')
+
 	constructor(
-		private readonly specialistRepository: SpecialistRepository,
-		private readonly specialtyRepository: SpecialtyRepository
+		@InjectRepository(Specialist)
+		private readonly specialistRepository: Repository<Specialist>
 	) {}
 
-	async execute(where: FindManyDto): Promise<SpecialistFormatted[]> {
-		const keys: Partial<SpecialistModel> = {}
+	async execute(where: FindManyDto): Promise<{ specialists: Specialist[]; total: number }> {
+		const { email, limit = 9, name, page = 1, specialties } = where
 
-		if (where.email) {
-			keys.DS_EMAIL = where.email
+		const keys: Partial<Record<keyof Specialist, unknown>> = {}
+
+		if (name) {
+			this.logger.log('Adding name query with insensitive case and starts with method')
+			keys.name = ILike(`${name}%`)
 		}
-		if (where.name) {
-			keys.NM_ESPECIALISTA = where.name
+
+		if (email) {
+			this.logger.log('Adding name query with starts with method')
+			keys.email = Like(`${email}%`)
 		}
 
-		const foundSpecialists = await this.specialistRepository.getMany(
-			!_.isEmpty(keys) ? keys : undefined,
-			'AND',
-			where.page,
-			where.limit
+		const whereKeys = {
+			...keys,
+			specialties: specialties
+				? {
+					name: In(specialties)
+				  }
+				: {}
+		}
+
+		this.logger.log('Counting specialists count with given where: ', whereKeys)
+		const total = await this.specialistRepository.count({
+			where: whereKeys,
+			cache: true
+		})
+
+		this.logger.log(
+			'Searching and returning specialists with given limit and page: ',
+			limit,
+			page
 		)
+		const foundSpecialists = await this.specialistRepository.find({
+			cache: true,
+			loadEagerRelations: true,
+			order: {
+				name: 'ASC'
+			},
+			take: +limit,
+			skip: (+page - 1) * +limit,
+			where: whereKeys
+		})
 
-		const foundSpecialties = await this.specialtyRepository.getManyByNames(
-			typeof where.specialties === 'string' ? [where.specialties] : where.specialties
-		)
-
-		const specialistsWithSpecialties = foundSpecialists
-			.filter(({ id }) => foundSpecialties.some(({ specialistId }) => id === specialistId))
-			.map(({ id, ...rest }) => {
-				const specialties = foundSpecialties.filter(
-					({ specialistId }) => specialistId === id
-				)
-
-				delete rest.password
-
-				return { id, ...rest, specialties }
-			})
-
-		return specialistsWithSpecialties
+		return {
+			specialists: foundSpecialists,
+			total
+		}
 	}
 }

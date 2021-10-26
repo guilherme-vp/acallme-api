@@ -1,38 +1,40 @@
-import { CallRepository } from '@modules/calls/repositories'
+import { CreateDto } from '@modules/calls/dtos'
+import { Call } from '@modules/calls/entities'
 import { SchedulesService } from '@modules/schedules/schedules.service'
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { BadRequestException, Injectable, Logger } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
 import { I18nService } from 'nestjs-i18n'
+import { Repository } from 'typeorm'
 
-import { CreateDto } from '../../dtos'
-import { CallFormatted } from '../../entities'
 @Injectable()
 export class CreateUseCase {
+	private logger: Logger = new Logger('CreateCall')
+
 	constructor(
-		private readonly callRepository: CallRepository,
 		private readonly scheduleService: SchedulesService,
-		private readonly languageService: I18nService
+		private readonly languageService: I18nService,
+		@InjectRepository(Call) private readonly callRepository: Repository<Call>
 	) {}
 
-	async execute(input: CreateDto): Promise<CallFormatted> {
+	async execute(input: CreateDto): Promise<Call> {
 		const { scheduleId, duration, rating } = input
 
+		this.logger.log('Finding schedule with given Id')
 		const foundSchedule = await this.scheduleService.getById(scheduleId)
 
 		if (!foundSchedule) {
+			this.logger.error('Throwing because schedule do not exists')
 			throw new BadRequestException(
 				await this.languageService.translate('schedule.dont-exist')
 			)
 		}
 
-		const createdCall = await this.callRepository.create({
-			CD_AGENDA: scheduleId,
-			VL_AVALIACAO: rating,
-			VL_DURACAO: duration
+		this.logger.log('Inserting call and returning it')
+		const createdCall = await this.callRepository.save({
+			scheduleId,
+			duration,
+			rating
 		})
-
-		if (!createdCall) {
-			throw new BadRequestException()
-		}
 
 		return createdCall
 	}

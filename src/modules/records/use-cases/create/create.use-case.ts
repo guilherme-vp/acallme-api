@@ -1,37 +1,39 @@
 import { CallService } from '@modules/calls/calls.service'
-import { RecordFormatted } from '@modules/records/entities'
-import { RecordRepository } from '@modules/records/repositories'
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { Record } from '@modules/records/entities'
+import { BadRequestException, Injectable, Logger } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
 import { I18nService } from 'nestjs-i18n'
+import { Repository } from 'typeorm'
 
 import { CreateDto } from '../../dtos'
 
 @Injectable()
 export class CreateUseCase {
+	private logger = new Logger()
+
 	constructor(
-		private readonly recordRepository: RecordRepository,
+		@InjectRepository(Record) private readonly recordRepository: Repository<Record>,
 		private readonly callService: CallService,
 		private readonly languageService: I18nService
 	) {}
 
-	async execute(input: CreateDto): Promise<RecordFormatted> {
-		const { callId, diagnosis } = input
+	async execute(input: CreateDto): Promise<Record> {
+		const { callId, diagnosis, observation } = input
 
+		this.logger.log('Finding call by id')
 		const foundCall = await this.callService.findById(callId)
 
 		if (!foundCall) {
+			this.logger.error('Throwing because call does not exist')
 			throw new BadRequestException(await this.languageService.translate('call.dont-exist'))
 		}
 
-		const createdRecord = await this.recordRepository.create({
-			CD_CHAMADA: callId,
-			DS_DIAGNOSTICO: diagnosis,
-			DS_OBSERVACAO: input.observation
+		this.logger.log('Creating record with given call id')
+		const createdRecord = await this.recordRepository.save({
+			callId,
+			diagnosis,
+			observation
 		})
-
-		if (!createdRecord) {
-			throw new BadRequestException()
-		}
 
 		return createdRecord
 	}

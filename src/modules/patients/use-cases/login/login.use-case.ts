@@ -1,24 +1,25 @@
 import { splitCpf } from '@common/utils'
 import { LoginDto } from '@modules/patients/dtos'
-import { PatientFormatted } from '@modules/patients/entities'
-import { PatientRepository } from '@modules/patients/repositories'
+import { Patient } from '@modules/patients/entities'
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
+import { InjectRepository } from '@nestjs/typeorm'
 import { CryptService } from '@services/crypt'
 import { I18nService } from 'nestjs-i18n'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class LoginUseCase {
-	private logger: Logger = new Logger('Patients')
+	private logger: Logger = new Logger('PatientLogin')
 
 	constructor(
-		private readonly patientRepository: PatientRepository,
 		private readonly cryptService: CryptService,
 		private readonly jwtService: JwtService,
-		private readonly languageService: I18nService
+		private readonly languageService: I18nService,
+		@InjectRepository(Patient) private readonly patientRepository: Repository<Patient>
 	) {}
 
-	async execute(input: LoginDto): Promise<{ patient: PatientFormatted; token: string }> {
+	async execute(input: LoginDto): Promise<{ patient: Patient; token: string }> {
 		const { password, username } = input
 
 		this.logger.log('Creating patient')
@@ -26,20 +27,23 @@ export class LoginUseCase {
 		let cpf = 0
 
 		if (username.replace(/.-/, '').length === 11) {
-			this.logger.log('splitting cpf if valid')
+			this.logger.log('Splitting cpf if valid')
 			const [full] = splitCpf(username)
 
 			cpf = full
 		}
 
 		this.logger.log('Searching for patient with given email or cpf')
-		const foundPatient = await this.patientRepository.getOne(
-			{
-				DS_EMAIL: username,
-				NR_CPF: cpf
-			},
-			'OR'
-		)
+		const foundPatient = await this.patientRepository.findOne({
+			where: [
+				{
+					email: username
+				},
+				{
+					cpf
+				}
+			]
+		})
 
 		if (!foundPatient) {
 			this.logger.error('Patient not found')

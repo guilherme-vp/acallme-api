@@ -1,51 +1,67 @@
 import { BaseUseCase } from '@common/domain/base'
-import { RequireAtLeastOne } from '@core/types/require-at-least-one'
+import { splitCnpj, splitCpf } from '@common/utils'
 import { FindOneDto } from '@modules/specialists/dtos'
-import { SpecialistFormatted, SpecialistModel } from '@modules/specialists/entities'
-import { SpecialistRepository } from '@modules/specialists/repositories'
-import { BadRequestException, Injectable } from '@nestjs/common'
-import { I18nService } from 'nestjs-i18n'
+import { Specialist } from '@modules/specialists/entities'
+import { Injectable, Logger } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 
 @Injectable()
-export class FindOneUseCase implements BaseUseCase<SpecialistModel> {
+export class FindOneUseCase implements BaseUseCase<Specialist> {
+	private logger: Logger = new Logger('LoginPatient')
+
 	constructor(
-		private readonly specialistRepository: SpecialistRepository,
-		private readonly languageService: I18nService
+		@InjectRepository(Specialist)
+		private readonly specialistRepository: Repository<Specialist>
 	) {}
 
-	async execute(where: FindOneDto): Promise<SpecialistFormatted | null> {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		const keys: RequireAtLeastOne<SpecialistModel> = {}
+	async execute(
+		where: FindOneDto,
+		method: 'AND' | 'OR' = 'OR'
+	): Promise<Specialist | null> {
+		this.logger.log('Splitting all custom fields')
+		const { cnpj, cpf, crm, crp, ...otherFields } = where
 
-		if (where.email) {
-			keys!.DS_EMAIL = where.email
-		}
-		if (where.name) {
-			keys!.NM_ESPECIALISTA = where.name
-		}
-		if (where.cnpj) {
-			const full = where.cnpj.substring(0, 12)
+		this.logger.log('Creating key object with other fields')
+		const keys: Partial<Specialist> = otherFields
 
-			keys!.NR_CNPJ = +full
-		}
-		if (where.cpf) {
-			const full = where.cpf.substring(0, 9)
+		if (cnpj) {
+			this.logger.log('Splitting cnpj and saving it to keys object')
+			const [full] = splitCnpj(cnpj)
 
-			keys!.NR_CPF = +full
+			keys.cnpj = +full
 		}
-		if (where.crm) {
-			keys!.NR_CRM = +where.crm
-		}
-		if (where.crp) {
-			keys!.NR_CRP = +where.crp
-		}
+		if (cpf) {
+			this.logger.log('Splitting cpf and saving it to keys object')
+			const [full] = splitCpf(cpf)
 
-		if (!keys) {
-			throw new BadRequestException(await this.languageService.translate('no-field'))
+			keys.cpf = +full
+		}
+		if (crm) {
+			this.logger.log('Parsing crm and saving it to keys object')
+			keys.crm = +crm
+		}
+		if (crp) {
+			this.logger.log('Parsing crp and saving it to keys object')
+			keys.crp = +crp
 		}
 
-		const foundSpecialist = await this.specialistRepository.getOne(keys, 'OR')
+		let foundSpecialist: Specialist | undefined
+
+		if (method === 'OR') {
+			const finalWhere: Array<Record<string, unknown>> = []
+
+			this.logger.log('Pushing each key to wheres array')
+			Object.entries(keys).map(([key, value]) =>
+				finalWhere.push({ [key as keyof Specialist]: value })
+			)
+
+			this.logger.log('Finding one specialist with where values and method OR')
+			foundSpecialist = await this.specialistRepository.findOne({ where: finalWhere })
+		} else {
+			this.logger.log('Finding one specialist with where values and method AND')
+			foundSpecialist = await this.specialistRepository.findOne({ where: keys })
+		}
 
 		if (!foundSpecialist) {
 			return null

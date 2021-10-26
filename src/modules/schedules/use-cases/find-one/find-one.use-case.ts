@@ -1,53 +1,56 @@
-import { RequireAtLeastOne } from '@core/types'
 import { FindOneDto } from '@modules/schedules/dtos'
-import { ScheduleFormatted, ScheduleModel } from '@modules/schedules/entities'
-import { ScheduleRepository } from '@modules/schedules/repositories'
-import { BadRequestException, Injectable } from '@nestjs/common'
-import { I18nService } from 'nestjs-i18n'
+import { Schedule } from '@modules/schedules/entities'
+import { Injectable, Logger } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class FindOneUseCase {
+	private logger: Logger = new Logger('FindOneSchedule')
+
 	constructor(
-		private readonly scheduleRepository: ScheduleRepository,
-		private readonly languageService: I18nService
+		@InjectRepository(Schedule) private readonly scheduleRepository: Repository<Schedule>
 	) {}
 
-	async execute(where: FindOneDto): Promise<{ schedule: ScheduleFormatted } | null> {
-		// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-		// @ts-ignore
-		const keys: RequireAtLeastOne<ScheduleModel> = {}
+	async execute(where: FindOneDto, method: 'AND' | 'OR' = 'OR'): Promise<Schedule | null> {
+		this.logger.log('Splitting all custom fields')
+		const { rangeEnd, rangeStart, confirmed, ...otherFields } = where
 
-		if (where.callId) {
-			keys!.CD_CHAMADA = where.callId
+		this.logger.log('Creating key object with other fields')
+		const keys: Partial<Schedule> = otherFields
+
+		if (rangeStart) {
+			keys.rangeStart = new Date(rangeStart)
 		}
-		if (where.patientId) {
-			keys!.CD_PACIENTE = where.patientId
+		if (rangeEnd) {
+			keys.rangeEnd = new Date(rangeEnd)
 		}
-		if (where.specialistId) {
-			keys!.CD_ESPECIALISTA = where.specialistId
-		}
-		if (where.confirmed) {
-			keys!.VL_CONFIRMADO = where.confirmed ? 1 : 0
-		}
-		if (where.rangeEnd) {
-			keys!.DT_FIM_RANGE = new Date(where.rangeEnd)
-		}
-		if (where.rangeStart) {
-			keys!.DT_INI_RANGE = new Date(where.rangeStart)
+		if (confirmed) {
+			keys.confirmed = confirmed ? 1 : 0
 		}
 
-		if (!keys) {
-			throw new BadRequestException(await this.languageService.translate('no-field'))
-		}
+		let foundSchedule: Schedule | undefined
 
-		const foundSchedule = await this.scheduleRepository.getOne(keys, 'OR')
+		if (method === 'OR') {
+			const finalWhere: Array<Record<string, unknown>> = []
+
+			this.logger.log('Pushing each key to wheres array')
+			Object.entries(keys).map(([key, value]) =>
+				finalWhere.push({ [key as keyof Schedule]: value })
+			)
+
+			this.logger.log('Finding one schedule with where values and method OR')
+			foundSchedule = await this.scheduleRepository.findOne({ where: finalWhere })
+		} else {
+			this.logger.log('Finding one schedule with where values and method AND')
+			foundSchedule = await this.scheduleRepository.findOne({ where: keys })
+		}
 
 		if (!foundSchedule) {
+			this.logger.log('Returning null because no schedule was found')
 			return null
 		}
 
-		return {
-			schedule: foundSchedule
-		}
+		return foundSchedule
 	}
 }

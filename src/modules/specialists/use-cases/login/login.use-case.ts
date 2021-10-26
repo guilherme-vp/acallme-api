@@ -1,26 +1,26 @@
 import { splitCnpj } from '@common/utils'
 import { LoginDto } from '@modules/specialists/dtos'
-import { SpecialistFormatted } from '@modules/specialists/entities'
-import { SpecialistRepository } from '@modules/specialists/repositories'
+import { Specialist } from '@modules/specialists/entities'
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
+import { InjectRepository } from '@nestjs/typeorm'
 import { CryptService } from '@services/crypt'
 import { I18nService } from 'nestjs-i18n'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class LoginUseCase {
 	private logger: Logger = new Logger('LoginPatient')
 
 	constructor(
-		private readonly specialistRepository: SpecialistRepository,
 		private readonly cryptService: CryptService,
 		private readonly jwtService: JwtService,
-		private readonly languageService: I18nService
+		private readonly languageService: I18nService,
+		@InjectRepository(Specialist)
+		private readonly specialistRepository: Repository<Specialist>
 	) {}
 
-	async execute(
-		input: LoginDto
-	): Promise<{ specialist: SpecialistFormatted; token: string }> {
+	async execute(input: LoginDto): Promise<{ specialist: Specialist; token: string }> {
 		const { password, username } = input
 
 		this.logger.log('Creating specialist')
@@ -35,13 +35,16 @@ export class LoginUseCase {
 		}
 
 		this.logger.log('Searching for specialist with given email or cnpj')
-		const foundSpecialist = await this.specialistRepository.getOne(
-			{
-				DS_EMAIL: username,
-				NR_CNPJ: cnpj
-			},
-			'OR'
-		)
+		const foundSpecialist = await this.specialistRepository.findOne({
+			where: [
+				{
+					email: username
+				},
+				{
+					cnpj
+				}
+			]
+		})
 
 		if (!foundSpecialist) {
 			this.logger.error('Specialist not found')

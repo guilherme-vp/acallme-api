@@ -1,21 +1,33 @@
 import { BaseUseCase } from '@common/domain/base'
-import { PatientFormatted, PatientModel } from '@modules/patients/entities'
-import { PatientRepository, PatientSelect } from '@modules/patients/repositories'
-import { Injectable } from '@nestjs/common'
+import { Patient } from '@modules/patients/entities'
+import { Injectable, Logger, NotFoundException } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { I18nService } from 'nestjs-i18n'
+import { Repository } from 'typeorm'
 
 @Injectable()
-export class FindByIdUseCase implements BaseUseCase<PatientModel> {
-	constructor(private readonly patientRepository: PatientRepository) {}
+export class FindByIdUseCase implements BaseUseCase<Patient> {
+	private logger: Logger = new Logger('FindPatientById')
 
-	async execute(id: number, select?: PatientSelect): Promise<PatientFormatted | null> {
-		const foundPatient = await this.patientRepository.getOneById(id, select)
+	constructor(
+		@InjectRepository(Patient) private readonly patientRepository: Repository<Patient>,
+		private readonly languageService: I18nService
+	) {}
+
+	async execute(id: number, select?: (keyof Patient)[]): Promise<Patient | null> {
+		this.logger.log('Searching for patient with given id')
+		const foundPatient = await this.patientRepository.findOne({ where: { id }, select })
 
 		if (!foundPatient) {
-			return null
+			this.logger.log('Throwing because no patient was found')
+			throw new NotFoundException(
+				await this.languageService.translate('patient.patient-not-found')
+			)
 		}
 
 		delete foundPatient.password
 
+		this.logger.log('Deleting and returning patient without password')
 		return foundPatient
 	}
 }

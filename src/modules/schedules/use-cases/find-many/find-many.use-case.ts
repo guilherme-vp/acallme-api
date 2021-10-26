@@ -1,50 +1,63 @@
 import { FindManyDto } from '@modules/schedules/dtos'
-import { ScheduleFormatted, ScheduleModel } from '@modules/schedules/entities'
-import { ScheduleRepository } from '@modules/schedules/repositories'
+import { Schedule } from '@modules/schedules/entities'
 import { Injectable, Logger } from '@nestjs/common'
-import _ from 'lodash'
+import { InjectRepository } from '@nestjs/typeorm'
+import { Repository } from 'typeorm'
 
 @Injectable()
 export class FindManyUseCase {
 	private logger: Logger = new Logger('FindManySchedules')
 
-	constructor(private readonly scheduleRepository: ScheduleRepository) {}
+	constructor(
+		@InjectRepository(Schedule) private readonly scheduleRepository: Repository<Schedule>
+	) {}
 
-	async execute(where: FindManyDto): Promise<ScheduleFormatted[]> {
-		const keys: Partial<ScheduleModel> = {}
+	async execute(where: FindManyDto): Promise<Schedule[]> {
+		this.logger.log('Splitting all custom fields')
+		const {
+			rangeEnd,
+			rangeStart,
+			confirmed,
+			disabled,
+			patientId,
+			callId,
+			specialistId,
+			...otherFields
+		} = where
 
-		if (where.callId) {
+		this.logger.log('Creating key object with other fields')
+		const keys: Partial<Schedule> = otherFields
+
+		if (callId) {
 			this.logger.log('Adding callId')
-			keys!.CD_CHAMADA = +where.callId
+			keys.callId = +callId
 		}
-		if (where.patientId) {
+		if (patientId) {
 			this.logger.log('Adding patientId')
-			keys!.CD_PACIENTE = +where.patientId
+			keys.patientId = +patientId
 		}
-		if (where.specialistId) {
+		if (specialistId) {
 			this.logger.log('Adding specialistId')
-			keys!.CD_ESPECIALISTA = +where.specialistId
+			keys.specialistId = +specialistId
 		}
-		if (where.confirmed) {
-			this.logger.log('Adding confirmed')
-			keys!.VL_CONFIRMADO = JSON.parse(where.confirmed) ? 1 : 0
-		}
-		if (where.rangeEnd) {
+		if (rangeEnd) {
 			this.logger.log('Adding rangeEnd')
-			keys!.DT_FIM_RANGE = new Date(where.rangeEnd)
+			keys.rangeEnd = new Date(rangeEnd)
 		}
-		if (where.rangeStart) {
+		if (rangeStart) {
 			this.logger.log('Adding rangeStart')
-			keys!.DT_INI_RANGE = new Date(where.rangeStart)
+			keys.rangeStart = new Date(rangeStart)
 		}
-		if (where.disabled) {
+		if (confirmed) {
+			this.logger.log('Adding confirmed')
+			keys.confirmed = JSON.parse(confirmed) ? 1 : 0
+		}
+		if (disabled) {
 			this.logger.log('Adding disabled')
-			keys!.VL_CONFIRMADO = JSON.parse(where.disabled) ? 1 : 0
+			keys.disabled = JSON.parse(disabled) ? 1 : 0
 		}
 
-		const foundSchedules = await this.scheduleRepository.getMany(
-			!_.isEmpty(keys) ? keys : undefined
-		)
+		const foundSchedules = await this.scheduleRepository.find({ where: keys })
 
 		return foundSchedules
 	}

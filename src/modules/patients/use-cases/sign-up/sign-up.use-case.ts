@@ -1,76 +1,103 @@
 import { BaseUseCase } from '@common/domain/base'
-import { splitCpf, splitPhone } from '@common/utils'
+import { splitCpf, splitPhone, uploadStream } from '@common/utils'
 import { welcomeEmailProps } from '@core/providers'
 import { SignUpDto } from '@modules/patients/dtos'
-import { PatientFormatted, PatientModel } from '@modules/patients/entities'
-import { PatientRepository } from '@modules/patients/repositories'
-import { BadRequestException, Injectable } from '@nestjs/common'
+import { Patient } from '@modules/patients/entities'
+import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
+import { InjectRepository } from '@nestjs/typeorm'
 import { CryptService } from '@services/crypt'
 import { MailerService } from '@services/mail'
-import * as datefns from 'date-fns'
 import { I18nService } from 'nestjs-i18n'
+import { Repository } from 'typeorm'
+import { v4 as uuid } from 'uuid'
 
 @Injectable()
-export class SignUpUseCase implements BaseUseCase<PatientModel> {
+export class SignUpUseCase implements BaseUseCase<Patient> {
+	private logger: Logger = new Logger('SignupPatient')
+
 	constructor(
-		private readonly patientRepository: PatientRepository,
 		private readonly languageService: I18nService,
 		private readonly cryptService: CryptService,
 		private readonly jwtService: JwtService,
-		private readonly mailerService: MailerService
+		private readonly mailerService: MailerService,
+		@InjectRepository(Patient) private readonly patientRepository: Repository<Patient>
 	) {}
 
-	async execute(input: SignUpDto): Promise<{ patient: PatientFormatted; token: string }> {
-		const { email, cpf, password: userPassword, birth, gender, name, phone } = input
+	async execute(input: SignUpDto): Promise<{ patient: Patient; token: string }> {
+		const { email, cpf, password: userPassword, birth, name, phone, file, gender } = input
 
+		this.logger.log('Splitting cpf')
 		const [fullCpf, digitsCpf] = splitCpf(cpf)
+		const finalCpf = [fullCpf, digitsCpf]
 
-		const patientExists = await this.patientRepository.existsEmailCpf({
-			email,
-			cpf: { digits: digitsCpf, full: fullCpf }
+		this.logger.log('Checking if patient with given cpf and email exists')
+		const patientExists = await this.patientRepository.count({
+			where: [
+				{
+					email
+				},
+				{
+					cpf: { digits: finalCpf[0], full: finalCpf[1] }
+				}
+			]
 		})
 
-		if (patientExists) {
+		if (patientExists > 0) {
+			this.logger.error('Throwing because patient already exists')
 			throw new BadRequestException(
 				await this.languageService.translate('auth.user-already-exists')
 			)
 		}
 
+		this.logger.log('Encrypting given password')
 		const password = await this.cryptService.encrypt(userPassword)
 
-		const finalPhone: number[] = []
+		this.logger.log('Splitting phone')
+		const [dddPhone, fullPhone] = splitPhone(
+			+phone.replace('(', '').replace(')', '').replace(' ', '').replace('-', '')
+		)
+		const finalPhone = [dddPhone, fullPhone]
 
-		if (phone) {
-			const [dddPhone, fullPhone] = splitPhone(+phone.replace(/() -/g, ''))
-			finalPhone.push(dddPhone, fullPhone)
+		let avatarUrl: string | undefined = file === null ? undefined : undefined
+
+		if (file) {
+			this.logger.log('Uploading avatar url to s3 bucket and returning its url')
+			const { stream, mimetype } = file
+			const [, fileExtension] = mimetype.split('/')
+
+			avatarUrl = await uploadStream({
+				key: `${name}-${uuid()}.${fileExtension}`,
+				bucket: process.env.IBM_SPECIALIST_BUCKETNAME as string,
+				body: stream
+			})
 		}
 
-		const createdPatient = await this.patientRepository.create({
-			NM_PACIENTE: name,
-			DS_EMAIL: email,
-			DS_SENHA: password,
-			DS_GENERO: gender,
-			DT_NASCIMENTO: new Date(birth),
-			NR_CPF: fullCpf,
-			NR_CPF_DIGITO: digitsCpf,
-			NR_TELEFONE_DDD: finalPhone[0],
-			NR_TELEFONE: finalPhone[1]
-		})
-
-		if (!createdPatient) {
-			throw new BadRequestException()
+		const creationData = {
+			email,
+			password,
+			name,
+			gender,
+			birth: new Date(birth).toISOString(),
+			cpf: finalCpf[0],
+			cpfDigits: finalCpf[1],
+			phone: finalPhone[0],
+			phoneDigits: finalPhone[1],
+			avatarUrl
 		}
 
-		const { id } = createdPatient
+		this.logger.log('Creating patient with given data: ', creationData)
+		const createdPatient = (await this.patientRepository.save(creationData)) as Patient
 
+		this.logger.log('Creating JWT for created Patient')
 		const createdToken = this.jwtService.sign({
-			id,
+			id: createdPatient.id,
 			name,
 			email,
 			role: 'patient'
 		})
 
+		this.logger.log('Sending signup email')
 		await this.mailerService.send({
 			to: {
 				address: email,
@@ -83,6 +110,7 @@ export class SignUpUseCase implements BaseUseCase<PatientModel> {
 
 		delete createdPatient.password
 
+		this.logger.log('Returning token and patient')
 		return {
 			token: createdToken,
 			patient: createdPatient
