@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client'
 import { IsNumber, IsOptional, Min } from 'class-validator'
 
 export class CreateDto {
@@ -13,5 +14,5 @@ export class CreateDto {
 	@IsNumber({ maxDecimalPlaces: 1 })
 	@Min(0)
 	@IsOptional()
-	rating?: number | null
+	rating?: Prisma.Decimal | null
 }
