@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Schedule {
+  id           Int        @id @default(autoincrement())
+  startsAt     DateTime
+  endsAt       DateTime
+  confirmed    Boolean?   @default(false)
+  disabled     Boolean?   @default(false)
+  specialist   Specialist @relation(fields: [specialistId], references: [id])
+  specialistId Int
+  Patient      Patient?   @relation(fields: [patientId], references: [id])
+  patientId    Int?
+  call         Call?
+}
+
+model Call {
+  id         Int      @id @default(autoincrement())
+  schedule   Schedule @relation(fields: [scheduleId], references: [id])
+  record     Record?
+  duration   Int?
+  rating     Decimal? @db.Decimal(2, 2)
+  scheduleId Int      @unique
+}
+
+model Specialty {
+  id                  Int                   @id @default(autoincrement())
+  specialty           String
+  specialistSpecialty SpecialistSpecialty[]
+}
+
+model Specialist {
+  id                  Int                   @id @default(autoincrement())
+  name                String                @db.VarChar(50)
+  email               String                @unique(map: "un_clg_especialista_email") @db.VarChar(50)
+  password            String                @db.VarChar(75)
+  phone               String
+  birth               DateTime              @db.Date
+  gender              Gender
+  description         String?               @db.VarChar(1000)
+  avatarUrl           String?               @db.VarChar(200)
+  cost                Decimal               @db.Decimal(5, 2)
+  cnpj                String?               @unique
+  cpf                 String?               @unique
+  crp                 String?
+  crm                 String?
+  schedule            Schedule[]
+  specialistSpecialty SpecialistSpecialty[]
+}
+
+enum Gender {
+  F
+  M
+  NB
+}
+
+model SpecialistSpecialty {
+  specialty    Specialty  @relation(fields: [specialtyId], references: [id])
+  Specialist   Specialist @relation(fields: [specialistId], references: [id])
+  specialtyId  Int
+  specialistId Int
+
+  @@id([specialtyId, specialistId])
+}
+
+model Patient {
+  id        Int        @id @default(autoincrement())
+  name      String
+  email     String     @unique()
+  password  String     @db.VarChar(75)
+  birth     DateTime   @db.Date
+  gender    Gender
+  avatarUrl String?    @db.VarChar(200)
+  cpf       String?    @unique()
+  phone     String
+  schedules Schedule[]
+}
+
+model Record {
+  id          Int     @id @default(autoincrement())
+  call        Call    @relation(fields: [callId], references: [id])
+  observation String? @db.VarChar(100)
+  diagnosis   String  @db.VarChar(100)
+  callId      Int     @unique
+}
