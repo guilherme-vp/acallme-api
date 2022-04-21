@@ -1,13 +1,18 @@
-DROP TABLE t_clg_agenda CASCADE CONSTRAINTS;
-DROP TABLE t_clg_chamada CASCADE CONSTRAINTS;
-DROP TABLE t_clg_especialidade CASCADE CONSTRAINTS;
-DROP TABLE t_clg_especialista CASCADE CONSTRAINTS;
-DROP TABLE t_clg_especialista_especialidade CASCADE CONSTRAINTS;
-DROP TABLE t_clg_paciente CASCADE CONSTRAINTS;
-DROP TABLE t_clg_prontuario CASCADE CONSTRAINTS;
+CREATE SCHEMA IF NOT EXISTS acallme;
+USE acallme;
+
+SET foreign_key_checks=0;
+
+DROP TABLE IF EXISTS t_clg_agenda CASCADE;
+DROP TABLE IF EXISTS t_clg_chamada CASCADE;
+DROP TABLE IF EXISTS t_clg_especialidade CASCADE;
+DROP TABLE IF EXISTS t_clg_especialista CASCADE;
+DROP TABLE IF EXISTS t_clg_especialista_especialidade CASCADE;
+DROP TABLE IF EXISTS t_clg_paciente CASCADE;
+DROP TABLE IF EXISTS t_clg_prontuario CASCADE;
 
 CREATE TABLE t_clg_agenda (
-    cd_agenda       INTEGER NOT NULL AUTO_INCREMENT,
+    cd_agenda       INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
     cd_chamada      INTEGER,
     cd_especialista INTEGER NOT NULL,
     cd_paciente     INTEGER,
@@ -18,7 +23,7 @@ CREATE TABLE t_clg_agenda (
 );
 
 CREATE TABLE t_clg_chamada (
-    cd_chamada    INTEGER NOT NULL AUTO_INCREMENT,
+    cd_chamada    INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
     cd_agenda     INTEGER NOT NULL,
     cd_prontuario INTEGER,
     vl_duracao    DECIMAL(4, 2),
@@ -26,18 +31,18 @@ CREATE TABLE t_clg_chamada (
 );
 
 CREATE TABLE t_clg_especialidade (
-    cd_especialidade INTEGER NOT NULL AUTO_INCREMENT,
+    cd_especialidade INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
     tp_especialidade VARCHAR(30) NOT NULL
 );
 
 CREATE TABLE t_clg_especialista (
-    cd_especialista INTEGER NOT NULL AUTO_INCREMENT,
+    cd_especialista INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
     nm_especialista VARCHAR(50) NOT NULL,
     ds_email        VARCHAR(50) NOT NULL,
     ds_senha        VARCHAR(75) NOT NULL,
     nr_telefone     BIGINT NOT NULL,
     nr_telefone_ddd TINYINT NOT NULL,
-    dt_nascimento   DATETIME NOT NULL,
+    dt_nascimento   DATE NOT NULL,
     ds_genero       VARCHAR(2) NOT NULL,
     ds_sobre        VARCHAR(1000),
     im_avatar_url   VARCHAR(200),
@@ -56,11 +61,11 @@ CREATE TABLE t_clg_especialista_especialidade (
 );
 
 CREATE TABLE t_clg_paciente (
-    cd_paciente     INTEGER NOT NULL AUTO_INCREMENT,
+    cd_paciente     INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
     nm_paciente     VARCHAR(50) NOT NULL,
     ds_email        VARCHAR(50) NOT NULL,
     ds_senha        VARCHAR(75) NOT NULL,
-    dt_nascimento   DATETIME NOT NULL,
+    dt_nascimento   DATE NOT NULL,
     ds_genero       VARCHAR(2) NOT NULL,
     im_avatar_url   VARCHAR(200),
     nr_cpf          BIGINT NOT NULL,
@@ -70,21 +75,13 @@ CREATE TABLE t_clg_paciente (
 );
 
 CREATE TABLE t_clg_prontuario (
-    cd_prontuario  INTEGER NOT NULL AUTO_INCREMENT,
+    cd_prontuario  INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY,
     cd_chamada     INTEGER,
     ds_observacao  VARCHAR(100),
     ds_diagnostico VARCHAR(100) NOT NULL
 );
 
-ALTER TABLE t_clg_agenda ADD CONSTRAINT pk_clg_agenda PRIMARY KEY ( cd_agenda );
-
 ALTER TABLE t_clg_chamada ADD CONSTRAINT t_clg_chamada_ck_1 CHECK ( vl_avaliacao < 5 );
-
-ALTER TABLE t_clg_chamada ADD CONSTRAINT pk_clg_chamada PRIMARY KEY ( cd_chamada );
-
-ALTER TABLE t_clg_especialidade ADD CONSTRAINT pk_clg_especialidade PRIMARY KEY ( cd_especialidade );
-
-ALTER TABLE t_clg_especialista ADD CONSTRAINT pk_clg_especialista PRIMARY KEY ( cd_especialista );
 
 ALTER TABLE t_clg_especialista ADD CONSTRAINT un_clg_especialista_cnpj UNIQUE ( nr_cnpj );
 
@@ -95,8 +92,6 @@ ALTER TABLE t_clg_especialista ADD CONSTRAINT un_clg_especialista_crm UNIQUE ( n
 ALTER TABLE t_clg_especialista ADD CONSTRAINT un_clg_especialista_crp UNIQUE ( nr_crp );
 
 ALTER TABLE t_clg_especialista ADD CONSTRAINT un_clg_especialista_email UNIQUE ( ds_email );
-
-ALTER TABLE t_clg_paciente ADD CONSTRAINT pk_clg_paciente PRIMARY KEY ( cd_paciente );
 
 ALTER TABLE t_clg_paciente ADD CONSTRAINT un_clg_paciente_cpf UNIQUE ( nr_cpf );
 
@@ -141,3 +136,5 @@ ALTER TABLE t_clg_prontuario
     ADD CONSTRAINT fk_clg_prontuario_chamada FOREIGN KEY ( cd_chamada )
         REFERENCES t_clg_chamada ( cd_chamada )
             ON DELETE CASCADE;
+
+SET foreign_key_checks=1;
