@@ -5,8 +5,6 @@ type Envs = 'development' | 'production'
 const {
 	PORT,
 	NODE_ENV: ProcessEnv,
-	DATABASE_USER,
-	DATABASE_PASS,
 	SECRET = 'test123',
 	MAIL_HOST,
 	MAIL_USER,
@@ -15,11 +13,6 @@ const {
 } = process.env
 
 const NODE_ENV: Envs = (ProcessEnv as Envs) || 'development'
-
-const dbConfig = {
-	user: DATABASE_USER ?? 'root',
-	password: DATABASE_PASS ?? 'admin'
-}
 
 const mailConfig: MailerOptions['transport'] = {
 	host: MAIL_HOST ?? 'smtp.mailtrap.io',
@@ -30,4 +23,4 @@ const mailConfig: MailerOptions['transport'] = {
 	}
 }
 
-export { NODE_ENV, dbConfig, mailConfig, SECRET, PORT }
+export { NODE_ENV, mailConfig, SECRET, PORT }
