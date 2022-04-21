@@ -7,73 +7,73 @@ DROP TABLE t_clg_paciente CASCADE CONSTRAINTS;
 DROP TABLE t_clg_prontuario CASCADE CONSTRAINTS;
 
 CREATE TABLE t_clg_agenda (
-    cd_agenda       NUMBER GENERATED ALWAYS AS IDENTITY,
-    cd_chamada      NUMBER(5),
-    cd_especialista NUMBER(5) NOT NULL,
-    cd_paciente     NUMBER(5),
-    dt_ini_range    TIMESTAMP NOT NULL,
-    dt_fim_range    TIMESTAMP NOT NULL,
-    vl_confirmado   NUMBER(1),
-    nr_desabilitado NUMBER(1)
+    cd_agenda       INTEGER NOT NULL AUTO_INCREMENT,
+    cd_chamada      INTEGER,
+    cd_especialista INTEGER NOT NULL,
+    cd_paciente     INTEGER,
+    dt_ini_range    DATETIME(6) NOT NULL,
+    dt_fim_range    DATETIME(6) NOT NULL,
+    vl_confirmado   TINYINT,
+    nr_desabilitado TINYINT
 );
 
 CREATE TABLE t_clg_chamada (
-    cd_chamada    NUMBER GENERATED ALWAYS AS IDENTITY,
-    cd_agenda     NUMBER(5) NOT NULL,
-    cd_prontuario NUMBER(5),
-    vl_duracao    NUMBER(4, 2),
-    vl_avaliacao  FLOAT(2)
+    cd_chamada    INTEGER NOT NULL AUTO_INCREMENT,
+    cd_agenda     INTEGER NOT NULL,
+    cd_prontuario INTEGER,
+    vl_duracao    DECIMAL(4, 2),
+    vl_avaliacao  DECIMAL(1,1)
 );
 
 CREATE TABLE t_clg_especialidade (
-    cd_especialidade NUMBER GENERATED ALWAYS AS IDENTITY,
-    tp_especialidade VARCHAR2(30) NOT NULL
+    cd_especialidade INTEGER NOT NULL AUTO_INCREMENT,
+    tp_especialidade VARCHAR(30) NOT NULL
 );
 
 CREATE TABLE t_clg_especialista (
-    cd_especialista NUMBER GENERATED ALWAYS AS IDENTITY,
-    nm_especialista VARCHAR2(50) NOT NULL,
-    ds_email        VARCHAR2(50) NOT NULL,
-    ds_senha        VARCHAR2(75) NOT NULL,
-    nr_telefone     NUMBER(9) NOT NULL,
-    nr_telefone_ddd NUMBER(2) NOT NULL,
-    dt_nascimento   DATE NOT NULL,
-    ds_genero       VARCHAR2(2) NOT NULL,
-    ds_sobre        VARCHAR2(1000),
-    im_avatar_url   VARCHAR2(200),
-    vl_consulta     NUMBER(5, 2) NOT NULL,
-    nr_cnpj         NUMBER(12),
-    nr_cnpj_digito  NUMBER(2),
-    nr_cpf          NUMBER(9),
-    nr_cpf_digito   NUMBER(2),
-    nr_crp          NUMBER(20),
-    nr_crm          NUMBER(20)
+    cd_especialista INTEGER NOT NULL AUTO_INCREMENT,
+    nm_especialista VARCHAR(50) NOT NULL,
+    ds_email        VARCHAR(50) NOT NULL,
+    ds_senha        VARCHAR(75) NOT NULL,
+    nr_telefone     BIGINT NOT NULL,
+    nr_telefone_ddd TINYINT NOT NULL,
+    dt_nascimento   DATETIME NOT NULL,
+    ds_genero       VARCHAR(2) NOT NULL,
+    ds_sobre        VARCHAR(1000),
+    im_avatar_url   VARCHAR(200),
+    vl_consulta     DECIMAL(5, 2) NOT NULL,
+    nr_cnpj         BIGINT,
+    nr_cnpj_digito  TINYINT,
+    nr_cpf          BIGINT,
+    nr_cpf_digito   TINYINT,
+    nr_crp          DECIMAL(20),
+    nr_crm          DECIMAL(20)
 );
 
 CREATE TABLE t_clg_especialista_especialidade (
-    cd_especialidade NUMBER(5) NOT NULL,
-    cd_especialista  NUMBER(5) NOT NULL
+    cd_especialidade INTEGER NOT NULL,
+    cd_especialista  INTEGER NOT NULL
 );
 
 CREATE TABLE t_clg_paciente (
-    cd_paciente     NUMBER GENERATED ALWAYS AS IDENTITY,
-    nm_paciente     VARCHAR2(50) NOT NULL,
-    ds_email        VARCHAR2(50) NOT NULL,
-    ds_senha        VARCHAR2(75) NOT NULL,
-    dt_nascimento   DATE NOT NULL,
-    ds_genero       VARCHAR2(2) NOT NULL,
-    im_avatar_url   VARCHAR2(200),
-    nr_cpf          NUMBER(9) NOT NULL,
-    nr_cpf_digito   NUMBER(2) NOT NULL,
-    nr_telefone     NUMBER(9) NOT NULL,
-    nr_telefone_ddd NUMBER(2) NOT NULL
+    cd_paciente     INTEGER NOT NULL AUTO_INCREMENT,
+    nm_paciente     VARCHAR(50) NOT NULL,
+    ds_email        VARCHAR(50) NOT NULL,
+    ds_senha        VARCHAR(75) NOT NULL,
+    dt_nascimento   DATETIME NOT NULL,
+    ds_genero       VARCHAR(2) NOT NULL,
+    im_avatar_url   VARCHAR(200),
+    nr_cpf          BIGINT NOT NULL,
+    nr_cpf_digito   TINYINT NOT NULL,
+    nr_telefone     BIGINT NOT NULL,
+    nr_telefone_ddd TINYINT NOT NULL
 );
 
 CREATE TABLE t_clg_prontuario (
-    cd_prontuario  NUMBER GENERATED ALWAYS AS IDENTITY,
-    cd_chamada     NUMBER(5) NOT NULL,
-    ds_observacao  VARCHAR2(100),
-    ds_diagnostico VARCHAR2(100) NOT NULL
+    cd_prontuario  INTEGER NOT NULL AUTO_INCREMENT,
+    cd_chamada     INTEGER,
+    ds_observacao  VARCHAR(100),
+    ds_diagnostico VARCHAR(100) NOT NULL
 );
 
 ALTER TABLE t_clg_agenda ADD CONSTRAINT pk_clg_agenda PRIMARY KEY ( cd_agenda );
