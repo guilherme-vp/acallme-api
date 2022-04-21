@@ -4,7 +4,6 @@ import { CallService } from '@modules/calls/calls.service'
 import { Gateways as CallGateways } from '@modules/calls/websockets'
 import { Global, Logger, Module } from '@nestjs/common'
 
-import { Schedule } from './entities'
 import { SchedulesController } from './schedules.controller'
 import { SchedulesService } from './schedules.service'
 import { TaskService } from './tasks'

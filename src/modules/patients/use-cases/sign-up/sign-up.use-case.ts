@@ -105,6 +105,7 @@ export class SignUpUseCase implements BaseUseCase<Patient> {
 			})
 		})
 
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { password: createdPassword, ...patient } = createdPatient
 
 		this.logger.log('Returning token and patient')

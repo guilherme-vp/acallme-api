@@ -30,6 +30,7 @@ export class FindByIdUseCase implements BaseUseCase<Patient> {
 			)
 		}
 
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { password, ...patientWithoutPassword } = foundPatient as Patient
 
 		return patientWithoutPassword

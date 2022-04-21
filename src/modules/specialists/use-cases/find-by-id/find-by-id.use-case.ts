@@ -30,7 +30,7 @@ export class FindByIdUseCase implements BaseUseCase<Specialist> {
 			)
 		}
 
-		this.logger.log('Remove specialist password')
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { password: specialistPassword, ...specialistWithoutPasssword } = foundSpecialist
 
 		this.logger.log('Return specialist')
