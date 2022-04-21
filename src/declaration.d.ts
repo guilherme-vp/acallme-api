@@ -5,7 +5,7 @@ import { Schedule } from '@modules/schedules/entities'
 
 declare module 'express' {
 	export interface Request {
-		user: UserModel & { id: number; role: Role }
+		user: UserModel & { role: Role }
 	}
 }
 
