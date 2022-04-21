@@ -24,7 +24,7 @@
 		"emitDecoratorMetadata": true,
 		"skipLibCheck": true,
 		"forceConsistentCasingInFileNames": true,
-		"diagnostics": true,
+		"diagnostics": false,
 		"paths": {
 			"@services/*": [
 				"services/*"
