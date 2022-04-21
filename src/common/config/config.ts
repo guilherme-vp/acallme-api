@@ -1,10 +1,9 @@
-import { SECRET, mailConfig, PORT, dbConfig } from '@common/constants/configuration'
+import { SECRET, mailConfig, PORT } from '@common/constants/configuration'
 import { MailerOptions } from '@nestjs-modules/mailer'
 
 export interface AppConfig {
 	nest: NestConfig
 	security: SecurityConfig
-	database: DatabaseConfig
 	mailer: MailerConfig
 }
 
@@ -18,12 +17,6 @@ export interface SecurityConfig {
 	secret: string
 }
 
-export interface DatabaseConfig {
-	username: string
-	password: string
-	uri?: string
-}
-
 export type MailerConfig = MailerOptions
 
 const config: AppConfig = {
@@ -34,10 +27,6 @@ const config: AppConfig = {
 		expiresIn: '1d',
 		refreshIn: '7d',
 		secret: SECRET
-	},
-	database: {
-		password: dbConfig.password as string,
-		username: dbConfig.user as string
 	},
 	mailer: {
 		transport: mailConfig,
