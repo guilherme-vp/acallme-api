@@ -2,19 +2,19 @@ import { UserGender } from '@common/domain/enums'
 import { Column } from 'typeorm'
 
 export abstract class UserModel {
-	@Column({ name: 'DS_EMAIL', unique: true, type: 'varchar2', length: 50 })
+	@Column({ name: 'DS_EMAIL', unique: true, type: 'varchar', length: 50 })
 	email!: string
 
-	@Column({ name: 'DS_SENHA', type: 'varchar2', length: 75 })
+	@Column({ name: 'DS_SENHA', type: 'varchar', length: 75 })
 	password?: string
 
 	@Column({ name: 'DT_NASCIMENTO', type: 'date' })
 	birth!: string
 
-	@Column({ name: 'DS_GENERO', type: 'varchar2', length: 2 })
+	@Column({ name: 'DS_GENERO', type: 'varchar', length: 2 })
 	gender!: UserGender
 
-	@Column({ name: 'IM_AVATAR_URL', type: 'varchar2', length: 100, nullable: true })
+	@Column({ name: 'IM_AVATAR_URL', type: 'varchar', length: 100, nullable: true })
 	avatarUrl?: string
 
 	@Column({ name: 'NR_CPF', type: 'number', precision: 9, nullable: true, unique: true })

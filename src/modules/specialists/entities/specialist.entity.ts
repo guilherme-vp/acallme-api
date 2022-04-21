@@ -16,7 +16,7 @@ export class Specialist extends UserModel {
 	@PrimaryGeneratedColumn({ name: 'CD_ESPECIALISTA', type: 'number' })
 	id!: number
 
-	@Column({ name: 'NM_ESPECIALISTA', type: 'varchar2', length: 50 })
+	@Column({ name: 'NM_ESPECIALISTA', type: 'varchar', length: 50 })
 	name!: string
 
 	@Column({ name: 'NR_CNPJ', type: 'number', nullable: true, precision: 12, unique: true })
@@ -25,10 +25,10 @@ export class Specialist extends UserModel {
 	@Column({ name: 'NR_CNPJ_DIGITO', type: 'number', nullable: true, precision: 2 })
 	cnpjDigits?: number
 
-	@Column({ name: 'DS_SOBRE', type: 'varchar2', length: 1000, nullable: true })
+	@Column({ name: 'DS_SOBRE', type: 'varchar', length: 1000, nullable: true })
 	about?: string
 
-	@Column({ name: 'VL_CONSULTA', type: 'number', scale: 2, precision: 5 })
+	@Column({ name: 'VL_CONSULTA', type: 'decimal', scale: 2, precision: 5 })
 	cost!: number
 
 	@Column({ name: 'NR_CRP', type: 'number', nullable: true, precision: 20 })

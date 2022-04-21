@@ -6,7 +6,7 @@ export class Patient extends UserModel {
 	@PrimaryGeneratedColumn({ name: 'CD_PACIENTE', type: 'number' })
 	id!: number
 
-	@Column({ name: 'NM_PACIENTE', type: 'varchar2', length: 50 })
+	@Column({ name: 'NM_PACIENTE', type: 'varchar', length: 50 })
 	name!: string
 
 	@Column({ name: 'NR_CPF', type: 'number', precision: 9, unique: true })

@@ -20,13 +20,13 @@ export class Schedule {
 	@PrimaryGeneratedColumn({ name: 'CD_AGENDA', type: 'number' })
 	id!: number
 
-	@Column({ name: 'CD_AGENDA', type: 'number', unique: true, precision: 5, nullable: true })
+	@Column({ name: 'CD_AGENDA', type: 'number', unique: true, nullable: true })
 	callId?: number
 
-	@Column({ name: 'CD_ESPECIALISTA', type: 'number', precision: 5 })
+	@Column({ name: 'CD_ESPECIALISTA', type: 'number' })
 	specialistId!: number
 
-	@Column({ name: 'CD_PACIENTE', type: 'number', precision: 5, nullable: true })
+	@Column({ name: 'CD_PACIENTE', type: 'number', nullable: true })
 	patientId?: number
 
 	@Column({ name: 'DT_INIT_RANGE', type: 'timestamp' })

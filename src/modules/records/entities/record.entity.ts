@@ -13,13 +13,13 @@ export class Record {
 	@PrimaryGeneratedColumn({ name: 'CD_PRONTUARIO', type: 'number' })
 	id!: number
 
-	@Column({ name: 'CD_CHAMADA', type: 'number', precision: 5 })
+	@Column({ name: 'CD_CHAMADA', type: 'number' })
 	callId!: number
 
-	@Column({ name: 'DS_OBSERVACAO', type: 'varchar2', length: 100, nullable: true })
+	@Column({ name: 'DS_OBSERVACAO', type: 'varchar', length: 100, nullable: true })
 	observation?: string
 
-	@Column({ name: 'DS_DIAGNOSTICO', type: 'varchar2', length: 100 })
+	@Column({ name: 'DS_DIAGNOSTICO', type: 'varchar', length: 100 })
 	diagnosis!: string
 
 	@OneToOne(() => Call)

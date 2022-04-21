@@ -15,10 +15,10 @@ export class Call {
 	@PrimaryGeneratedColumn({ name: 'CD_CHAMADA', type: 'number' })
 	id!: number
 
-	@Column({ name: 'CD_AGENDA', unique: true, precision: 5 })
+	@Column({ name: 'CD_AGENDA', unique: true })
 	scheduleId!: number
 
-	@Column({ name: 'CD_PRONTUARIO', unique: true, precision: 5 })
+	@Column({ name: 'CD_PRONTUARIO', unique: true })
 	recordId?: number
 
 	@Column({ name: 'VL_DURACAO', nullable: true, precision: 4, scale: 2 })
