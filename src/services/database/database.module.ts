@@ -7,7 +7,6 @@ import { Specialist, Specialty } from '@modules/specialists/entities'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
-import oracledb from 'oracledb'
 
 import { CustomNamingStrategy } from './custom-name-strategy'
 
@@ -21,22 +20,11 @@ const entities = [Patient, Specialist, Specialty, Call, Schedule, Record]
 			useFactory: async (configService: ConfigService) => {
 				const databaseConfig = configService.get<DatabaseConfig>('database')
 
-				if (process.platform === 'win32') {
-					// Windows
-					oracledb.initOracleClient({ libDir: 'C:\\oracle\\instantclient_19_11' })
-				} else if (process.platform === 'darwin') {
-					// macOS
-					oracledb.initOracleClient({
-						libDir: `${process.env.HOME}/Downloads/instantclient_19_8`
-					})
-				}
-
 				return {
 					...databaseConfig,
-					type: 'oracle',
+					type: 'mysql',
 					logging: true,
-					connectString: databaseConfig?.uri,
-					synchronize: false,
+					synchronize: true,
 					entities,
 					keepConnectionAlive: true,
 					entityPrefix: 'T_CLG_',
