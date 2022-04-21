@@ -25,7 +25,7 @@ export class FindManyUseCase implements BaseUseCase<Specialist> {
 				name: name ? { contains: name } : undefined,
 				email: email ? { contains: email } : undefined,
 				specialistSpecialty: {
-					some: { specialty: { specialty: { in: specialties } } }
+					some: { specialty: { name: { in: specialties } } }
 				}
 			},
 			orderBy: {

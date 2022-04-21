@@ -78,13 +78,13 @@ export class SignUpUseCase implements BaseUseCase<Specialist> {
 		const currentSpecialties = await Promise.all(
 			specialties.map(async specialty => {
 				const foundSpecialty = await this.prisma.specialty.findFirst({
-					where: { specialty }
+					where: { name: specialty }
 				})
 
 				if (!foundSpecialty) {
 					const createdSpecialty = await this.prisma.specialty.create({
 						data: {
-							specialty
+							name: specialty
 						}
 					})
 
