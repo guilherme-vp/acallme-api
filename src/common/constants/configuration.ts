@@ -1,5 +1,4 @@
 import { MailerOptions } from '@nestjs-modules/mailer'
-import { ConnectionAttributes } from 'oracledb'
 
 type Envs = 'development' | 'production'
 
@@ -8,7 +7,6 @@ const {
 	NODE_ENV: ProcessEnv,
 	DATABASE_USER,
 	DATABASE_PASS,
-	DATABASE_URI,
 	SECRET = 'test123',
 	MAIL_HOST,
 	MAIL_USER,
@@ -18,10 +16,9 @@ const {
 
 const NODE_ENV: Envs = (ProcessEnv as Envs) || 'development'
 
-const dbConfig: Pick<ConnectionAttributes, 'user' | 'password' | 'connectionString'> = {
-	user: DATABASE_USER ?? 'oracle',
-	password: DATABASE_PASS ?? 'oracle',
-	connectionString: DATABASE_URI ?? 'localhost:1521/ORCLCDB.localdomain'
+const dbConfig = {
+	user: DATABASE_USER ?? 'root',
+	password: DATABASE_PASS ?? 'admin'
 }
 
 const mailConfig: MailerOptions['transport'] = {

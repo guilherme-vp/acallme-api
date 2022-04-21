@@ -37,8 +37,7 @@ const config: AppConfig = {
 	},
 	database: {
 		password: dbConfig.password as string,
-		username: dbConfig.user as string,
-		uri: dbConfig.connectionString as string
+		username: dbConfig.user as string
 	},
 	mailer: {
 		transport: mailConfig,
