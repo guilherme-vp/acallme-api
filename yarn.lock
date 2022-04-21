@@ -1506,16 +1506,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/oracledb@npm:^5.2.1":
-  version: 5.2.1
-  resolution: "@types/oracledb@npm:5.2.1"
-  dependencies:
-    "@types/node": "*"
-    dotenv: ^8.2.0
-  checksum: e10a6e6ebe4f6f3c6abedee62eaac0d45da0a72b9ea083afe5e07fae561454437c2f0b1b68c624eb55245a0efec03dbf50ca1d5bc2189ab7f9f2e6da8974f41e
-  languageName: node
-  linkType: hard
-
 "@types/parse-json@npm:^4.0.0":
   version: 4.0.0
   resolution: "@types/parse-json@npm:4.0.0"
@@ -1921,7 +1911,6 @@ __metadata:
     "@types/lodash": ^4.14.176
     "@types/multer": ^1.4.7
     "@types/node": ^16.4.3
-    "@types/oracledb": ^5.2.1
     "@types/uuid": ^8.3.1
     "@typescript-eslint/eslint-plugin": ^4.28.5
     "@typescript-eslint/parser": ^4.28.5
@@ -1947,7 +1936,6 @@ __metadata:
     multer: ^1.4.3
     nestjs-i18n: ^8.1.3
     nodemailer: ^6.6.5
-    oracledb: ^5.3.0
     prettier: ^2.3.2
     reflect-metadata: ^0.1.13
     rxjs: ^7.2.0
@@ -8281,13 +8269,6 @@ __metadata:
     strip-ansi: ^6.0.0
     wcwidth: ^1.0.1
   checksum: 28d476ee6c1049d68368c0dc922e7225e3b5600c3ede88fade8052837f9ed342625fdaa84a6209302587c8ddd9b664f71f0759833cbdb3a4cf81344057e63c63
-  languageName: node
-  linkType: hard
-
-"oracledb@npm:^5.3.0":
-  version: 5.3.0
-  resolution: "oracledb@npm:5.3.0"
-  checksum: c15f6416c2e8e828caf1580611427cb45f9442ea8c2919ed872778508252fd06633f96ed533b0a9206be5972326aaacc76d69979787b3c5d45c13dae3d5d82ca
   languageName: node
   linkType: hard
 
