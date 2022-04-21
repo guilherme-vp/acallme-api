@@ -107,7 +107,7 @@ export class NotificationGateway
 	}
 
 	sendAppointmentConfirmation(schedule: Schedule) {
-		const { id, patientId, rangeStart, confirmed } = schedule
+		const { id, patientId, startsAt, confirmed } = schedule
 
 		const patientSocket = this.patients.find(patient => patient.id === patientId)
 
@@ -122,12 +122,12 @@ export class NotificationGateway
 			type: 'appointment_confirmation',
 			scheduleId: id,
 			isConfirmed: Boolean(confirmed),
-			when: rangeStart
-		} as NotificationModel)
+			when: startsAt
+		})
 	}
 
 	async sendNewAppointment(schedule: Schedule) {
-		const { id: scheduleId, patientId, specialistId, rangeStart } = schedule
+		const { id: scheduleId, patientId, specialistId, startsAt } = schedule
 
 		const specialist = await this.specialistService.findById(specialistId)
 		const specialistSocket = this.patients.find(patient => patient.id === patientId)
@@ -143,7 +143,7 @@ export class NotificationGateway
 			type: 'appointment_new',
 			avatar: specialist?.avatarUrl,
 			name: specialist?.name,
-			when: rangeStart,
+			when: startsAt,
 			createdAt: new Date()
 		} as NotificationModel)
 	}

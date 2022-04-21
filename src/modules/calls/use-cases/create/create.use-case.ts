@@ -2,9 +2,8 @@ import { CreateDto } from '@modules/calls/dtos'
 import { Call } from '@modules/calls/entities'
 import { SchedulesService } from '@modules/schedules/schedules.service'
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import { PrismaService } from '@services/prisma'
 import { I18nService } from 'nestjs-i18n'
-import { Repository } from 'typeorm'
 
 @Injectable()
 export class CreateUseCase {
@@ -13,7 +12,7 @@ export class CreateUseCase {
 	constructor(
 		private readonly scheduleService: SchedulesService,
 		private readonly languageService: I18nService,
-		@InjectRepository(Call) private readonly callRepository: Repository<Call>
+		private readonly prismaService: PrismaService
 	) {}
 
 	async execute(input: CreateDto): Promise<Call> {
@@ -30,10 +29,12 @@ export class CreateUseCase {
 		}
 
 		this.logger.log('Inserting call and returning it')
-		const createdCall = await this.callRepository.save({
-			scheduleId,
-			duration,
-			rating
+		const createdCall = await this.prismaService.call.create({
+			data: {
+				scheduleId,
+				duration,
+				rating
+			}
 		})
 
 		return createdCall

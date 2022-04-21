@@ -3,11 +3,11 @@ import { IsOptional, IsDateString, IsBooleanString, IsNumberString } from 'class
 export class FindManyDto {
 	@IsDateString()
 	@IsOptional()
-	rangeStart?: string
+	startsAt?: string
 
 	@IsDateString()
 	@IsOptional()
-	rangeEnd?: string
+	endsAt?: string
 
 	@IsOptional()
 	@IsNumberString()

@@ -41,7 +41,6 @@ export class SignUpDto {
 
 	@IsString()
 	@IsOptional()
-	@MinLength(1)
 	crm?: string
 
 	@IsString()
@@ -60,7 +59,6 @@ export class SignUpDto {
 	about!: string
 
 	@IsNumber()
-	@Min(1)
 	cost!: number
 
 	@IsString({ each: true })

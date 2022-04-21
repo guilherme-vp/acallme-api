@@ -20,7 +20,7 @@ export class SchedulesController {
 		@Specialist('id') specialistId: number,
 		@Body('confirmed') confirmed: boolean
 	) {
-		const data = await this.schedulesService.confirm(+id, specialistId, confirmed ? 1 : 0)
+		const data = await this.schedulesService.confirm(+id, specialistId, confirmed)
 
 		return {
 			ok: data

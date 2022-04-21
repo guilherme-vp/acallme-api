@@ -3,7 +3,6 @@ import { CallsModule } from '@modules/calls/calls.module'
 import { CallService } from '@modules/calls/calls.service'
 import { Gateways as CallGateways } from '@modules/calls/websockets'
 import { Global, Logger, Module } from '@nestjs/common'
-import { TypeOrmModule } from '@nestjs/typeorm'
 
 import { Schedule } from './entities'
 import { SchedulesController } from './schedules.controller'
@@ -13,7 +12,7 @@ import { UseCases } from './use-cases'
 
 @Global()
 @Module({
-	imports: [TypeOrmModule.forFeature([Schedule]), CallsModule],
+	imports: [CallsModule],
 	controllers: [SchedulesController],
 	providers: [
 		...UseCases,
@@ -24,6 +23,6 @@ import { UseCases } from './use-cases'
 		SchedulesService,
 		Logger
 	],
-	exports: [SchedulesService, TaskService, TypeOrmModule]
+	exports: [SchedulesService, TaskService]
 })
 export class SchedulesModule {}

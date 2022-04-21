@@ -1,29 +1,27 @@
 import { BaseUseCase } from '@common/domain/base'
-import { splitCnpj, splitCpf, splitPhone, uploadStream } from '@common/utils'
+import { uploadStream } from '@common/utils'
 import { welcomeEmailProps } from '@core/providers'
 import { SignUpDto } from '@modules/specialists/dtos'
-import { Specialist, Specialty } from '@modules/specialists/entities'
+import { Specialist } from '@modules/specialists/entities'
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { InjectRepository } from '@nestjs/typeorm'
 import { CryptService } from '@services/crypt'
 import { MailerService } from '@services/mail'
+import { PrismaService } from '@services/prisma'
+import { format } from 'date-fns'
 import { I18nService } from 'nestjs-i18n'
-import { getRepository, Repository } from 'typeorm'
 import { v4 as uuid } from 'uuid'
 
 @Injectable()
 export class SignUpUseCase implements BaseUseCase<Specialist> {
 	private logger: Logger = new Logger('SignupSpecialist')
-	private specialtyRepository = getRepository(Specialty)
 
 	constructor(
 		private readonly languageService: I18nService,
 		private readonly cryptService: CryptService,
 		private readonly jwtService: JwtService,
 		private readonly mailerService: MailerService,
-		@InjectRepository(Specialist)
-		private readonly specialistRepository: Repository<Specialist>
+		private readonly prisma: PrismaService
 	) {}
 
 	async execute(input: SignUpDto): Promise<{ specialist: Specialist; token: string }> {
@@ -42,23 +40,7 @@ export class SignUpUseCase implements BaseUseCase<Specialist> {
 			...otherFields
 		} = input
 
-		const finalCnpj: any[] = [undefined, undefined]
-
-		if (cnpj) {
-			this.logger.log('Splitting cnpj')
-			const [fullCnpj, digitsCnpj] = splitCnpj(cnpj)
-			finalCnpj.push(fullCnpj, digitsCnpj)
-		}
-
-		const finalCpf: any[] = [undefined, undefined]
-
-		if (cpf) {
-			this.logger.log('Splitting cpf')
-			const [fullCpf, digitsCpf] = splitCpf(cpf)
-			finalCpf.push(fullCpf, digitsCpf)
-		}
-
-		if (finalCnpj.length < 2 && finalCpf.length < 2) {
+		if (!cnpj && !cpf) {
 			this.logger.error('CPF or CNPJ not given')
 			throw new BadRequestException(
 				await this.languageService.translate('specialist.cpnj-cpf-not-given')
@@ -66,18 +48,20 @@ export class SignUpUseCase implements BaseUseCase<Specialist> {
 		}
 
 		this.logger.log('Checking if specialsit with given cnpj, cpf or email exists')
-		const specialistExists = await this.specialistRepository.count({
-			where: [
-				{
-					email
-				},
-				{
-					cnpj: { digits: finalCnpj[0], full: finalCnpj[1] }
-				},
-				{
-					cpf: { digits: finalCpf[0], full: finalCpf[1] }
-				}
-			]
+		const specialistExists = await this.prisma.specialist.count({
+			where: {
+				OR: [
+					{
+						email
+					},
+					{
+						cnpj
+					},
+					{
+						cpf
+					}
+				]
+			}
 		})
 
 		if (specialistExists > 0) {
@@ -93,27 +77,30 @@ export class SignUpUseCase implements BaseUseCase<Specialist> {
 		this.logger.log('Creating specialties')
 		const currentSpecialties = await Promise.all(
 			specialties.map(async specialty => {
-				const foundSpecialty = await this.specialtyRepository.findOne({
-					where: { name: specialty }
+				const foundSpecialty = await this.prisma.specialty.findFirst({
+					where: { specialty }
 				})
 
 				if (!foundSpecialty) {
-					const createdSpecialty = await this.specialtyRepository.save({
-						name: specialty
+					const createdSpecialty = await this.prisma.specialty.create({
+						data: {
+							specialty
+						}
 					})
 
 					return createdSpecialty
-				} else {
-					return foundSpecialty
 				}
+
+				return foundSpecialty
 			})
 		)
 
 		this.logger.log('Splitting phone')
-		const [dddPhone, fullPhone] = splitPhone(
-			+phone.replace('(', '').replace(')', '').replace(' ', '').replace('-', '')
-		)
-		const finalPhone = [dddPhone, fullPhone]
+		const formattedPhone = phone
+			.replace('(', '')
+			.replace(')', '')
+			.replace(' ', '')
+			.replace('-', '')
 
 		let avatarUrl: string | undefined = file === null ? undefined : undefined
 
@@ -134,23 +121,20 @@ export class SignUpUseCase implements BaseUseCase<Specialist> {
 			email,
 			password,
 			name,
-			birth: new Date(birth).toISOString(),
-			cpf: finalCpf[0],
-			cpfDigits: finalCpf[1],
-			cnpj: finalCnpj[0],
-			cnpjDigits: finalCnpj[1],
-			phone: finalPhone[0],
-			phoneDigits: finalPhone[1],
-			crm: Number(crm),
-			crp: Number(crp),
+			birth: format(new Date(birth), 'yyyy-MM-dd'),
+			cpf,
+			cnpj,
+			phone: formattedPhone,
+			crm,
+			crp,
 			specialties: currentSpecialties,
 			avatarUrl
 		}
 
 		this.logger.log('Creating specialist with given data: ', creationData)
-		const createdSpecialist = (await this.specialistRepository.save(
-			creationData
-		)) as Specialist
+		const createdSpecialist = await this.prisma.specialist.create({
+			data: creationData
+		})
 
 		this.logger.log('Creating JWT for created Specialist')
 		const createdToken = this.jwtService.sign({
@@ -171,12 +155,13 @@ export class SignUpUseCase implements BaseUseCase<Specialist> {
 			})
 		})
 
-		delete createdSpecialist.password
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { password: createdPassword, ...specialistWithoutPassword } = createdSpecialist
 
 		this.logger.log('Returning token and specialist')
 		return {
 			token: createdToken,
-			specialist: createdSpecialist
+			specialist: specialistWithoutPassword
 		}
 	}
 }

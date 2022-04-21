@@ -1,12 +1,10 @@
-import { splitCnpj } from '@common/utils'
 import { LoginDto } from '@modules/specialists/dtos'
 import { Specialist } from '@modules/specialists/entities'
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { InjectRepository } from '@nestjs/typeorm'
 import { CryptService } from '@services/crypt'
+import { PrismaService } from '@services/prisma'
 import { I18nService } from 'nestjs-i18n'
-import { Repository } from 'typeorm'
 
 @Injectable()
 export class LoginUseCase {
@@ -16,8 +14,7 @@ export class LoginUseCase {
 		private readonly cryptService: CryptService,
 		private readonly jwtService: JwtService,
 		private readonly languageService: I18nService,
-		@InjectRepository(Specialist)
-		private readonly specialistRepository: Repository<Specialist>
+		private readonly prisma: PrismaService
 	) {}
 
 	async execute(input: LoginDto): Promise<{ specialist: Specialist; token: string }> {
@@ -25,25 +22,26 @@ export class LoginUseCase {
 
 		this.logger.log('Creating specialist')
 
-		let cnpj = 0
+		let cnpj = ''
 
 		if (username.replace(/.-\//, '').length === 14) {
 			this.logger.log('splitting cnpj if valid')
-			const [full] = splitCnpj(username)
 
-			cnpj = full
+			cnpj = username
 		}
 
 		this.logger.log('Searching for specialist with given email or cnpj')
-		const foundSpecialist = await this.specialistRepository.findOne({
-			where: [
-				{
-					email: username
-				},
-				{
-					cnpj
-				}
-			]
+		const foundSpecialist = await this.prisma.specialist.findFirst({
+			where: {
+				OR: [
+					{
+						email: username
+					},
+					{
+						cnpj
+					}
+				]
+			}
 		})
 
 		if (!foundSpecialist) {
@@ -73,12 +71,13 @@ export class LoginUseCase {
 		this.logger.log('Creating JWT')
 		const token = await this.jwtService.signAsync(payload)
 
-		delete foundSpecialist.password
+		const { password: foundSpecialistPassword, ...specialistWithoutPassword } =
+			foundSpecialist
 
 		this.logger.log('Returning user')
 		return {
 			token,
-			specialist: foundSpecialist
+			specialist: specialistWithoutPassword
 		}
 	}
 }

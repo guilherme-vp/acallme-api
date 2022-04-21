@@ -1,5 +1,1 @@
-export enum UserGender {
-	M = 'M',
-	F = 'F',
-	NB = 'NB'
-}
+export type UserGender = 'M' | 'F' | 'NB'

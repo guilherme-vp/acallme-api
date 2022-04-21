@@ -41,7 +41,7 @@ export class SchedulesService {
 		return this.findManyUseCase.execute(where)
 	}
 
-	async confirm(scheduleId: number, specialistId: number, confirmed: number) {
+	async confirm(scheduleId: number, specialistId: number, confirmed: boolean) {
 		return this.confirmUseCase.execute(scheduleId, specialistId, confirmed)
 	}
 }

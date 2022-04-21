@@ -1,12 +1,10 @@
-import { splitCpf } from '@common/utils'
 import { LoginDto } from '@modules/patients/dtos'
 import { Patient } from '@modules/patients/entities'
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { InjectRepository } from '@nestjs/typeorm'
 import { CryptService } from '@services/crypt'
+import { PrismaService } from '@services/prisma'
 import { I18nService } from 'nestjs-i18n'
-import { Repository } from 'typeorm'
 
 @Injectable()
 export class LoginUseCase {
@@ -16,33 +14,24 @@ export class LoginUseCase {
 		private readonly cryptService: CryptService,
 		private readonly jwtService: JwtService,
 		private readonly languageService: I18nService,
-		@InjectRepository(Patient) private readonly patientRepository: Repository<Patient>
+		private readonly prisma: PrismaService
 	) {}
 
 	async execute(input: LoginDto): Promise<{ patient: Patient; token: string }> {
 		const { password, username } = input
 
-		this.logger.log('Creating patient')
-
-		let cpf = 0
-
-		if (username.replace(/.-/, '').length === 11) {
-			this.logger.log('Splitting cpf if valid')
-			const [full] = splitCpf(username)
-
-			cpf = full
-		}
-
 		this.logger.log('Searching for patient with given email or cpf')
-		const foundPatient = await this.patientRepository.findOne({
-			where: [
-				{
-					email: username
-				},
-				{
-					cpf
-				}
-			]
+		const foundPatient = await this.prisma.patient.findFirst({
+			where: {
+				OR: [
+					{
+						email: username
+					},
+					{
+						cpf: username
+					}
+				]
+			}
 		})
 
 		if (!foundPatient) {
@@ -55,10 +44,7 @@ export class LoginUseCase {
 		const { id, password: patientPassword } = foundPatient
 
 		this.logger.log('Comparing passwords')
-		const comparedPassword = await this.cryptService.compare(
-			password,
-			patientPassword as string
-		)
+		const comparedPassword = await this.cryptService.compare(password, patientPassword)
 
 		if (!comparedPassword) {
 			this.logger.error('Incorrect password')
@@ -72,12 +58,12 @@ export class LoginUseCase {
 		this.logger.log('Creating JWT')
 		const token = await this.jwtService.signAsync(payload)
 
-		delete foundPatient.password
+		const { password: foundPassword, ...patientWithoutPassword } = foundPatient
 
 		this.logger.log('Returning user')
 		return {
 			token,
-			patient: foundPatient
+			patient: patientWithoutPassword
 		}
 	}
 }

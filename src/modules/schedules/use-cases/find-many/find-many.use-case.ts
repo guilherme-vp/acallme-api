@@ -1,22 +1,19 @@
 import { FindManyDto } from '@modules/schedules/dtos'
 import { Schedule } from '@modules/schedules/entities'
 import { Injectable, Logger } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
-import { Repository } from 'typeorm'
+import { PrismaService } from '@services/prisma'
 
 @Injectable()
 export class FindManyUseCase {
 	private logger: Logger = new Logger('FindManySchedules')
 
-	constructor(
-		@InjectRepository(Schedule) private readonly scheduleRepository: Repository<Schedule>
-	) {}
+	constructor(private readonly prisma: PrismaService) {}
 
 	async execute(where: FindManyDto): Promise<Schedule[]> {
 		this.logger.log('Splitting all custom fields')
 		const {
-			rangeEnd,
-			rangeStart,
+			endsAt,
+			startsAt,
 			confirmed,
 			disabled,
 			patientId,
@@ -40,24 +37,26 @@ export class FindManyUseCase {
 			this.logger.log('Adding specialistId')
 			keys.specialistId = +specialistId
 		}
-		if (rangeEnd) {
-			this.logger.log('Adding rangeEnd')
-			keys.rangeEnd = new Date(rangeEnd)
+		if (endsAt) {
+			this.logger.log('Adding endsAt')
+			keys.endsAt = new Date(endsAt)
 		}
-		if (rangeStart) {
-			this.logger.log('Adding rangeStart')
-			keys.rangeStart = new Date(rangeStart)
+		if (startsAt) {
+			this.logger.log('Adding startsAt')
+			keys.startsAt = new Date(startsAt)
 		}
 		if (confirmed) {
 			this.logger.log('Adding confirmed')
-			keys.confirmed = JSON.parse(confirmed) ? 1 : 0
+			keys.confirmed = JSON.parse(confirmed)
 		}
 		if (disabled) {
 			this.logger.log('Adding disabled')
-			keys.disabled = JSON.parse(disabled) ? 1 : 0
+			keys.disabled = JSON.parse(disabled)
 		}
 
-		const foundSchedules = await this.scheduleRepository.find({ where: keys })
+		const foundSchedules = await this.prisma.schedule.findMany({
+			where: keys
+		})
 
 		return foundSchedules
 	}

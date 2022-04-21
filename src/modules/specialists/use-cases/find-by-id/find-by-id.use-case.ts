@@ -1,9 +1,8 @@
 import { BaseUseCase } from '@common/domain/base'
 import { Specialist } from '@modules/specialists/entities'
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import { PrismaService } from '@services/prisma'
 import { I18nService } from 'nestjs-i18n'
-import { Repository } from 'typeorm'
 
 @Injectable()
 export class FindByIdUseCase implements BaseUseCase<Specialist> {
@@ -11,16 +10,18 @@ export class FindByIdUseCase implements BaseUseCase<Specialist> {
 
 	constructor(
 		private readonly languageService: I18nService,
-		@InjectRepository(Specialist)
-		private readonly specialistRepository: Repository<Specialist>
+		private readonly prisma: PrismaService
 	) {}
 
-	async execute(id: number, select?: (keyof Specialist)[]): Promise<Specialist | null> {
+	async execute(
+		id: number,
+		select?: Record<keyof Specialist, boolean>
+	): Promise<Specialist | null> {
 		this.logger.log('Finding specialist by given id')
-		const foundSpecialist = await this.specialistRepository.findOne({
+		const foundSpecialist = (await this.prisma.specialist.findUnique({
 			where: { id },
 			select
-		})
+		})) as Specialist
 
 		if (!foundSpecialist) {
 			this.logger.log('Throwing because no specialist was found')
@@ -30,9 +31,9 @@ export class FindByIdUseCase implements BaseUseCase<Specialist> {
 		}
 
 		this.logger.log('Remove specialist password')
-		delete foundSpecialist.password
+		const { password: specialistPassword, ...specialistWithoutPasssword } = foundSpecialist
 
 		this.logger.log('Return specialist')
-		return foundSpecialist
+		return specialistWithoutPasssword
 	}
 }

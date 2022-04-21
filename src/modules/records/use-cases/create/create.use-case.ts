@@ -1,9 +1,8 @@
 import { CallService } from '@modules/calls/calls.service'
 import { Record } from '@modules/records/entities'
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import { PrismaService } from '@services/prisma'
 import { I18nService } from 'nestjs-i18n'
-import { Repository } from 'typeorm'
 
 import { CreateDto } from '../../dtos'
 
@@ -12,7 +11,7 @@ export class CreateUseCase {
 	private logger = new Logger()
 
 	constructor(
-		@InjectRepository(Record) private readonly recordRepository: Repository<Record>,
+		private readonly prisma: PrismaService,
 		private readonly callService: CallService,
 		private readonly languageService: I18nService
 	) {}
@@ -29,10 +28,12 @@ export class CreateUseCase {
 		}
 
 		this.logger.log('Creating record with given call id')
-		const createdRecord = await this.recordRepository.save({
-			callId,
-			diagnosis,
-			observation
+		const createdRecord = await this.prisma.record.create({
+			data: {
+				callId,
+				diagnosis,
+				observation
+			}
 		})
 
 		return createdRecord

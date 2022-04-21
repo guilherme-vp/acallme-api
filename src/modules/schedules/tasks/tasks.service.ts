@@ -4,15 +4,30 @@ import { PatientService } from '@modules/patients/patients.service'
 import { SpecialistService } from '@modules/specialists/specialists.service'
 import { Injectable } from '@nestjs/common'
 import { Cron, CronExpression } from '@nestjs/schedule'
-import { InjectRepository } from '@nestjs/typeorm'
 import { MailerService } from '@services/mail'
-import * as datefns from 'date-fns'
-import { Between, Repository } from 'typeorm'
+import { PrismaService } from '@services/prisma'
+import {
+	startOfToday,
+	endOfToday,
+	startOfHour,
+	subHours,
+	differenceInSeconds,
+	format,
+	addHours
+} from 'date-fns'
 
-import { Schedule } from '../entities'
 import { SchedulesService } from '../schedules.service'
 
-export const BetweenDates = (startDate: Date, endDate: Date) => Between(startDate, endDate)
+export const BetweenDates = (startDate: Date, endDate: Date) => ({
+	startsAt: {
+		gte: startDate,
+		lte: endDate
+	},
+	endsAt: {
+		gte: startDate,
+		lte: endDate
+	}
+})
 
 @Injectable()
 export class TaskService {
@@ -23,7 +38,7 @@ export class TaskService {
 		private readonly mailerService: MailerService,
 		private readonly videoCallGateway: VideoCallGateway,
 		private readonly notificationGateway: NotificationGateway,
-		@InjectRepository(Schedule) private readonly scheduleRepository: Repository<Schedule>
+		private readonly prisma: PrismaService
 	) {}
 
 	@Cron(CronExpression.EVERY_5_MINUTES, { name: 'db-refresh' })
@@ -33,18 +48,15 @@ export class TaskService {
 
 	@Cron('0 5 * * *', { name: 'daily-calls' })
 	async sendDailyCalls() {
-		const todayStart = datefns.startOfToday()
-		const todayEnd = datefns.endOfToday()
+		const todayStart = startOfToday()
+		const todayEnd = endOfToday()
 
-		const dailySchedules = await this.scheduleRepository.find({
-			where: {
-				rangeStart: BetweenDates(todayStart, todayEnd),
-				rangeEnd: BetweenDates(todayStart, todayEnd)
-			}
+		const dailySchedules = await this.prisma.schedule.findMany({
+			where: BetweenDates(todayStart, todayEnd)
 		})
 
 		await Promise.all(
-			dailySchedules.map(async ({ patientId, specialistId, confirmed, rangeStart }) => {
+			dailySchedules.map(async ({ patientId, specialistId, confirmed, startsAt }) => {
 				if (!confirmed || !patientId) {
 					return
 				}
@@ -56,7 +68,7 @@ export class TaskService {
 					return
 				}
 
-				const formattedDate = datefns.format(rangeStart, 'haaa')
+				const formattedDate = format(startsAt, 'haaa')
 
 				await this.mailerService.send({
 					to: {
@@ -74,12 +86,12 @@ export class TaskService {
 
 	@Cron('0 6-20/1 * * *', { name: 'send-warn-call-notification' })
 	async sendWarnCallNotification() {
-		const twoHoursAfterNow = datefns.addHours(new Date(), 2)
+		const twoHoursAfterNow = addHours(new Date(), 2)
 
-		const schedules = await this.scheduleRepository.find({
+		const schedules = await this.prisma.schedule.findMany({
 			where: {
-				confirmed: 1,
-				rangeStart: twoHoursAfterNow
+				confirmed: true,
+				startsAt: twoHoursAfterNow
 			}
 		})
 
@@ -123,11 +135,11 @@ export class TaskService {
 
 	@Cron('0 6-20/1 * * *', { name: 'send-call-notification' })
 	async sendCallNotification() {
-		const hourStart = datefns.startOfHour(new Date())
+		const hourStart = startOfHour(new Date())
 
 		const schedules = await this.scheduleService.getMany({
 			confirmed: String(true),
-			rangeStart: hourStart.toISOString()
+			startsAt: hourStart.toISOString()
 		})
 
 		await Promise.all(
@@ -164,11 +176,11 @@ export class TaskService {
 
 	@Cron('0 6-20/1 * * *', { name: 'warn-close-call-notification' })
 	async warnCloseCall() {
-		const hourBefore = datefns.subHours(new Date(), 1)
-		const startOfHourBefore = datefns.startOfHour(hourBefore)
+		const hourBefore = subHours(new Date(), 1)
+		const startOfHourBefore = startOfHour(hourBefore)
 
 		const schedules = await this.scheduleService.getMany({
-			rangeStart: startOfHourBefore.toISOString(),
+			startsAt: startOfHourBefore.toISOString(),
 			confirmed: String(true)
 		})
 
@@ -194,12 +206,12 @@ export class TaskService {
 
 	@Cron('5 6-20/1 * * *', { name: 'close-call' })
 	async closeCall() {
-		const hourBefore = datefns.subHours(new Date(), 1)
-		const startOfHourBefore = datefns.startOfHour(hourBefore)
-		const duration = datefns.differenceInSeconds(startOfHourBefore, Date.now())
+		const hourBefore = subHours(new Date(), 1)
+		const startOfHourBefore = startOfHour(hourBefore)
+		const duration = differenceInSeconds(startOfHourBefore, Date.now())
 
 		const schedules = await this.scheduleService.getMany({
-			rangeStart: startOfHourBefore.toISOString(),
+			startsAt: startOfHourBefore.toISOString(),
 			confirmed: String(true)
 		})
 
@@ -209,7 +221,6 @@ export class TaskService {
 
 				await this.videoCallGateway.endCall({
 					scheduleId: id,
-					rating: 0,
 					duration
 				})
 			})

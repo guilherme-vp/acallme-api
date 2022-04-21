@@ -1,15 +1,14 @@
 import { BaseUseCase } from '@common/domain/base'
-import { splitCpf, splitPhone, uploadStream } from '@common/utils'
+import { uploadStream } from '@common/utils'
 import { welcomeEmailProps } from '@core/providers'
 import { SignUpDto } from '@modules/patients/dtos'
 import { Patient } from '@modules/patients/entities'
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { InjectRepository } from '@nestjs/typeorm'
 import { CryptService } from '@services/crypt'
 import { MailerService } from '@services/mail'
+import { PrismaService } from '@services/prisma'
 import { I18nService } from 'nestjs-i18n'
-import { Repository } from 'typeorm'
 import { v4 as uuid } from 'uuid'
 
 @Injectable()
@@ -21,26 +20,24 @@ export class SignUpUseCase implements BaseUseCase<Patient> {
 		private readonly cryptService: CryptService,
 		private readonly jwtService: JwtService,
 		private readonly mailerService: MailerService,
-		@InjectRepository(Patient) private readonly patientRepository: Repository<Patient>
+		private readonly prisma: PrismaService
 	) {}
 
 	async execute(input: SignUpDto): Promise<{ patient: Patient; token: string }> {
 		const { email, cpf, password: userPassword, birth, name, phone, file, gender } = input
 
-		this.logger.log('Splitting cpf')
-		const [fullCpf, digitsCpf] = splitCpf(cpf)
-		const finalCpf = [fullCpf, digitsCpf]
-
-		this.logger.log('Checking if patient with given cpf and email exists')
-		const patientExists = await this.patientRepository.count({
-			where: [
-				{
-					email
-				},
-				{
-					cpf: { digits: finalCpf[0], full: finalCpf[1] }
-				}
-			]
+		this.logger.log('Searching for patient with given email or cpf')
+		const patientExists = await this.prisma.patient.count({
+			where: {
+				OR: [
+					{
+						email
+					},
+					{
+						cpf
+					}
+				]
+			}
 		})
 
 		if (patientExists > 0) {
@@ -53,11 +50,11 @@ export class SignUpUseCase implements BaseUseCase<Patient> {
 		this.logger.log('Encrypting given password')
 		const password = await this.cryptService.encrypt(userPassword)
 
-		this.logger.log('Splitting phone')
-		const [dddPhone, fullPhone] = splitPhone(
-			+phone.replace('(', '').replace(')', '').replace(' ', '').replace('-', '')
-		)
-		const finalPhone = [dddPhone, fullPhone]
+		const formattedPhone = phone
+			.replace('(', '')
+			.replace(')', '')
+			.replace(' ', '')
+			.replace('-', '')
 
 		let avatarUrl: string | undefined = file === null ? undefined : undefined
 
@@ -79,15 +76,15 @@ export class SignUpUseCase implements BaseUseCase<Patient> {
 			name,
 			gender,
 			birth: new Date(birth).toISOString(),
-			cpf: finalCpf[0],
-			cpfDigits: finalCpf[1],
-			phone: finalPhone[0],
-			phoneDigits: finalPhone[1],
+			cpf,
+			phone: formattedPhone,
 			avatarUrl
 		}
 
 		this.logger.log('Creating patient with given data: ', creationData)
-		const createdPatient = (await this.patientRepository.save(creationData)) as Patient
+		const createdPatient = await this.prisma.patient.create({
+			data: creationData
+		})
 
 		this.logger.log('Creating JWT for created Patient')
 		const createdToken = this.jwtService.sign({
@@ -108,12 +105,12 @@ export class SignUpUseCase implements BaseUseCase<Patient> {
 			})
 		})
 
-		delete createdPatient.password
+		const { password: createdPassword, ...patient } = createdPatient
 
 		this.logger.log('Returning token and patient')
 		return {
 			token: createdToken,
-			patient: createdPatient
+			patient
 		}
 	}
 }

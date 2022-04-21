@@ -3,11 +3,11 @@ import { IsOptional, IsDateString, IsNumber, IsBoolean } from 'class-validator'
 export class FindOneDto {
 	@IsDateString()
 	@IsOptional()
-	rangeStart?: string
+	startsAt?: string
 
 	@IsDateString()
 	@IsOptional()
-	rangeEnd?: string
+	endsAt?: string
 
 	@IsOptional()
 	@IsNumber()

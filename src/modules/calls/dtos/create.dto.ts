@@ -8,10 +8,10 @@ export class CreateDto {
 	@IsNumber()
 	@Min(0)
 	@IsOptional()
-	duration?: number
+	duration?: number | null
 
 	@IsNumber({ maxDecimalPlaces: 1 })
 	@Min(0)
 	@IsOptional()
-	rating?: number
+	rating?: number | null
 }

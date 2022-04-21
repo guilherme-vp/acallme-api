@@ -1,22 +1,27 @@
 import { BaseUseCase } from '@common/domain/base'
 import { Patient } from '@modules/patients/entities'
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import { PrismaService } from '@services/prisma'
 import { I18nService } from 'nestjs-i18n'
-import { Repository } from 'typeorm'
 
 @Injectable()
 export class FindByIdUseCase implements BaseUseCase<Patient> {
 	private logger: Logger = new Logger('FindPatientById')
 
 	constructor(
-		@InjectRepository(Patient) private readonly patientRepository: Repository<Patient>,
-		private readonly languageService: I18nService
+		private readonly languageService: I18nService,
+		private readonly prisma: PrismaService
 	) {}
 
-	async execute(id: number, select?: (keyof Patient)[]): Promise<Patient | null> {
+	async execute(
+		id: number,
+		select?: Record<keyof Patient, boolean>
+	): Promise<Patient | null> {
 		this.logger.log('Searching for patient with given id')
-		const foundPatient = await this.patientRepository.findOne({ where: { id }, select })
+		const foundPatient = await this.prisma.patient.findUnique({
+			where: { id },
+			select: { password: false, ...select }
+		})
 
 		if (!foundPatient) {
 			this.logger.log('Throwing because no patient was found')
@@ -25,9 +30,8 @@ export class FindByIdUseCase implements BaseUseCase<Patient> {
 			)
 		}
 
-		delete foundPatient.password
+		const { password, ...patientWithoutPassword } = foundPatient as Patient
 
-		this.logger.log('Deleting and returning patient without password')
-		return foundPatient
+		return patientWithoutPassword
 	}
 }

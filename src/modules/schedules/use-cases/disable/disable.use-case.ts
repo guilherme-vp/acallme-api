@@ -1,10 +1,8 @@
 import { NotificationGateway } from '@common/gateways'
-import { Schedule } from '@modules/schedules/entities'
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import { PrismaService } from '@services/prisma'
 import { startOfHour } from 'date-fns'
 import { I18nService } from 'nestjs-i18n'
-import { Repository } from 'typeorm'
 
 import { DisableDto } from '../../dtos'
 
@@ -15,18 +13,20 @@ export class DisableUseCase {
 	constructor(
 		private readonly notificationGateway: NotificationGateway,
 		private readonly languageService: I18nService,
-		@InjectRepository(Schedule) private readonly scheduleRepository: Repository<Schedule>
+		private readonly prisma: PrismaService
 	) {}
 
 	async execute(data: DisableDto, specialistId: number): Promise<boolean> {
 		const { dateEnd, dateStart } = data
-		const rangeStart = startOfHour(new Date(dateStart))
-		const rangeEnd = startOfHour(new Date(dateEnd))
+		const startsAt = startOfHour(new Date(dateStart))
+		const endsAt = startOfHour(new Date(dateEnd))
 
 		this.logger.log('Searching for existing schedule')
-		const scheduleExist = await this.scheduleRepository.findOne({
-			specialistId,
-			rangeStart
+		const scheduleExist = await this.prisma.schedule.findFirst({
+			where: {
+				specialistId,
+				startsAt
+			}
 		})
 
 		if (scheduleExist && scheduleExist.confirmed) {
@@ -36,32 +36,27 @@ export class DisableUseCase {
 			)
 		}
 
-		if (!scheduleExist) {
-			this.logger.log('Creating schedule if it does not exist')
-			await this.scheduleRepository.save({
-				specialistId,
-				rangeStart,
-				rangeEnd,
-				disabled: 1
-			})
-		} else {
-			this.logger.log('Updating found schedule')
-			const updatedSchedule = await this.scheduleRepository.update(
-				{ disabled: 1, confirmed: 0 },
-				{
-					id: scheduleExist.id
-				}
-			)
-
-			if (!updatedSchedule) {
-				return false
+		await this.prisma.schedule.upsert({
+			create: {
+				startsAt,
+				endsAt,
+				specialistId
+			},
+			update: {
+				disabled: true,
+				confirmed: false
+			},
+			where: {
+				id: scheduleExist?.id
 			}
+		})
 
+		if (scheduleExist) {
 			this.logger.log('Send appointment notification to patient and specialist')
 			this.notificationGateway.sendAppointmentConfirmation({
 				...scheduleExist,
-				disabled: 1,
-				confirmed: 0
+				disabled: true,
+				confirmed: false
 			})
 		}
 

@@ -21,7 +21,7 @@ export class PatientService {
 		return this.loginUseCase.execute(input)
 	}
 
-	async findById(id: number, select?: (keyof Patient)[]) {
+	async findById(id: number, select?: Record<keyof Patient, boolean>) {
 		return this.findByIdUseCase.execute(id, select)
 	}
 

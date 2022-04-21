@@ -1,9 +1,7 @@
 import { NotificationGateway } from '@common/gateways'
-import { Schedule } from '@modules/schedules/entities'
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+import { PrismaService } from '@services/prisma'
 import { I18nService } from 'nestjs-i18n'
-import { Repository } from 'typeorm'
 
 @Injectable()
 export class ConfirmUseCase {
@@ -12,12 +10,12 @@ export class ConfirmUseCase {
 	constructor(
 		private readonly languageService: I18nService,
 		private readonly notificationGateway: NotificationGateway,
-		@InjectRepository(Schedule) private readonly scheduleRepository: Repository<Schedule>
+		private readonly prisma: PrismaService
 	) {}
 
-	async execute(scheduleId: number, specialistId: number, confirmed: number) {
+	async execute(scheduleId: number, specialistId: number, confirmed: boolean) {
 		this.logger.log('Find schedule with given schedule and specialist id')
-		const foundSchedule = await this.scheduleRepository.findOne({
+		const foundSchedule = await this.prisma.schedule.findFirst({
 			where: {
 				id: scheduleId,
 				specialistId
@@ -39,7 +37,7 @@ export class ConfirmUseCase {
 		}
 
 		this.logger.log('Confirming schedule')
-		await this.scheduleRepository.save({ id: scheduleId, confirmed })
+		await this.prisma.schedule.update({ where: { id: scheduleId }, data: { confirmed } })
 
 		this.notificationGateway.sendAppointmentConfirmation({ ...foundSchedule, confirmed })
 
