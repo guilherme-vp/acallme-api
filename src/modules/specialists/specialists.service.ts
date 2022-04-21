@@ -28,7 +28,7 @@ export class SpecialistService {
 		return this.loginUseCase.execute(input)
 	}
 
-	async findById(id: number, select?: (keyof Specialist)[]) {
+	async findById(id: number, select?: Record<keyof Specialist, boolean>) {
 		return this.findByIdUseCase.execute(id, select)
 	}
 
