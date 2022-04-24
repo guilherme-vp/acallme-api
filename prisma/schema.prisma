@@ -43,7 +43,7 @@ model Specialist {
   phone               String
   birth               DateTime              @db.Date
   gender              Gender
-  description         String?               @db.VarChar(1000)
+  about               String?               @db.VarChar(1000)
   avatarUrl           String?               @db.VarChar(200)
   cost                Decimal               @db.Decimal(5, 2)
   cnpj                String?               @unique
