@@ -37,14 +37,14 @@ export class FindManyUseCase {
 			this.logger.log('Adding specialistId')
 			keys.specialistId = +specialistId
 		}
-		if (endsAt) {
-			this.logger.log('Adding endsAt')
-			keys.endsAt = new Date(endsAt)
-		}
-		if (startsAt) {
-			this.logger.log('Adding startsAt')
-			keys.startsAt = new Date(startsAt)
-		}
+		// if (endsAt) {
+		// 	this.logger.log('Adding endsAt')
+		// 	keys.endsAt = new Date(endsAt)
+		// }
+		// if (startsAt) {
+		// 	this.logger.log('Adding startsAt')
+		// 	keys.startsAt = new Date(startsAt)
+		// }
 		if (confirmed) {
 			this.logger.log('Adding confirmed')
 			keys.confirmed = JSON.parse(confirmed)
@@ -55,7 +55,7 @@ export class FindManyUseCase {
 		}
 
 		const foundSchedules = await this.prisma.schedule.findMany({
-			where: keys
+			// where: keys
 		})
 
 		return foundSchedules

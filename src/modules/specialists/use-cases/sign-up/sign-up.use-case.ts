@@ -121,19 +121,25 @@ export class SignUpUseCase implements BaseUseCase<Specialist> {
 			email,
 			password,
 			name,
-			birth: format(new Date(birth), 'yyyy-MM-dd'),
+			birth: new Date(birth),
 			cpf,
 			cnpj,
 			phone: formattedPhone,
 			crm,
 			crp,
-			specialties: currentSpecialties,
 			avatarUrl
 		}
 
 		this.logger.log('Creating specialist with given data: ', creationData)
 		const createdSpecialist = await this.prisma.specialist.create({
-			data: creationData
+			data: {
+				...creationData,
+				specialistSpecialty: {
+					createMany: {
+						data: currentSpecialties.map(({ id }) => ({ specialtyId: id }))
+					}
+				}
+			}
 		})
 
 		this.logger.log('Creating JWT for created Specialist')

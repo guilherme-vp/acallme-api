@@ -20,7 +20,7 @@ export class FindByIdUseCase implements BaseUseCase<Patient> {
 		this.logger.log('Searching for patient with given id')
 		const foundPatient = await this.prisma.patient.findUnique({
 			where: { id },
-			select: { password: false, ...select }
+			select
 		})
 
 		if (!foundPatient) {
