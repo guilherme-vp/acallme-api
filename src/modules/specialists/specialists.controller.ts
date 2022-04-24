@@ -61,8 +61,6 @@ export class SpecialistsController {
 	async findMany(@Query() queries: FindManyDto) {
 		const data = await this.specialistService.findMany(queries)
 
-		return {
-			specialists: data
-		}
+		return data
 	}
 }
