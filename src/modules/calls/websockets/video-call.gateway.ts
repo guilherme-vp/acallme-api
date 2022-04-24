@@ -57,6 +57,7 @@ export class VideoCallGateway
 			const newPatient = { ...patient, socketId: client.id }
 
 			this.patients.push(newPatient)
+			this.logger.log(newPatient, 'A new patient entered')
 			return client.emit(WsEvents.ME, client.id)
 		}
 
@@ -64,7 +65,7 @@ export class VideoCallGateway
 			const newSpecialist = { ...specialist, socketId: client.id }
 
 			this.specialists.push(newSpecialist)
-
+			this.logger.log(newSpecialist, 'A new specialist entered')
 			return client.emit(WsEvents.ME, client.id)
 		}
 
@@ -72,11 +73,12 @@ export class VideoCallGateway
 	}
 
 	sendCallCloseNotification(scheduleId: number) {
+		this.logger.warn({ scheduleId }, 'Sending close notification to room')
 		this.server.to(`room-${scheduleId}`).emit(WsEvents.SEND_CLOSE_NOTIFICATION)
 	}
 
 	@SubscribeMessage(WsEvents.SEND_MESSAGE)
-	// @UseGuards(WsAuthGuard)
+	@UseGuards(WsAuthGuard)
 	sendMessage(
 		@MessageBody()
 		messageData: {
@@ -89,7 +91,7 @@ export class VideoCallGateway
 	) {
 		const { room, ...data } = messageData
 
-		const userRole = client.handshake.auth.role
+		const { role: userRole } = client.handshake.auth
 
 		const sender =
 			userRole === Role.Patient
@@ -104,7 +106,7 @@ export class VideoCallGateway
 	}
 
 	@SubscribeMessage(WsEvents.UPDATE_MEDIA)
-	// @UseGuards(WsAuthGuard)
+	@UseGuards(WsAuthGuard)
 	updateMedia(
 		@MessageBody()
 		data: {
@@ -115,6 +117,8 @@ export class VideoCallGateway
 		@ConnectedSocket() client: Socket
 	) {
 		const { room, ...rest } = data
+
+		this.logger.log({ room }, 'Emitting updated media to room')
 
 		this.server
 			.to(room)
@@ -139,18 +143,22 @@ export class VideoCallGateway
 		const roomIndex = this.rooms.findIndex(({ name }) => name === room)
 
 		if (roomIndex === -1) {
+			this.logger.log({ room, signal }, 'Creating room with given signal')
 			this.rooms.push({ name: room, peers: [signal] })
 		} else {
 			const roomPosition = this.rooms[roomIndex]
 
+			this.logger.log({ room, signal }, 'Adding peer and signal to room')
 			this.rooms[roomIndex] = {
 				...roomPosition,
 				peers: [...roomPosition.peers, signal]
 			}
 		}
 
+		this.logger.log('Adding socket to room')
 		client.join(room)
 
+		this.logger.warn('Emitting ENTER CALL event to room')
 		this.server.to(room).emit(WsEvents.ENTER_CALL, {
 			socketId: client.id,
 			signal,
