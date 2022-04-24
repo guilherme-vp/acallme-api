@@ -19,7 +19,7 @@ export class SignUpDto {
 	@Length(2, 50)
 	name!: string
 
-	@Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{6,}$/)
+	@Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9]).{6,}$/)
 	@IsString()
 	password!: string
 
@@ -27,8 +27,9 @@ export class SignUpDto {
 	file?: Express.Multer.File
 
 	@IsString()
-	@Length(11, 14)
-	cnpj!: string
+	// @Length(11, 14)
+	@IsOptional()
+	cnpj?: string
 
 	@IsString()
 	@Length(11, 14)
