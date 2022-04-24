@@ -1,8 +1,7 @@
-import { UserToken } from '@common/domain/base'
 import { Role } from '@common/domain/enums'
 import { PatientService } from '@modules/patients/patients.service'
 import { SpecialistService } from '@modules/specialists/specialists.service'
-import { CanActivate, Injectable } from '@nestjs/common'
+import { CanActivate, Injectable, Logger } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { WsException } from '@nestjs/websockets'
 import { I18nService } from 'nestjs-i18n'
@@ -10,6 +9,8 @@ import { Socket } from 'socket.io'
 
 @Injectable()
 export class WsAuthGuard implements CanActivate {
+	private logger: Logger = new Logger('WS-Auth-Guard')
+
 	constructor(
 		private readonly jwtService: JwtService,
 		private readonly languageService: I18nService,
@@ -20,50 +21,36 @@ export class WsAuthGuard implements CanActivate {
 	async canActivate(context: any): Promise<boolean> {
 		const request = context.switchToWs().getClient() as Socket
 
-		const authHeader = request.handshake.headers['authorization']
-
-		if (!authHeader) {
+		if (!request.handshake.auth) {
 			throw new WsException(await this.languageService.translate('auth.not-authorized'))
 		}
 
-		const splitted = authHeader.split(' ')
-
-		if (!splitted[1]) {
-			throw new WsException(await this.languageService.translate('auth.not-authorized'))
-		}
-
-		const token = splitted[1]
-
-		let decoded: UserToken
-
-		try {
-			decoded = await this.jwtService.verifyAsync(token)
-		} catch {
-			throw new WsException(await this.languageService.translate('auth.not-authorized'))
-		}
+		const decoded = request.handshake.auth
 
 		if (decoded.role === Role.Patient) {
 			const patient = await this.patientService.findById(decoded.id)
 
 			if (!patient) {
+				this.logger.error('Patient does not exist')
 				throw new WsException(
 					await this.languageService.translate('auth.user-does-not-exists')
 				)
 			}
 
-			request.handshake.auth = { ...patient, role: Role.Patient }
+			request.data = { ...patient, role: Role.Patient }
 		}
 
 		if (decoded.role === Role.Specialist) {
 			const specialist = await this.specialistService.findById(decoded.id)
 
 			if (!specialist) {
+				this.logger.error('Specialist is invalid')
 				throw new WsException(
 					await this.languageService.translate('auth.user-does-not-exists')
 				)
 			}
 
-			request.handshake.auth = { ...specialist, role: Role.Specialist }
+			request.data = { ...specialist, role: Role.Specialist }
 		}
 
 		return true
