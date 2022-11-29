@@ -199,7 +199,7 @@ export class TaskService {
 					return
 				}
 
-				this.videoCallGateway.sendCallCloseNotification(id)
+				this.videoCallGateway.sendCallCloseNotification(`room-${id}`)
 			})
 		)
 	}
