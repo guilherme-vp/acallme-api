@@ -14,9 +14,11 @@ export class FindManyUseCase implements BaseUseCase<Specialist> {
 		const { email, limit = 9, name, page = 1, specialties } = where
 
 		this.logger.log(
-			'Searching and returning specialists with given limit and page: ',
-			limit,
-			page
+			{
+				limit,
+				page
+			},
+			'Searching and returning specialists with given limit and page: '
 		)
 		const foundSpecialists = await this.prisma.specialist.findMany({
 			take: +limit,

@@ -11,7 +11,7 @@ export class MailerService {
 			await this.mailerService.sendMail({
 				from: {
 					name: 'ACall me',
-					address: 'acallme.vortechs@gmail.com'
+					address: 'admin@acallme.com.br'
 				},
 				...message
 			})

@@ -1,4 +1,3 @@
-/* eslint-disable import/extensions */
 import { UserToken } from '@common/domain/base'
 import { Role } from '@common/domain/enums'
 import { PatientService } from '@modules/patients/patients.service'
@@ -27,7 +26,6 @@ export class AuthGuard implements CanActivate {
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
-		this.logger.log('Getting HTTP Request')
 		const request = context.switchToHttp().getRequest() as Request
 
 		const authHeader = request.headers['authorization']
@@ -40,7 +38,6 @@ export class AuthGuard implements CanActivate {
 			)
 		}
 
-		this.logger.log('Split authorization header')
 		const splitted = authHeader.split(' ')
 
 		if (!splitted[1]) {

@@ -8,7 +8,6 @@ import { JwtService } from '@nestjs/jwt'
 import { CryptService } from '@services/crypt'
 import { MailerService } from '@services/mail'
 import { PrismaService } from '@services/prisma'
-import { format } from 'date-fns'
 import { I18nService } from 'nestjs-i18n'
 import { v4 as uuid } from 'uuid'
 
@@ -164,7 +163,6 @@ export class SignUpUseCase implements BaseUseCase<Specialist> {
 		// eslint-disable-next-line @typescript-eslint/no-unused-vars
 		const { password: createdPassword, ...specialistWithoutPassword } = createdSpecialist
 
-		this.logger.log('Returning token and specialist')
 		return {
 			token: createdToken,
 			specialist: specialistWithoutPassword

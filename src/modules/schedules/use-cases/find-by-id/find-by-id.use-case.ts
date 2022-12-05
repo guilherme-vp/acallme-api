@@ -12,10 +12,7 @@ export class FindByIdUseCase {
 		private readonly prisma: PrismaService
 	) {}
 
-	async execute(
-		id: number,
-		select?: Record<keyof Schedule, boolean>
-	): Promise<Schedule | null> {
+	async execute(id: number, select?: Record<keyof Schedule, boolean>): Promise<Schedule> {
 		this.logger.log('Searching for schedule with given id')
 		const foundSchedule = await this.prisma.schedule.findUnique({ where: { id }, select })
 

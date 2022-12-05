@@ -14,7 +14,7 @@ export class SchedulesController {
 
 	@UseGuards(AuthGuard, RolesGuard, CallGuard)
 	@Roles(Role.Specialist)
-	@Post('confirm/:scheduleId')
+	@Post('confirm/:id')
 	async confirmSchedule(
 		@Param('id') id: string,
 		@Specialist('id') specialistId: number,

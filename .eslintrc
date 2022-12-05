@@ -55,13 +55,7 @@
 				"allowIndentationTabs": true
 			}
 		],
-		"indent": [
-			"error",
-			"tab",
-			{
-				"SwitchCase": 1
-			}
-		],
+		"indent": "off",
 		"lines-between-class-members": "off",
 		"no-param-reassign": "off",
 		"no-nested-ternary": "off",

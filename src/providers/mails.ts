@@ -5,7 +5,7 @@ import { WelcomeMailVars, generateWelcomeMail } from '@core/views/mails'
 
 export const welcomeEmailProps = (args: WelcomeMailVars): IReturnMail => {
 	return {
-		subject: 'Estamos felizes que você está conosco!',
+		subject: 'Estamos felizes por você estar conosco!',
 		html: generateWelcomeMail(args),
 		attachments: [
 			{
