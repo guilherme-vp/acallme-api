@@ -3,7 +3,7 @@ import path from 'path'
 import { Module, Global } from '@nestjs/common'
 import {
 	I18nModule,
-	I18nJsonParser as LocaleParser,
+	I18nJsonLoader,
 	HeaderResolver,
 	AcceptLanguageResolver
 } from 'nestjs-i18n'
@@ -13,9 +13,10 @@ import {
 	imports: [
 		I18nModule.forRoot({
 			fallbackLanguage: 'pt-BR',
-			parser: LocaleParser,
-			parserOptions: {
-				path: path.join(__dirname, '/locales/')
+			loader: I18nJsonLoader,
+			loaderOptions: {
+				path: path.join(__dirname, '/locales/'),
+				watch: true
 			},
 			resolvers: [new HeaderResolver(['x-custom-lang']), AcceptLanguageResolver]
 		})
