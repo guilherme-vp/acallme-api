@@ -1,3 +1,4 @@
+import { NotificationGateway } from '@modules/notifications/gateways'
 import { CreateDto } from '@modules/schedules/dtos'
 import { Schedule } from '@modules/schedules/entities'
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
@@ -10,6 +11,7 @@ export class CreateUseCase {
 	private logger: Logger = new Logger('CreateSchedule')
 
 	constructor(
+		private readonly notificationGateway: NotificationGateway,
 		private readonly languageService: I18nService,
 		private readonly prisma: PrismaService
 	) {}
@@ -48,6 +50,8 @@ export class CreateUseCase {
 				endsAt
 			}
 		})
+
+		await this.notificationGateway.sendNewAppointment(createdSchedule)
 
 		this.logger.log('Returning created schedule')
 		return createdSchedule

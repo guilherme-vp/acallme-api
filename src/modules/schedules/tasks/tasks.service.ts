@@ -1,5 +1,5 @@
-import { NotificationGateway } from '@common/gateways/notification.gateway'
 import { VideoCallGateway } from '@modules/calls/websockets'
+import { NotificationGateway } from '@modules/notifications/gateways'
 import { PatientService } from '@modules/patients/patients.service'
 import { SpecialistService } from '@modules/specialists/specialists.service'
 import { Injectable } from '@nestjs/common'

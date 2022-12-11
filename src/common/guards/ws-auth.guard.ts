@@ -1,8 +1,7 @@
 import { Role } from '@common/domain/enums'
 import { PatientService } from '@modules/patients/patients.service'
 import { SpecialistService } from '@modules/specialists/specialists.service'
-import { CanActivate, Injectable, Logger } from '@nestjs/common'
-import { JwtService } from '@nestjs/jwt'
+import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common'
 import { WsException } from '@nestjs/websockets'
 import { I18nService } from 'nestjs-i18n'
 import { Socket } from 'socket.io'
@@ -12,13 +11,13 @@ export class WsAuthGuard implements CanActivate {
 	private logger: Logger = new Logger('WS-Auth-Guard')
 
 	constructor(
-		private readonly jwtService: JwtService,
 		private readonly languageService: I18nService,
 		private readonly patientService: PatientService,
 		private readonly specialistService: SpecialistService
 	) {}
 
-	async canActivate(context: any): Promise<boolean> {
+	async canActivate(context: ExecutionContext): Promise<boolean> {
+		this.logger.log('Getting user auth')
 		const request = context.switchToWs().getClient() as Socket
 
 		if (!request.handshake.auth) {

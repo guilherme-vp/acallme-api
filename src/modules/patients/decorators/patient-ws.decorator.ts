@@ -9,6 +9,10 @@ export const PatientWs = createParamDecorator(
 
 		const { auth } = request.handshake
 
+		if (auth.role !== 'patient') {
+			return null
+		}
+
 		if (auth) {
 			return data ? auth[data] : auth
 		}

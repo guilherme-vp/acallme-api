@@ -1,7 +1,6 @@
-import { Gateways as CommonGateways } from '@common/gateways'
 import { CallsModule } from '@modules/calls/calls.module'
 import { CallService } from '@modules/calls/calls.service'
-import { Gateways as CallGateways } from '@modules/calls/websockets'
+import { NotificationsModule } from '@modules/notifications/notifications.module'
 import { Global, Logger, Module } from '@nestjs/common'
 
 import { SchedulesController } from './schedules.controller'
@@ -11,17 +10,9 @@ import { UseCases } from './use-cases'
 
 @Global()
 @Module({
-	imports: [CallsModule],
+	imports: [CallsModule, NotificationsModule],
 	controllers: [SchedulesController],
-	providers: [
-		...UseCases,
-		...CommonGateways,
-		...CallGateways,
-		TaskService,
-		CallService,
-		SchedulesService,
-		Logger
-	],
+	providers: [...UseCases, TaskService, CallService, SchedulesService, Logger],
 	exports: [SchedulesService, TaskService]
 })
 export class SchedulesModule {}

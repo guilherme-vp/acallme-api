@@ -1,4 +1,4 @@
-import { NotificationGateway } from '@common/gateways'
+import { NotificationGateway } from '@modules/notifications/gateways'
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { PrismaService } from '@services/prisma'
 import { I18nService } from 'nestjs-i18n'
