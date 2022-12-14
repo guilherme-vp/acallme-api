@@ -1,4 +1,3 @@
-import { UserGender } from '@common/domain/enums'
 import { Exclude } from 'class-transformer'
 import {
 	IsDateString,
@@ -10,6 +9,8 @@ import {
 	Matches,
 	MinLength
 } from 'class-validator'
+
+import { UserGender } from '@common/domain/enums'
 
 export class SignUpDto {
 	@IsEmail()

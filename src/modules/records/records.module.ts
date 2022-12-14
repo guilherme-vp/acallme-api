@@ -1,5 +1,6 @@
-import { CallService } from '@modules/calls/calls.service'
 import { Global, Module } from '@nestjs/common'
+
+import { CallService } from '@modules/calls/calls.service'
 
 import { RecordsController } from './records.controller'
 import { RecordService } from './records.service'

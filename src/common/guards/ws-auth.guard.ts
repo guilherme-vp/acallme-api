@@ -1,10 +1,11 @@
-import { Role } from '@common/domain/enums'
-import { PatientService } from '@modules/patients/patients.service'
-import { SpecialistService } from '@modules/specialists/specialists.service'
 import { CanActivate, ExecutionContext, Injectable, Logger } from '@nestjs/common'
 import { WsException } from '@nestjs/websockets'
 import { I18nService } from 'nestjs-i18n'
-import { Socket } from 'socket.io'
+
+import { Role } from '@common/domain/enums'
+
+import { PatientService } from '@modules/patients/patients.service'
+import { SpecialistService } from '@modules/specialists/specialists.service'
 
 @Injectable()
 export class WsAuthGuard implements CanActivate {
@@ -18,7 +19,7 @@ export class WsAuthGuard implements CanActivate {
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
 		this.logger.log('Getting user auth')
-		const request = context.switchToWs().getClient() as Socket
+		const request = context.switchToWs().getClient()
 
 		if (!request.handshake.auth) {
 			throw new WsException(await this.languageService.translate('auth.not-authorized'))

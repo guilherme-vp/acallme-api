@@ -1,11 +1,3 @@
-import { WsAuthGuard } from '@common/guards/ws-auth.guard'
-import { PatientWs } from '@modules/patients/decorators'
-import { Patient } from '@modules/patients/entities'
-import { PatientService } from '@modules/patients/patients.service'
-import { Schedule } from '@modules/schedules/entities'
-import { SpecialistWs } from '@modules/specialists/decorators'
-import { Specialist } from '@modules/specialists/entities'
-import { SpecialistService } from '@modules/specialists/specialists.service'
 import { Logger, UseFilters, UseGuards } from '@nestjs/common'
 import {
 	BaseWsExceptionFilter,
@@ -19,6 +11,16 @@ import {
 } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
 import { v4 as uuidv4 } from 'uuid'
+
+import { WsAuthGuard } from '@common/guards/ws-auth.guard'
+
+import { PatientWs } from '@modules/patients/decorators'
+import { Patient } from '@modules/patients/entities'
+import { PatientService } from '@modules/patients/patients.service'
+import { Schedule } from '@modules/schedules/entities'
+import { SpecialistWs } from '@modules/specialists/decorators'
+import { Specialist } from '@modules/specialists/entities'
+import { SpecialistService } from '@modules/specialists/specialists.service'
 
 import { NotificationModel } from '../entities'
 import { NotificationsEnum, NotificationsWsEvents } from '../entities/enums'
@@ -34,9 +36,11 @@ export class NotificationGateway
 	) {}
 
 	@WebSocketServer() server!: Server
+
 	private logger: Logger = new Logger('NotificationGateway')
 
 	public patients: (Patient & { socketId: string })[] = []
+
 	public specialists: (Specialist & { socketId: string })[] = []
 
 	public afterInit(): void {

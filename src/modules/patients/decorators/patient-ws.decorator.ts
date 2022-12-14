@@ -1,11 +1,10 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common'
-import { Socket } from 'socket.io'
 
 import { Patient } from '../entities'
 
 export const PatientWs = createParamDecorator(
 	(data: keyof Patient, context: ExecutionContext) => {
-		const request = context.switchToWs().getClient() as Socket
+		const request = context.switchToWs().getClient()
 
 		const { auth } = request.handshake
 

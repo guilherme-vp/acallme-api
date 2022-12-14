@@ -1,5 +1,6 @@
-import { SECRET, mailConfig, PORT } from '@common/constants/configuration'
 import { MailerOptions } from '@nestjs-modules/mailer'
+
+import { SECRET, mailConfig, PORT } from '@common/constants/configuration'
 
 export interface AppConfig {
 	nest: NestConfig

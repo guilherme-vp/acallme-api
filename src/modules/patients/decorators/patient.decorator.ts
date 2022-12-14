@@ -1,10 +1,11 @@
-import { SECRET } from '@common/constants/configuration'
 import {
 	createParamDecorator,
 	ExecutionContext,
 	UnauthorizedException
 } from '@nestjs/common'
 import jwt from 'jsonwebtoken'
+
+import { SECRET } from '@common/constants/configuration'
 
 import { Patient as PatientEntity } from '../entities'
 

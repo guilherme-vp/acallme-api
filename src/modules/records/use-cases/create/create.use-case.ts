@@ -1,8 +1,10 @@
+import { BadRequestException, Injectable, Logger } from '@nestjs/common'
+import { I18nService } from 'nestjs-i18n'
+
 import { CallService } from '@modules/calls/calls.service'
 import { Record } from '@modules/records/entities'
-import { BadRequestException, Injectable, Logger } from '@nestjs/common'
+
 import { PrismaService } from '@services/prisma'
-import { I18nService } from 'nestjs-i18n'
 
 import { CreateDto } from '../../dtos'
 

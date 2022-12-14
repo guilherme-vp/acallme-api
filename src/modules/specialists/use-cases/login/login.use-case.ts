@@ -1,10 +1,12 @@
-import { LoginDto } from '@modules/specialists/dtos'
-import { Specialist } from '@modules/specialists/entities'
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
+import { I18nService } from 'nestjs-i18n'
+
+import { LoginDto } from '@modules/specialists/dtos'
+import { Specialist } from '@modules/specialists/entities'
+
 import { CryptService } from '@services/crypt'
 import { PrismaService } from '@services/prisma'
-import { I18nService } from 'nestjs-i18n'
 
 @Injectable()
 export class LoginUseCase {
@@ -54,10 +56,7 @@ export class LoginUseCase {
 		const { id, password: specialistPassword } = foundSpecialist
 
 		this.logger.log('Comparing passwords')
-		const comparedPassword = await this.cryptService.compare(
-			password,
-			specialistPassword as string
-		)
+		const comparedPassword = await this.cryptService.compare(password, specialistPassword)
 
 		if (!comparedPassword) {
 			this.logger.error('Incorrect password')

@@ -1,10 +1,11 @@
-import { NestConfig } from '@common/config'
-import { HttpExceptionFilter } from '@common/filters'
-import { ValidationPipe } from '@common/pipes'
 import { Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import { NestExpressApplication } from '@nestjs/platform-express'
+
+import { NestConfig } from '@common/config'
+import { HttpExceptionFilter } from '@common/filters'
+import { ValidationPipe } from '@common/pipes'
 
 import { AppModule } from './app.module'
 

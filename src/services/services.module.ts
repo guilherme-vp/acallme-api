@@ -1,8 +1,9 @@
-import { SecurityConfig } from '@common/config'
 import { Global, Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { JwtModule } from '@nestjs/jwt'
 import { ScheduleModule } from '@nestjs/schedule'
+
+import { SecurityConfig } from '@common/config'
 
 import { CryptService } from './crypt'
 import { LanguageModule } from './language'
@@ -10,7 +11,7 @@ import { MailerModule } from './mail'
 import { PrismaModule } from './prisma'
 
 const jwtModule = JwtModule.registerAsync({
-	useFactory: async (configService: ConfigService) => {
+	useFactory: (configService: ConfigService) => {
 		const securityConfig = configService.get<SecurityConfig>('security')
 		return {
 			secret: securityConfig?.secret,

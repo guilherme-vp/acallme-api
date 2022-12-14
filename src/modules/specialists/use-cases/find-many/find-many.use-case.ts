@@ -1,7 +1,10 @@
+import { Injectable, Logger } from '@nestjs/common'
+
 import { BaseUseCase } from '@common/domain/base'
+
 import { FindManyDto } from '@modules/specialists/dtos'
 import { Specialist } from '@modules/specialists/entities'
-import { Injectable, Logger } from '@nestjs/common'
+
 import { PrismaService } from '@services/prisma'
 
 @Injectable()

@@ -1,7 +1,3 @@
-import { UserToken } from '@common/domain/base'
-import { Role } from '@common/domain/enums'
-import { PatientService } from '@modules/patients/patients.service'
-import { SpecialistService } from '@modules/specialists/specialists.service'
 import {
 	Injectable,
 	CanActivate,
@@ -11,8 +7,13 @@ import {
 	Logger
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
-import { Request } from 'express'
 import { I18nService } from 'nestjs-i18n'
+
+import { UserToken } from '@common/domain/base'
+import { Role } from '@common/domain/enums'
+
+import { PatientService } from '@modules/patients/patients.service'
+import { SpecialistService } from '@modules/specialists/specialists.service'
 
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -26,9 +27,9 @@ export class AuthGuard implements CanActivate {
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const request = context.switchToHttp().getRequest() as Request
+		const request = context.switchToHttp().getRequest()
 
-		const authHeader = request.headers['authorization']
+		const authHeader = request.headers.authorization
 
 		if (!authHeader) {
 			this.logger.error('No authorization header given')

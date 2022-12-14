@@ -1,10 +1,12 @@
-import { LoginDto } from '@modules/patients/dtos'
-import { Patient } from '@modules/patients/entities'
 import { BadRequestException, Injectable, Logger, NotFoundException } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
+import { I18nService } from 'nestjs-i18n'
+
+import { LoginDto } from '@modules/patients/dtos'
+import { Patient } from '@modules/patients/entities'
+
 import { CryptService } from '@services/crypt'
 import { PrismaService } from '@services/prisma'
-import { I18nService } from 'nestjs-i18n'
 
 @Injectable()
 export class LoginUseCase {

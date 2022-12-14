@@ -1,9 +1,11 @@
+import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common'
+
 import { Roles } from '@common/decorators'
 import { Role } from '@common/domain/enums'
 import { AuthGuard, CallGuard, RolesGuard } from '@common/guards'
+
 import { Patient } from '@modules/patients/decorators'
 import { Specialist } from '@modules/specialists/decorators'
-import { Body, Controller, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common'
 
 import { CreateDto, DisableDto, FindManyDto } from './dtos'
 import { SchedulesService } from './schedules.service'

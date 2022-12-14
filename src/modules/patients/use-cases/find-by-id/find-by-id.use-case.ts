@@ -1,8 +1,11 @@
-import { BaseUseCase } from '@common/domain/base'
-import { Patient } from '@modules/patients/entities'
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
-import { PrismaService } from '@services/prisma'
 import { I18nService } from 'nestjs-i18n'
+
+import { BaseUseCase } from '@common/domain/base'
+
+import { Patient } from '@modules/patients/entities'
+
+import { PrismaService } from '@services/prisma'
 
 @Injectable()
 export class FindByIdUseCase implements BaseUseCase<Patient> {

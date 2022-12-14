@@ -1,6 +1,8 @@
+import { Injectable } from '@nestjs/common'
+
 import { FindManyDto } from '@modules/schedules/dtos'
 import { Schedule } from '@modules/schedules/entities'
-import { Injectable } from '@nestjs/common'
+
 import { PrismaService } from '@services/prisma'
 
 @Injectable()

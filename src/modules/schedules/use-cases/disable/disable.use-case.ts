@@ -1,8 +1,10 @@
-import { NotificationGateway } from '@modules/notifications/gateways'
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
-import { PrismaService } from '@services/prisma'
 import { startOfHour } from 'date-fns'
 import { I18nService } from 'nestjs-i18n'
+
+import { NotificationGateway } from '@modules/notifications/gateways'
+
+import { PrismaService } from '@services/prisma'
 
 import { DisableDto } from '../../dtos'
 

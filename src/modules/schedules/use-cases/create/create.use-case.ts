@@ -1,10 +1,12 @@
+import { BadRequestException, Injectable, Logger } from '@nestjs/common'
+import { differenceInHours, startOfHour } from 'date-fns'
+import { I18nService } from 'nestjs-i18n'
+
 import { NotificationGateway } from '@modules/notifications/gateways'
 import { CreateDto } from '@modules/schedules/dtos'
 import { Schedule } from '@modules/schedules/entities'
-import { BadRequestException, Injectable, Logger } from '@nestjs/common'
+
 import { PrismaService } from '@services/prisma'
-import { differenceInHours, startOfHour } from 'date-fns'
-import { I18nService } from 'nestjs-i18n'
 
 @Injectable()
 export class CreateUseCase {

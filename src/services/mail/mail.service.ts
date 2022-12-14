@@ -1,6 +1,7 @@
-import { IMessage } from '@core/types/email-args'
 import { MailerService as NestMailerService } from '@nestjs-modules/mailer'
 import { Injectable } from '@nestjs/common'
+
+import { IMessage } from '@core/types/email-args'
 
 @Injectable()
 export class MailerService {

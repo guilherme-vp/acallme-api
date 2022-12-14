@@ -1,4 +1,3 @@
-import { SchedulesService } from '@modules/schedules/schedules.service'
 import {
 	Injectable,
 	CanActivate,
@@ -6,8 +5,9 @@ import {
 	BadRequestException,
 	Logger
 } from '@nestjs/common'
-import { Request } from 'express'
 import { I18nService } from 'nestjs-i18n'
+
+import { SchedulesService } from '@modules/schedules/schedules.service'
 
 @Injectable()
 export class CallGuard implements CanActivate {
@@ -19,9 +19,9 @@ export class CallGuard implements CanActivate {
 	) {}
 
 	async canActivate(context: ExecutionContext): Promise<boolean> {
-		const { user, params } = context.switchToHttp().getRequest() as Request
+		const { user, params } = context.switchToHttp().getRequest()
 
-		if (!(params as any).id) {
+		if (!params.id) {
 			this.logger.log('No schedule id provided')
 			throw new BadRequestException(
 				await this.languageService.translate('schedule.no-schedule-id')

@@ -1,7 +1,9 @@
-import { Schedule } from '@modules/schedules/entities'
 import { Injectable, Logger, NotFoundException } from '@nestjs/common'
-import { PrismaService } from '@services/prisma'
 import { I18nService } from 'nestjs-i18n'
+
+import { Schedule } from '@modules/schedules/entities'
+
+import { PrismaService } from '@services/prisma'
 
 @Injectable()
 export class FindByIdUseCase {

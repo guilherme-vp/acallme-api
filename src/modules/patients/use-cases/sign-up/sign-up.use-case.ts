@@ -1,15 +1,18 @@
-import { BaseUseCase } from '@common/domain/base'
-import { uploadStream } from '@common/utils'
-import { welcomeEmailProps } from '@core/providers'
-import { SignUpDto } from '@modules/patients/dtos'
-import { Patient } from '@modules/patients/entities'
 import { BadRequestException, Injectable, Logger } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
+import { I18nService } from 'nestjs-i18n'
+import { v4 as uuid } from 'uuid'
+
+import { BaseUseCase } from '@common/domain/base'
+import { uploadStream } from '@common/utils'
+
+import { SignUpDto } from '@modules/patients/dtos'
+import { Patient } from '@modules/patients/entities'
+
+import { welcomeEmailProps } from '@core/providers'
 import { CryptService } from '@services/crypt'
 import { MailerService } from '@services/mail'
 import { PrismaService } from '@services/prisma'
-import { I18nService } from 'nestjs-i18n'
-import { v4 as uuid } from 'uuid'
 
 @Injectable()
 export class SignUpUseCase implements BaseUseCase<Patient> {

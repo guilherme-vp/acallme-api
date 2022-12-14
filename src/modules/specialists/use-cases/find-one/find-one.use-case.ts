@@ -1,8 +1,11 @@
 /* eslint-disable indent */
+import { Injectable } from '@nestjs/common'
+
 import { BaseUseCase } from '@common/domain/base'
+
 import { FindOneDto } from '@modules/specialists/dtos'
 import { Specialist } from '@modules/specialists/entities'
-import { Injectable } from '@nestjs/common'
+
 import { PrismaService } from '@services/prisma'
 
 @Injectable()

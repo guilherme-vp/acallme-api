@@ -14,7 +14,7 @@ describe('LanguageModule', () => {
 		languageService = module.get(I18nService)
 	})
 
-	it('language service should be defined', async () => {
+	it('language service should be defined', () => {
 		expect(languageService).toBeTruthy()
 	})
 

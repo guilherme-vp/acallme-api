@@ -1,9 +1,11 @@
+import { BadRequestException, Injectable, Logger } from '@nestjs/common'
+import { I18nService } from 'nestjs-i18n'
+
 import { CreateDto } from '@modules/calls/dtos'
 import { Call } from '@modules/calls/entities'
 import { SchedulesService } from '@modules/schedules/schedules.service'
-import { BadRequestException, Injectable, Logger } from '@nestjs/common'
+
 import { PrismaService } from '@services/prisma'
-import { I18nService } from 'nestjs-i18n'
 
 @Injectable()
 export class CreateUseCase {

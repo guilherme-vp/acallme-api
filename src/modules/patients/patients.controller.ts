@@ -1,7 +1,8 @@
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common'
+
 import { Roles } from '@common/decorators'
 import { Role } from '@common/domain/enums'
 import { AuthGuard, RolesGuard } from '@common/guards'
-import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common'
 
 import { Patient } from './decorators'
 import { LoginDto, SignUpDto } from './dtos'

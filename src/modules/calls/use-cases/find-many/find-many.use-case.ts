@@ -1,5 +1,7 @@
-import { Call } from '@modules/calls/entities'
 import { Injectable, Logger } from '@nestjs/common'
+
+import { Call } from '@modules/calls/entities'
+
 import { PrismaService } from '@services/prisma'
 
 import { FindManyDto } from '../../dtos'

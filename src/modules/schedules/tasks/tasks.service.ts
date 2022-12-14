@@ -1,11 +1,5 @@
-import { VideoCallGateway } from '@modules/calls/websockets'
-import { NotificationGateway } from '@modules/notifications/gateways'
-import { PatientService } from '@modules/patients/patients.service'
-import { SpecialistService } from '@modules/specialists/specialists.service'
 import { Injectable } from '@nestjs/common'
 import { Cron, CronExpression } from '@nestjs/schedule'
-import { MailerService } from '@services/mail'
-import { PrismaService } from '@services/prisma'
 import {
 	startOfToday,
 	endOfToday,
@@ -15,6 +9,14 @@ import {
 	format,
 	addHours
 } from 'date-fns'
+
+import { VideoCallGateway } from '@modules/calls/websockets'
+import { NotificationGateway } from '@modules/notifications/gateways'
+import { PatientService } from '@modules/patients/patients.service'
+import { SpecialistService } from '@modules/specialists/specialists.service'
+
+import { MailerService } from '@services/mail'
+import { PrismaService } from '@services/prisma'
 
 import { SchedulesService } from '../schedules.service'
 

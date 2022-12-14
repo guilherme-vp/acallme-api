@@ -1,6 +1,3 @@
-import { Roles } from '@common/decorators'
-import { Role } from '@common/domain/enums'
-import { AuthGuard, RolesGuard } from '@common/guards'
 import {
 	Controller,
 	Get,
@@ -13,6 +10,10 @@ import {
 	UploadedFile
 } from '@nestjs/common'
 import { FileInterceptor } from '@nestjs/platform-express'
+
+import { Roles } from '@common/decorators'
+import { Role } from '@common/domain/enums'
+import { AuthGuard, RolesGuard } from '@common/guards'
 
 import { Specialist } from './decorators'
 import { FindManyDto, LoginDto, SignUpDto } from './dtos'

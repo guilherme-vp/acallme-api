@@ -33,8 +33,8 @@ describe('CryptService', () => {
 
 			const promise = cryptService.encrypt(str)
 
-			expect(promise).resolves.toBeDefined()
-			expect(promise).resolves.toEqual(hashedStr)
+			await expect(promise).resolves.toBeDefined()
+			await expect(promise).resolves.toEqual(hashedStr)
 		})
 
 		it('should return false if compare is falsy', async () => {
@@ -45,8 +45,8 @@ describe('CryptService', () => {
 
 			const promise = cryptService.compare(str, hashedStr)
 
-			expect(promise).resolves.toBeDefined()
-			expect(promise).resolves.toBeFalsy()
+			await expect(promise).resolves.toBeDefined()
+			await expect(promise).resolves.toBeFalsy()
 		})
 
 		it('should return true if compare is truthy', async () => {
@@ -57,8 +57,8 @@ describe('CryptService', () => {
 
 			const promise = cryptService.compare(str, hashedStr)
 
-			expect(promise).resolves.toBeDefined()
-			expect(promise).resolves.toBeTruthy()
+			await expect(promise).resolves.toBeDefined()
+			await expect(promise).resolves.toBeTruthy()
 		})
 	})
 })

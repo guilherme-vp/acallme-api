@@ -1,5 +1,6 @@
 import { Role } from '@common/domain/enums'
 import { UserModel } from '@common/domain/models'
+
 import { Call } from '@modules/calls/entities'
 import { Schedule } from '@modules/schedules/entities'
 

@@ -1,7 +1,3 @@
-import { WsEvents } from '@common/domain/enums'
-import { WsAuthGuard } from '@common/guards'
-import { CallService } from '@modules/calls/calls.service'
-import { Call } from '@modules/calls/entities'
 import { Logger, UseFilters, UseGuards } from '@nestjs/common'
 import {
 	BaseWsExceptionFilter,
@@ -16,13 +12,21 @@ import {
 } from '@nestjs/websockets'
 import { Server, Socket } from 'socket.io'
 
+import { WsEvents } from '@common/domain/enums'
+import { WsAuthGuard } from '@common/guards'
+
+import { CallService } from '@modules/calls/calls.service'
+import { Call } from '@modules/calls/entities'
+
 @UseFilters(new BaseWsExceptionFilter())
 @WebSocketGateway({ namespace: 'videocall', cors: true })
 export class VideoCallGateway
 	implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
 	@WebSocketServer() server!: Server
+
 	private logger: Logger = new Logger('VideoCallGateway')
+
 	public rooms: Record<string, Array<{ socketId: string; userId: string }>> = {}
 
 	public socketToRoom: Record<
@@ -52,7 +56,7 @@ export class VideoCallGateway
 
 	@SubscribeMessage(WsEvents.JOIN_CALL)
 	@UseGuards(WsAuthGuard)
-	async join(@MessageBody() roomId: string, @ConnectedSocket() client: Socket) {
+	join(@MessageBody() roomId: string, @ConnectedSocket() client: Socket) {
 		this.logger.log(roomId, 'Joining room')
 
 		this.logger.log('Adding socket to room or creating one')
@@ -112,7 +116,7 @@ export class VideoCallGateway
 
 	@SubscribeMessage(WsEvents.SEND_SIGNAL)
 	@UseGuards(WsAuthGuard)
-	async sendSignal(
+	sendSignal(
 		@MessageBody()
 		payload: {
 			userToSignal: string
@@ -135,7 +139,7 @@ export class VideoCallGateway
 
 	@SubscribeMessage(WsEvents.RETURN_SIGNAL)
 	@UseGuards(WsAuthGuard)
-	async returnSignal(
+	returnSignal(
 		@MessageBody()
 		payload: {
 			signal: any
